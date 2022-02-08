@@ -1,0 +1,17 @@
+requirements.txt are the required libraries that docker will have to import
+
+Build the docker image in the Dockerfile using:    docker build -t spotifinders .
+
+
+
+How to Read the Docker Compose File
+2 services: web and redis.
+The web service builds from the Dockerfile in the current directory…
+Forwards the container’s exposed port (5000) to port 5000 on the host…
+Mounts the project directory on the host to /code inside the container (allowing you to modify the code without having to rebuild the image)…
+And links the web service to the Redis service.
+The redis service uses the latest Redis image from Docker Hub.
+
+
+run the docker compose application:    docker-compose up -directory
+stopping it: docker-compose stop
