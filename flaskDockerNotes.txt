@@ -13,5 +13,5 @@ And links the web service to the Redis service.
 The redis service uses the latest Redis image from Docker Hub.
 
 
-run the docker compose application:    docker-compose up -directory
+run the docker compose application:    docker-compose up -d
 stopping it: docker-compose stop
