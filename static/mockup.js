@@ -9,7 +9,7 @@ recognition.onstart = function() {
     //console.log("We are listening. Try speaking into the microphone.");
 };
 socket.addEventListener('message', ev => {
-  console.log('<<< ' + ev.data, 'ass');
+  console.log('<<< ' + ev.data);
 });
 
 recognition.onspeechend = function() {
