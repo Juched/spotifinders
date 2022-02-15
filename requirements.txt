@@ -1,2 +1,4 @@
 flask
 redis
+flask-sock
+gunicorn
