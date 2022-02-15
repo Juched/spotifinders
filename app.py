@@ -54,7 +54,12 @@ def log():
 
     # Step 4. Signed in, display data
     spotify = spotipy.Spotify(auth_manager=auth_manager)
-    return render_template("loggedin.html")
+
+    u_data = spotify.me()
+
+    prof_pic_url = u_data['images'][0]['url']
+
+    return render_template("loggedin.html",purl=prof_pic_url, pname=u_data['display_name'])
 
 
 
