@@ -1,19 +1,21 @@
 # compose_flask/app.py
-from flask import Flask
-from redis import Redis
+from flask import Flask, render_template
+
+from flask_sock import Sock
 
 app = Flask(__name__)
-redis = Redis(host='redis', port=6379)
+sock = Sock(app)
 
 @app.route('/')
-def hello():
-    redis.incr('hits')
-    return f"This Compose/Flask demo has been viewed {int(redis.get('hits'))} time(s)."
+def index():
+    return render_template('index.html')
 
-@app.route('/test')
-def testing():
-    e = redis.client_getname()
-    return "hillo" + str(e)
+
+@sock.route('/echo')
+def echo(sock):
+    while True:
+        data = sock.receive()
+        sock.send(data)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
