@@ -1,4 +1,6 @@
 flask
+Flask-Session
 redis
 flask-sock
 gunicorn
+spotipy
