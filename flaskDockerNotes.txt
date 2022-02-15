@@ -1,6 +1,7 @@
 requirements.txt are the required libraries that docker will have to import
 
-Build the docker image in the Dockerfile using:    docker build -t spotifinders .
+Build the docker image in the Dockerfile using:    
+sudo docker build -t spotifinders .
 
 
 
@@ -13,5 +14,7 @@ And links the web service to the Redis service.
 The redis service uses the latest Redis image from Docker Hub.
 
 
-run the docker compose application:    docker-compose up -d
+run the docker compose application:    
+sudo docker-compose up -d
+
 stopping it: docker-compose stop
