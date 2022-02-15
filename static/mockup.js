@@ -1,13 +1,16 @@
 var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 var recognition = new SpeechRecognition();
-recognition.continuous = true;
-recognition.interimResults = true;
 recognition.addEventListener('end', () => recognition.start())
 // This runs when the speech recognition service starts
-console.log(recognition)
+
+const socket = new WebSocket('ws://' + location.host + '/echo');
+
 recognition.onstart = function() {
     //console.log("We are listening. Try speaking into the microphone.");
 };
+socket.addEventListener('message', ev => {
+  console.log('<<< ' + ev.data, 'ass');
+});
 
 recognition.onspeechend = function() {
     // when user is done speaking
@@ -16,11 +19,14 @@ recognition.onspeechend = function() {
 }
               
 // This runs when the speech recognition service returns result
+var that = this;
 recognition.onresult = function(event) {
     var transcript = event.results[0][0].transcript;
     var confidence = event.results[0][0].confidence;
     console.log(transcript)
     console.log(confidence)
+    socket.send(transcript)
+    
 };
 
 //console.log("did this even start")
