@@ -2,6 +2,7 @@ requirements.txt are the required libraries that docker will have to import
 
 Build the docker image in the Dockerfile using:    
 sudo docker build -t spotifinders .
+sudo docker-compose build
 
 
 
