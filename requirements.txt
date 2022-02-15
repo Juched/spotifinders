@@ -1,3 +1,5 @@
 flask
 redis
 spotipy
+flask-sock
+gunicorn
