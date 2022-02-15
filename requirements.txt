@@ -1,4 +1,5 @@
 flask
+Flask-Session
 redis
 spotipy
 flask-sock
