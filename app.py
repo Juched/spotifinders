@@ -27,6 +27,7 @@ def session_cache_path():
     return caches_folder + session.get('uuid')
 
 
+USERDICT = {}
 
 # @app.route('/')
 # def index():
@@ -56,6 +57,8 @@ def log():
 
     # Step 4. Signed in, display data
     spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+    USERDICT[session['uuid']] = spotify
     return render_template("loggedin.html")
 
 
@@ -67,8 +70,15 @@ def echo(sock):
         sock.send(data)
 
 
-@app.route('/player')
-def player():
+def player(audioFeatures):
+    # get black box list of audio features :)
+    # danceability, valence, energy dictionary
+    localSP  = USERDICT[session['uuid']] 
+    songs = localSP.recommendations(seed_genres='rock,pop,alternative,indie,rap', # just geneal stuff for now
+        target_danceability=audioFeatures['danceability'], target_energy=audioFeatures['energy'], 
+        target_valence=audioFeatures['valence'])
+    localSP.add_to_queue(songs[0])
+    localSP.start_playback()
     return f""
 
 
