@@ -90,6 +90,9 @@ def echo(sock):
 def player(audioFeatures):
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
+    print(session.get('uuid'))
+    print(CURRENT_TIME[session['uuid']])
+    print(USERDICT[session['uuid']])
     prev_time = CURRENT_TIME[session['uuid']]
     CURRENT_TIME[session['uuid']] = time.perf_counter()
 
@@ -100,13 +103,24 @@ def player(audioFeatures):
             target_danceability=audioFeatures['danceability'], target_energy=audioFeatures['energy'], 
             target_valence=audioFeatures['valence'])
         # adds new suggest song to queue
-        localSP.add_to_queue(songs[0])
-        if localSP.currently_playing() != None: # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
-            localSP.next_track()
-        else:
-            localSP.start_playback()
+        print(songs[0])
+        # localSP.add_to_queue(songs[0])
+        # if localSP.currently_playing() != None: # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
+        #     localSP.next_track()
+        # else:
+        #     localSP.start_playback()
 
     return
+
+
+@app.route('/testplayer')
+def test():
+    audioFeatures = {}
+    audioFeatures['danceability'] = .88
+    audioFeatures['energy'] = .9
+    audioFeatures['valence'] = .2
+
+    player(audioFeatures)
 
 @app.route('/sign_out')
 def sign_out():
