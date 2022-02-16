@@ -1,5 +1,4 @@
 # compose_flask/app.py
-from asyncio.windows_events import NULL
 from flask import Flask, render_template, session, request, redirect
 from flask_sock import Sock
 import spotipy
@@ -21,6 +20,7 @@ Session(app)
 SPOTIPY_CLIENT_ID = os.environ['SPOTIPY_CLIENT_ID']
 SPOTIPY_CLIENT_SECRET = os.environ['SPOTIPY_CLIENT_SECRET']
 SPOTIPY_REDIRECT_URI = os.environ['SPOTIPY_REDIRECT_URI']
+# print(SPOTIPY_REDIRECT_URI)
 
 caches_folder = './.spotify_caches/'
 if not os.path.exists(caches_folder):
@@ -59,6 +59,7 @@ def log():
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         # Step 2. Display sign in link when no token
         auth_url = auth_manager.get_authorize_url()
+        # print(auth_url)
         return render_template("index.html", auth_url=auth_url)
         #return f'<h2><a href="{auth_url}">Sign in</a></h2>'
 
