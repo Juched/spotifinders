@@ -69,5 +69,15 @@ def echo(sock):
         data = sock.receive()
         sock.send(data)
 
+@app.route('/sign_out')
+def sign_out():
+    try:
+        # Remove the CACHE file (.cache-test) so that a new user can authorize.
+        os.remove(session_cache_path())
+        session.clear()
+    except OSError as e:
+        print ("Error: %s - %s." % (e.filename, e.strerror))
+    return redirect('/')
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
