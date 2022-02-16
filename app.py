@@ -1,10 +1,12 @@
 # compose_flask/app.py
-from flask import Flask, render_template, session, request, redirect
-from flask_sock import Sock
-from flask_session import Session
-import spotipy
-import uuid
 import os
+import uuid
+
+import spotipy
+from flask import Flask, redirect, render_template, request, session
+from flask_session import Session
+from flask_sock import Sock
+
 app = Flask(__name__)
 sock = Sock(app)
 
