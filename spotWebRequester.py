@@ -9,3 +9,6 @@ def requestSong():
     # results = sp.search(q='artist:' + name, type='artist')
     # items = results['artists']['items']
     # sp.recommendations(seed_genres=recommendation_genre_seeds())
+    # q=name:abacab&type=album,track where q is the query and type is the thing with that name, returns list of album or tracks in this case with name q
+
+    
