@@ -1,13 +1,15 @@
 # compose_flask/app.py
 from flask import Flask, render_template, session, request, redirect
-from flask_sock import Sock
-import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from flask_session import Session
-import uuid
-import os
+
 import time
+import os
+import uuid
+
+import spotipy
+from flask_session import Session
+from flask_sock import Sock
 
 app = Flask(__name__)
 sock = Sock(app)
@@ -47,7 +49,7 @@ def log():
         session['uuid'] = str(uuid.uuid4())
 
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
-    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-read-currently-playing playlist-modify-private',
+    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-library-read playlist-read-private user-top-read user-read-currently-playing streaming',
                                                 cache_handler=cache_handler, 
                                                 show_dialog=True)
 
@@ -69,7 +71,12 @@ def log():
     USERDICT[session['uuid']] = spotify
     # curernt time set to 0 until the player starts to play
     CURRENT_TIME[session['uuid']] = 0
-    return render_template("loggedin.html")
+    
+    u_data = spotify.me()
+
+    prof_pic_url = u_data['images'][0]['url']
+
+    return render_template("loggedin.html",purl=prof_pic_url, pname=u_data['display_name'])
 
 
 
@@ -101,6 +108,16 @@ def player(audioFeatures):
 
     return
 
+@app.route('/sign_out')
+def sign_out():
+    try:
+        # Remove the CACHE file (.cache-test) so that a new user can authorize.
+        os.remove(session_cache_path())
+        session.clear()
+        print('User ')
+    except OSError as e:
+        print ("Error: %s - %s." % (e.filename, e.strerror))
+    return redirect('/')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
