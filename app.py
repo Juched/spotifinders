@@ -1,4 +1,5 @@
 # compose_flask/app.py
+from asyncio.windows_events import NULL
 from flask import Flask, render_template, session, request, redirect
 from flask_sock import Sock
 import spotipy
@@ -7,6 +8,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from flask_session import Session
 import uuid
 import os
+import time
+
 app = Flask(__name__)
 sock = Sock(app)
 
@@ -28,6 +31,10 @@ def session_cache_path():
 
 
 USERDICT = {}
+# curernt time set to 0 for a session until the player starts to play
+CURRENT_TIME = {}
+# update the song playing every 15 seconds
+UPDATE_SONG_TIME_SECONDS = 15
 
 # @app.route('/')
 # def index():
@@ -59,6 +66,8 @@ def log():
     spotify = spotipy.Spotify(auth_manager=auth_manager)
 
     USERDICT[session['uuid']] = spotify
+    # curernt time set to 0 until the player starts to play
+    CURRENT_TIME[session['uuid']] = 0
     return render_template("loggedin.html")
 
 
@@ -73,13 +82,23 @@ def echo(sock):
 def player(audioFeatures):
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
-    localSP  = USERDICT[session['uuid']] 
-    songs = localSP.recommendations(seed_genres='rock,pop,alternative,indie,rap', # just geneal stuff for now
-        target_danceability=audioFeatures['danceability'], target_energy=audioFeatures['energy'], 
-        target_valence=audioFeatures['valence'])
-    localSP.add_to_queue(songs[0])
-    localSP.start_playback()
-    return f""
+    prev_time = CURRENT_TIME[session['uuid']]
+    CURRENT_TIME[session['uuid']] = time.perf_counter()
+
+    # play a new song if the timer allows it
+    if CURRENT_TIME[session['uuid']] - prev_time >=  UPDATE_SONG_TIME_SECONDS:
+        localSP  = USERDICT[session['uuid']] 
+        songs = localSP.recommendations(seed_genres='rock,pop,alternative,indie,rap', # just general stuff for now
+            target_danceability=audioFeatures['danceability'], target_energy=audioFeatures['energy'], 
+            target_valence=audioFeatures['valence'])
+        # adds new suggest song to queue
+        localSP.add_to_queue(songs[0])
+        if localSP.currently_playing() != None: # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
+            localSP.next_track()
+        else:
+            localSP.start_playback()
+
+    return
 
 
 if __name__ == "__main__":
