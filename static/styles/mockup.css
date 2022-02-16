@@ -5,6 +5,12 @@ body {
     background: black;
   }
   
+  .profile-container {
+    position: absolute;
+    top: 8%;
+    left: 84%;
+  }
+
   .container {
     display: flex;
     justify-content: center;
@@ -28,14 +34,12 @@ body {
 
   .spotbutt {
     background-color: #1ED760;
-    position: absolute;
     border-radius: 500px;
     padding: 14px 32px;
-    top: 8%;
-    left: 84%;
     border-color: transparent;
     font-size : 20px;
   }
+
 
   .dropdown {
     background-color: #1ED760;
@@ -84,4 +88,17 @@ body {
     font-size:1.2em;
     font-weight:bold;
     text-decoration:none;
+  }
+
+  .profile-dropdown-content {
+    display: none;
+    position: relative;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+  }
+  .profile-dropdown:hover .profile-dropdown-content {
+    display: block;
   }
