@@ -10,7 +10,8 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         <!-- Our js and stylesheet-->
         
-        <link rel="stylesheet" href="mockup.css">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mockup.css') }}">
+
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"/>
@@ -28,8 +29,11 @@
             </div>
         </div>
         
-        <div>         
-            <button class="spotbutt"><img width="42" height="42" src="trollface.png" alt="me"> &nbsp Troll</button> 
+        <div class="profile-dropdown profile-container">         
+            <button class="spotbutt" id="pDropdown"><img width="42" height="42" src="{{ purl }}" alt="me"> &nbsp {{ pname }} </button>
+            <div class="profile-dropdown-content">
+                <a href="/sign_out">Sign Out</a>
+            </div>
         </div>
 
         <div class="dropdown">
@@ -42,7 +46,9 @@
               <button class="dropdown-item" href="#">Mad</button>
             </div>
         </div>
+
           
     </body>
-    <script src="mockup.js"></script>
+    <script src="{{url_for('static', filename='mockup.js')}}"></script>
+
 </html>
