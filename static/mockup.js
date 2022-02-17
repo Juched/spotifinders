@@ -23,6 +23,15 @@ var that = this;
 recognition.onresult = function(event) {
     var transcript = event.results[0][0].transcript;
     var confidence = event.results[0][0].confidence;
+    var x = document.getElementById("snackbar");
+    x.innerHTML = transcript;
+
+    // Add the "show" class to DIV
+    x.className = "show";
+
+    // After 3 seconds, remove the show class from DIV
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
+
     console.log(transcript)
     console.log(confidence)
     socket.send(transcript)
