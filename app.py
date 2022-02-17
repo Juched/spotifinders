@@ -87,7 +87,8 @@ def echo(sock):
         data = sock.receive()
         feature_dict = model.get_vector(data)
         player(feature_dict)
-        sock.send(data)
+        print(feature_dict)
+        sock.send(feature_dict)
 
 
 def player(audioFeatures):
@@ -176,7 +177,7 @@ def start_playing():
     # track = spotify.current_user_playing_track()
     spotify.start_playback(uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7'])
 
-    # return redirect('/')
+    return "Playing"
 
 
 if __name__ == "__main__":
