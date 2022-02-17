@@ -22,7 +22,6 @@ Session(app)
 SPOTIPY_CLIENT_ID = os.environ['SPOTIPY_CLIENT_ID']
 SPOTIPY_CLIENT_SECRET = os.environ['SPOTIPY_CLIENT_SECRET']
 SPOTIPY_REDIRECT_URI = os.environ['SPOTIPY_REDIRECT_URI']
-# print(SPOTIPY_REDIRECT_URI)
 
 caches_folder = './.spotify_caches/'
 if not os.path.exists(caches_folder):
@@ -58,7 +57,6 @@ def log():
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         # Step 2. Display sign in link when no token
         auth_url = auth_manager.get_authorize_url()
-        # print(auth_url)
         return render_template("index.html", auth_url=auth_url)
         #return f'<h2><a href="{auth_url}">Sign in</a></h2>'
 
@@ -84,36 +82,41 @@ def echo(sock):
 def player(audioFeatures):
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
-    
-    # standard
-    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
-    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
-    if not auth_manager.validate_token(cache_handler.get_cached_token()):
-        return redirect('/')
-
-    localSP = spotipy.Spotify(auth_manager=auth_manager)
-    # return spotify.current_user_playlists()
-
-    # 
-    thing = localSP.current_playback()
-
-    # play a new song if the timer allows it
-    if localSP.current_playback() == None or localSP.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS:
-        songs = localSP.recommendations(seed_genres= ['rock', 'pop', 'alternative', 'indie', 'rap'], #localSP.recommendation_genre_seeds(),  #'alternative', #, pop, alternative, indie', # just general stuff for now
-            target_danceability=audioFeatures['danceability'], 
-            target_energy=audioFeatures['energy'], 
-            target_valence=audioFeatures['valence']
-            )
-
-
+    thing = ''
+    try:
         
-        # adds new suggest song to queue
-        thing = songs['tracks'][0]['id']
-        localSP.add_to_queue(thing)
-        if localSP.current_playback() != None: #currently_playing() != None: # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
-            localSP.next_track()
-        else:
-            localSP.start_playback()
+        # standard
+        cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+        auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+        if not auth_manager.validate_token(cache_handler.get_cached_token()):
+            return redirect('/')
+
+        localSP = spotipy.Spotify(auth_manager=auth_manager)
+        # return spotify.current_user_playlists()
+
+        # 
+        thing = localSP.current_playback()
+
+        # play a new song if the timer allows it
+        if localSP.current_playback() == None or localSP.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS:
+            songs = localSP.recommendations(seed_genres= ['rock', 'pop', 'alternative', 'indie', 'rap'], #localSP.recommendation_genre_seeds(),  #'alternative', #, pop, alternative, indie', # just general stuff for now
+                target_danceability=audioFeatures['danceability'], 
+                target_energy=audioFeatures['energy'], 
+                target_valence=audioFeatures['valence']
+                )
+
+
+            
+            # adds new suggest song to queue
+            thing = songs['tracks'][0]['id']
+            localSP.add_to_queue(thing)
+            if localSP.current_playback() != None: #currently_playing() != None: # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
+                localSP.next_track()
+            else:
+                localSP.start_playback()
+
+    except Exception as e:
+        print (f"Error: {e}")
 
     return thing
 
@@ -133,10 +136,9 @@ def test():
 def sign_out():
     try:
         # Remove the CACHE file (.cache-test) so that a new user can authorize.
-        print(session) # probably want to remove their entry from the dictionary too
+        # probably want to remove their entry from the dictionary too
         os.remove(session_cache_path())
         session.clear()
-        print('User ')
     except OSError as e:
         print ("Error: %s - %s." % (e.filename, e.strerror))
     return redirect('/')
