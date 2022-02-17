@@ -1,6 +1,6 @@
 flask
 Flask-Session
 redis
+spotipy
 flask-sock
 gunicorn
-spotipy
