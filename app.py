@@ -32,9 +32,6 @@ def session_cache_path():
     return caches_folder + session.get('uuid')
 
 
-USERDICT = {}
-# curernt time set to 0 for a session until the player starts to play
-CURRENT_TIME = {}
 # update the song playing every 15 seconds
 UPDATE_SONG_TIME_MS = 15 * 1000
 
@@ -44,7 +41,6 @@ UPDATE_SONG_TIME_MS = 15 * 1000
 
 @app.route('/')
 def log():
-    print('WE ARE HERE')
     if not session.get('uuid'):
         # Step 1. Visitor is unknown, give random ID
         session['uuid'] = str(uuid.uuid4())
@@ -69,13 +65,6 @@ def log():
     # Step 4. Signed in, display data
     spotify = spotipy.Spotify(auth_manager=auth_manager)
 
-    USERDICT[session.get('uuid')] = spotify
-    # curernt time set to 0 until the player starts to play
-    CURRENT_TIME[session.get('uuid')] = 0
-
-    # print('userDict:', USERDICT)
-    # print('curr time', CURRENT_TIME)
-
     
     u_data = spotify.me()
 
@@ -84,7 +73,7 @@ def log():
     return render_template("loggedin.html",purl=prof_pic_url, pname=u_data['display_name'])
 
 
-
+# called once for each thread
 @sock.route('/echo')
 def echo(sock):
     while True:
@@ -105,16 +94,11 @@ def player(audioFeatures):
     localSP = spotipy.Spotify(auth_manager=auth_manager)
     # return spotify.current_user_playlists()
 
-    # prev_time = CURRENT_TIME[session]
-    # CURRENT_TIME[session] = time.perf_counter()
-
+    # 
     thing = localSP.current_playback()
-    print(thing)
 
     # play a new song if the timer allows it
-    # if CURRENT_TIME[session.get('uuid')] - prev_time >=  UPDATE_SONG_TIME_SECONDS:
     if localSP.current_playback() == None or localSP.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS:
-        # localSP  = USERDICT[session.get('uuid')] 
         songs = localSP.recommendations(seed_genres= ['rock', 'pop', 'alternative', 'indie', 'rap'], #localSP.recommendation_genre_seeds(),  #'alternative', #, pop, alternative, indie', # just general stuff for now
             target_danceability=audioFeatures['danceability'], 
             target_energy=audioFeatures['energy'], 
@@ -122,13 +106,9 @@ def player(audioFeatures):
             )
 
 
-        # headers = {
-        #     'Authorization': 'Bearer {token}'.format(token=access_token)
-        # }
+        
         # adds new suggest song to queue
         thing = songs['tracks'][0]['id']
-        print(songs['tracks'][0]['id'])
-        print('WE MAKEIT HERE')
         localSP.add_to_queue(thing)
         if localSP.current_playback() != None: #currently_playing() != None: # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
             localSP.next_track()
