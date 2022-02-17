@@ -44,7 +44,6 @@ UPDATE_SONG_TIME_MS = 15 * 1000
 
 @app.route('/')
 def log():
-    print('WE ARE HERE')
     if not session.get('uuid'):
         # Step 1. Visitor is unknown, give random ID
         session['uuid'] = str(uuid.uuid4())
