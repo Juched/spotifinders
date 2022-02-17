@@ -24,7 +24,6 @@ Session(app)
 SPOTIPY_CLIENT_ID = os.environ['SPOTIPY_CLIENT_ID']
 SPOTIPY_CLIENT_SECRET = os.environ['SPOTIPY_CLIENT_SECRET']
 SPOTIPY_REDIRECT_URI = os.environ['SPOTIPY_REDIRECT_URI']
-# print(SPOTIPY_REDIRECT_URI)
 
 caches_folder = './.spotify_caches/'
 if not os.path.exists(caches_folder):
@@ -63,7 +62,6 @@ def log():
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         # Step 2. Display sign in link when no token
         auth_url = auth_manager.get_authorize_url()
-        # print(auth_url)
         return render_template("index.html", auth_url=auth_url)
         #return f'<h2><a href="{auth_url}">Sign in</a></h2>'
 
@@ -74,10 +72,6 @@ def log():
     # curernt time set to 0 until the player starts to play
     CURRENT_TIME[session.get('uuid')] = 0
 
-    # print('userDict:', USERDICT)
-    # print('curr time', CURRENT_TIME)
-
-    
     u_data = spotify.me()
 
     prof_pic_url = u_data['images'][0]['url']
@@ -113,7 +107,6 @@ def player(audioFeatures):
     # CURRENT_TIME[session] = time.perf_counter()
 
     thing = localSP.current_playback()
-    print(thing)
 
     # play a new song if the timer allows it
     # if CURRENT_TIME[session.get('uuid')] - prev_time >=  UPDATE_SONG_TIME_SECONDS:
@@ -131,8 +124,6 @@ def player(audioFeatures):
         # }
         # adds new suggest song to queue
         thing = songs['tracks'][0]['id']
-        print(songs['tracks'][0]['id'])
-        print('WE MAKEIT HERE')
         localSP.add_to_queue(thing)
         if localSP.current_playback() != None: #currently_playing() != None: # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
             localSP.next_track()
@@ -157,10 +148,8 @@ def test():
 def sign_out():
     try:
         # Remove the CACHE file (.cache-test) so that a new user can authorize.
-        print(session) # probably want to remove their entry from the dictionary too
         os.remove(session_cache_path())
         session.clear()
-        print('User ')
     except OSError as e:
         print ("Error: %s - %s." % (e.filename, e.strerror))
     return redirect('/')
