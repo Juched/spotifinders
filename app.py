@@ -11,6 +11,8 @@ import spotipy
 from flask_session import Session
 from flask_sock import Sock
 
+from nlp_model import SpotifinderModel
+
 app = Flask(__name__)
 sock = Sock(app)
 
@@ -74,8 +76,11 @@ def log():
 # called once for each thread
 @sock.route('/echo')
 def echo(sock):
+    model = SpotifinderModel()
     while True:
         data = sock.receive()
+        feature_dict = model.get_vector(data)
+        player(feature_dict)
         sock.send(data)
 
 
