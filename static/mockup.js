@@ -3,7 +3,13 @@ var recognition = new SpeechRecognition();
 recognition.addEventListener('end', () => recognition.start())
 // This runs when the speech recognition service starts
 
-const socket = new WebSocket('ws://' + location.host + '/echo');
+if (window.location.protocol == "https:") {
+  var ws_scheme = "wss://";
+} else {
+  var ws_scheme = "ws://"
+};
+
+const socket = new WebSocket(ws_scheme + location.host + '/echo');
 
 recognition.onstart = function() {
     //console.log("We are listening. Try speaking into the microphone.");
