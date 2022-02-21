@@ -10,6 +10,7 @@ import uuid
 import spotipy
 from flask_session import Session
 from flask_sock import Sock
+from flask_bower import Bower
 
 from nlp_model import SpotifinderModel
 
@@ -20,6 +21,7 @@ app.config['SECRET_KEY'] = os.urandom(64)
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_FILE_DIR'] = './.flask_session/'
 Session(app)
+Bower(app)
 
 SPOTIPY_CLIENT_ID = os.environ['SPOTIPY_CLIENT_ID']
 SPOTIPY_CLIENT_SECRET = os.environ['SPOTIPY_CLIENT_SECRET']

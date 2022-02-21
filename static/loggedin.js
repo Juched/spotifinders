@@ -5,6 +5,8 @@ if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
   // Do Firefox-related activities
 }
 
+var julius = new Julius();
+
 recognition.addEventListener('end', () => recognition.start())
 // This runs when the speech recognition service starts
 
