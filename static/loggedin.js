@@ -1,6 +1,10 @@
-var SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
-
+var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 var recognition = new SpeechRecognition();
+
+if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
+  // Do Firefox-related activities
+}
+
 recognition.addEventListener('end', () => recognition.start())
 // This runs when the speech recognition service starts
 
