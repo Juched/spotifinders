@@ -44,6 +44,15 @@ UPDATE_SONG_TIME_MS = 15 * 1000
 # def index():
 #     return render_template('index.html')
 
+@app.before_request
+def before_request():
+    if 'localhost' not in SPOTIPY_REDIRECT_URI :
+        if not request.is_secure:
+            url = request.url.replace('http://', 'https://', 1)
+            code = 301
+            return redirect(url, code=code)
+
+
 @app.route('/')
 def log():
     print('WE ARE HERE')
