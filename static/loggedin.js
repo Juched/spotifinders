@@ -31,6 +31,10 @@ recognition.onspeechend = function() {
     //recognition.start()
 }
               
+julius.onrecognition = function(sentence) {
+  console.log(sentence);
+};
+
 // This runs when the speech recognition service returns result
 var that = this;
 recognition.onresult = function(event) {
