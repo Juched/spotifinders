@@ -1,7 +1,6 @@
-var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
-var SpeechRecognitionEvent = SpeechRecognitionEvent || webkitSpeechRecognitionEvent
+var SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
 
+var recognition = new SpeechRecognition();
 recognition.addEventListener('end', () => recognition.start())
 // This runs when the speech recognition service starts
 
