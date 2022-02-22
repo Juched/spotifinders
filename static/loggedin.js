@@ -1,43 +1,48 @@
 
 
-if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-  var julius = new Julius();
-}else{
-  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  var recognition = new SpeechRecognition();
+// if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
+//   var julius = new Julius();
+// }else{
+var SpeechRecognition = window.webkitSpeechRecognition ||
+                        window.mozSpeechRecognition ||
+                        window.msSpeechRecognition ||
+                        window.oSpeechRecognition ||
+                        window.SpeechRecognition;
 
-  recognition.addEventListener('end', () => recognition.start())
-  recognition.onstart = function() {
-    //console.log("We are listening. Try speaking into the microphone.");
-  };
+var recognition = new SpeechRecognition();
 
-  recognition.onspeechend = function() {
-    // when user is done speaking
-    //recognition.stop();
-    //recognition.start()
-  }
+recognition.addEventListener('end', () => recognition.start())
+recognition.onstart = function() {
+  //console.log("We are listening. Try speaking into the microphone.");
+};
 
-  var that = this;
-  recognition.onresult = function(event) {
-      var transcript = event.results[0][0].transcript;
-      var confidence = event.results[0][0].confidence;
-      var x = document.getElementById("snackbar");
-      x.innerHTML = transcript;
-
-      // Add the "show" class to DIV
-      x.className = "show";
-
-      // After 3 seconds, remove the show class from DIV
-      setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
-
-      console.log(transcript)
-      console.log(confidence)
-      socket.send(transcript)
-      
-  };
-  recognition.start();
-         
+recognition.onspeechend = function() {
+  // when user is done speaking
+  //recognition.stop();
+  //recognition.start()
 }
+
+var that = this;
+recognition.onresult = function(event) {
+    var transcript = event.results[0][0].transcript;
+    var confidence = event.results[0][0].confidence;
+    var x = document.getElementById("snackbar");
+    x.innerHTML = transcript;
+
+    // Add the "show" class to DIV
+    x.className = "show";
+
+    // After 3 seconds, remove the show class from DIV
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
+
+    console.log(transcript)
+    console.log(confidence)
+    socket.send(transcript)
+    
+};
+recognition.start();
+         
+//}
 
 
 
@@ -58,9 +63,9 @@ socket.addEventListener('message', ev => {
 });
 
    
-julius.onrecognition = function(sentence) {
-  console.log(sentence);
-};
+// julius.onrecognition = function(sentence) {
+//   console.log(sentence);
+// };
 
 // This runs when the speech recognition service returns result
 
