@@ -137,12 +137,23 @@ def spotifyWebPlayer(sock):
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         return redirect('/')
     
-    print('Obtaining access token for web player')
+    # print('Obtaining access token for web player')
     token = auth_manager.get_access_token()
-    print(f'Token obtained: {token}')
+    # print(f'Token obtained: {token}')
 
     sock.send(token['access_token'])
-    sock.close()
+    # sock.close()
+
+@sock.route('/deviceID')
+def deviceListener(sock):
+    device_id = sock.receive()
+    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+    if not auth_manager.validate_token(cache_handler.get_cached_token()):
+        return redirect('/')
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+    
+    spotify.start_playback(device_id=device_id, uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']) #Ideally, we start playing a song depending on what they want
 
 
 
