@@ -62,7 +62,6 @@ socket.addEventListener('message', ev => {
   console.log('<<< ' + ev.data);
 });
 
-   
 // julius.onrecognition = function(sentence) {
 //   console.log(sentence);
 // };
