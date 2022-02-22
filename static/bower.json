@@ -1,0 +1,22 @@
+{
+  "name": "spotifinders",
+  "description": "An app which  listens to your conversations and suggests music",
+  "main": "index.js",
+  "authors": [
+    "Juched <prth.2000@gmail.com>"
+  ],
+  "license": "mit",
+  "homepage": "https://github.com/Juched/spotifinders",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "juliusjs": "^0.0.0-pre",
+    "jquery": "^3.6.0"
+  }
+}
