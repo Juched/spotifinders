@@ -1,13 +1,47 @@
-var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-var recognition = new SpeechRecognition();
+
 
 if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-  // Do Firefox-related activities
+  var julius = new Julius();
+}else{
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var recognition = new SpeechRecognition();
+
+  recognition.addEventListener('end', () => recognition.start())
+  recognition.onstart = function() {
+    //console.log("We are listening. Try speaking into the microphone.");
+  };
+
+  recognition.onspeechend = function() {
+    // when user is done speaking
+    //recognition.stop();
+    //recognition.start()
+  }
+
+  var that = this;
+  recognition.onresult = function(event) {
+      var transcript = event.results[0][0].transcript;
+      var confidence = event.results[0][0].confidence;
+      var x = document.getElementById("snackbar");
+      x.innerHTML = transcript;
+
+      // Add the "show" class to DIV
+      x.className = "show";
+
+      // After 3 seconds, remove the show class from DIV
+      setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
+
+      console.log(transcript)
+      console.log(confidence)
+      socket.send(transcript)
+      
+  };
+  recognition.start();
+         
 }
 
-var julius = new Julius();
 
-recognition.addEventListener('end', () => recognition.start())
+
+
 // This runs when the speech recognition service starts
 
 if (window.location.protocol == "https:") {
@@ -18,46 +52,22 @@ if (window.location.protocol == "https:") {
 
 const socket = new WebSocket(ws_scheme + location.host + '/echo');
 
-recognition.onstart = function() {
-    //console.log("We are listening. Try speaking into the microphone.");
-};
+
 socket.addEventListener('message', ev => {
   console.log('<<< ' + ev.data);
 });
 
-recognition.onspeechend = function() {
-    // when user is done speaking
-    //recognition.stop();
-    //recognition.start()
-}
-              
+   
 julius.onrecognition = function(sentence) {
   console.log(sentence);
 };
 
 // This runs when the speech recognition service returns result
-var that = this;
-recognition.onresult = function(event) {
-    var transcript = event.results[0][0].transcript;
-    var confidence = event.results[0][0].confidence;
-    var x = document.getElementById("snackbar");
-    x.innerHTML = transcript;
 
-    // Add the "show" class to DIV
-    x.className = "show";
-
-    // After 3 seconds, remove the show class from DIV
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
-
-    console.log(transcript)
-    console.log(confidence)
-    socket.send(transcript)
-    
-};
 
 //console.log("did this even start")
 // start recognition
-recognition.start();
+
 
 var canvas = document.createElement("canvas");
 var width = canvas.width = window.innerWidth * 0.75;
