@@ -1,47 +1,3 @@
-var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-var recognition = new SpeechRecognition();
-recognition.addEventListener('end', () => recognition.start())
-// This runs when the speech recognition service starts
-
-const socket = new WebSocket('ws://' + location.host + '/echo');
-
-recognition.onstart = function() {
-    //console.log("We are listening. Try speaking into the microphone.");
-};
-socket.addEventListener('message', ev => {
-  console.log('<<< ' + ev.data);
-});
-
-recognition.onspeechend = function() {
-    // when user is done speaking
-    //recognition.stop();
-    //recognition.start()
-}
-              
-// This runs when the speech recognition service returns result
-var that = this;
-recognition.onresult = function(event) {
-    var transcript = event.results[0][0].transcript;
-    var confidence = event.results[0][0].confidence;
-    var x = document.getElementById("snackbar");
-    x.innerHTML = transcript;
-
-    // Add the "show" class to DIV
-    x.className = "show";
-
-    // After 3 seconds, remove the show class from DIV
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
-
-    console.log(transcript)
-    console.log(confidence)
-    socket.send(transcript)
-    
-};
-
-//console.log("did this even start")
-// start recognition
-recognition.start();
-
 var canvas = document.createElement("canvas");
 var width = canvas.width = window.innerWidth * 0.75;
 var height = canvas.height = window.innerHeight * 0.75;
@@ -195,16 +151,4 @@ function getAttribLocation(program, name) {
 canvas.onmousemove = function(e) {
   mouse.x = e.clientX;
   mouse.y = e.clientY;
-}
-
-
-function toggleMic()
-{
-  document.getElementById("mic_icon").innerHTML = (document.getElementById('mic_icon').innerHTML === "mic_on" ? "mic_off" : "mic_on")
-  if( document.getElementById("mic_icon").innerHTML == "mic_on"){
-    document.getElementById("mic_icon").style.paddingLeft = "35%"
-  } else {
-    document.getElementById("mic_icon").style.paddingLeft = "0%"
-  }
-  
 }
