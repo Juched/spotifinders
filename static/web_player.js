@@ -1,11 +1,9 @@
-// completely untested since I could not get my spotify to load with the app :)
-
-
-
-
 
 
 window.onSpotifyWebPlaybackSDKReady = () => {
+
+
+  
   const token = '';
   const player = new Spotify.Player({
     name: 'Spotifinders Web Player',
