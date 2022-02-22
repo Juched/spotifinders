@@ -40,6 +40,18 @@ UPDATE_SONG_TIME_MS = 15 * 1000
 # def index():
 #     return render_template('index.html')
 
+@app.before_request
+def before_request():
+    if 'localhost' not in SPOTIPY_REDIRECT_URI:
+        scheme = request.headers.get('X-Forwarded-Proto')
+        if scheme and scheme == 'http' and request.url.startswith('http://'):
+            url = request.url.replace('http://', 'https://', 1)
+            code = 301
+            return redirect(url, code=code)
+    else:
+        return 
+
+
 @app.route('/')
 def log():
     if not session.get('uuid'):
