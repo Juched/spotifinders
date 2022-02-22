@@ -50,6 +50,10 @@
     <div id="snackbar">Bottom Text</div>
           
     </body>
-    <script src="{{url_for('static', filename='mockup.js')}}"></script>
+    <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/juliusjs/dist/julius.js') }}"></script>
+    <script src="{{url_for('static', filename='loggedin.js')}}"></script>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script src="spotWebPlayer.js"> </script>
 
 </html>
