@@ -130,20 +130,18 @@ def player(audioFeatures):
     return thing
 
 
+#This websocket is responsible for sending the auth token to the fronend in order to initialize a webplayer. See static/web_player.js
 @sock.route('/webPlayer')
 def spotifyWebPlayer(sock):
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
     auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
-        return redirect('/')
-    
-    # print('Obtaining access token for web player')
+        return redirect('/')    
     token = auth_manager.get_access_token()
-    # print(f'Token obtained: {token}')
-
     sock.send(token['access_token'])
     # sock.close()
 
+#This websocket is used to first switch over Spotify to the Spotifinders Web API Device. This is what "Turns on" Our webplayer
 @sock.route('/deviceID')
 def deviceListener(sock):
     device_id = sock.receive()
