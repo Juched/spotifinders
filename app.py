@@ -47,7 +47,7 @@ def log():
         session['uuid'] = str(uuid.uuid4())
 
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
-    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-library-read playlist-read-private user-top-read user-read-currently-playing user-read-playback-state streaming',
+    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-library-read playlist-read-private user-top-read user-read-currently-playing user-read-playback-state streaming user-modify-playback-state',
                                                 cache_handler=cache_handler, 
                                                 show_dialog=True)
 
@@ -128,6 +128,22 @@ def player(audioFeatures):
         print (f"Error: {e}")
 
     return thing
+
+
+@sock.route('/webPlayer')
+def spotifyWebPlayer(sock):
+    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+    if not auth_manager.validate_token(cache_handler.get_cached_token()):
+        return redirect('/')
+    
+    print('Obtaining access token for web player')
+    token = auth_manager.get_access_token()
+    print(f'Token obtained: {token}')
+
+    sock.send(token['access_token'])
+    sock.close()
+
 
 
 @app.route('/testplayer')
