@@ -6,4 +6,3 @@ flask-sock
 gunicorn
 pandas
 scikit-learn
-flask-bower
