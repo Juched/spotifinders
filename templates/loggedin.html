@@ -32,7 +32,8 @@
         <div class="profile-dropdown profile-container">         
             <button class="spotbutt" id="pDropdown"><img width="42" height="42" src="{{ purl }}" alt="me"> &nbsp {{ pname }} </button>
             <div class="profile-dropdown-content">
-                <a href="/">debug -- additional info</a>
+                <!-- <a href="/">debug -- additional info</a> -->
+                <div><a onclick="debug()">debug -- additional info</a></div>
                 <a href="/sign_out">Sign Out</a>
             </div>
         </div>
@@ -49,6 +50,8 @@
         </div>
 
     <div id="snackbar">Bottom Text</div>
+    <div id="debugIdentifier">DEBUG mode</div>
+    <div id="featureDiv"></div>
           
     </body>
     <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.js') }}"></script>

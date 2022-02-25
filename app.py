@@ -89,11 +89,16 @@ def log():
 @sock.route('/echo')
 def echo(sock):
     model = SpotifinderModel()
+    returnInfo = {}
+    returnInfo["conversation"] = None
     while True:
-        data = sock.receive()
-        feature_dict = model.get_vector(data)
+        data = sock.receive() # transcript
+        feature_dict = model.get_vector(data) 
         player(feature_dict)
-        sock.send(data)
+        returnInfo["text"] = data
+        returnInfo["features"] = feature_dict
+        returnInfo["conversation"] = feature_dict # will update laters
+        sock.send(returnInfo) # sending back 
 
 
 def player(audioFeatures):

@@ -21,19 +21,25 @@ recognition.onspeechend = function() {
   //recognition.stop();
   //recognition.start()
 }
-
+debugMode = false;
+features = {};
+// snackbar!
 var that = this;
 recognition.onresult = function(event) {
     var transcript = event.results[0][0].transcript;
     var confidence = event.results[0][0].confidence;
     var x = document.getElementById("snackbar");
-    x.innerHTML = transcript;
 
+    x.innerHTML = transcript;
+    
     // Add the "show" class to DIV
-    x.className = "show";
+    x.className = (that.debugMode ? "show" : "noshow");
 
     // After 3 seconds, remove the show class from DIV
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
+    setTimeout(function(){ 
+      // x.className = x.className.replace("show", ""); 
+      x.className = "noshow"; 
+    }, 400 * x.innerHTML.split(' ').length);  // .4 seconds for each word
 
     console.log(transcript)
     console.log(confidence)
@@ -59,7 +65,20 @@ const socket = new WebSocket(ws_scheme + location.host + '/echo');
 
 
 socket.addEventListener('message', ev => {
-  console.log('<<< ' + ev.data);
+  try{
+    console.log('<<< ' + ev.data["features"]);
+    // that.features = ev.data["features"];
+    var liveFeatures = document.getElementById("featureDiv");
+    liveFeatures.textContent = "[ "
+    for(const [feature, value] of Object.entries(ev.data["features"]))
+    {
+      liveFeatures.textContent += "["+feature + "=" + value +"]"
+    }
+    liveFeatures.textContent += " ]"
+
+  } catch (e) {
+    console.log(e)
+  }
 });
 
 // julius.onrecognition = function(sentence) {
@@ -238,4 +257,25 @@ function toggleMic()
     document.getElementById("mic_icon").style.paddingLeft = "0%"
   }
   
+}
+
+// TOGGLE
+function debug()
+{
+  // show the text from the nlp model: TOGGLE
+  try{
+    let debugMode = document.getElementById("debugIdentifier").style.visibility == "visible"
+    document.getElementById("debugIdentifier").style.visibility = (debugMode ? "hidden" : "visible")
+
+    // var liveText = document.getElementById("snackbar");
+    document.getElementById("featureDiv").style.visibility = (debugMode ? "hidden" : "visible")
+
+
+  } catch (e) {
+      console.log(e)
+  }
+  // show the audio features
+  // manually adjust audio features? sliders?
+  // queue?
+  // more under the hood stuff?
 }
