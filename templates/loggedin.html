@@ -35,6 +35,13 @@
                 <div><a href="/currently_playing">Whats playing</a></div>
                 <div><a onclick="playSong('/start_playing')">Make a hardcoded specific song play</a></div>
                 <div><a href="#" id="start_device">Start This Device</a></div>
+                <div><a id="resume_song">Resume Song</a></div>
+                <div><a id="activate_element">Activate Player</a></div>
+                <div><a id="skip_track">Skip Track</a></div>
+                <div><a id="curr_state">Console Log Current Player State</a></div>
+
+
+
                 <div><a href="/sign_out">Sign Out</a></div>
             </div>
         </div>
@@ -61,6 +68,5 @@
     <script src="{{ url_for('static', filename='bower_components/juliusjs/dist/julius.js') }}"></script>
     <script src="{{url_for('static', filename='loggedin.js')}}"></script>
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
-    <script src="spotWebPlayer.js"> </script>
 
 </html>
