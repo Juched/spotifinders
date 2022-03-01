@@ -72,7 +72,7 @@ socket.addEventListener('message', ev => {
     liveFeatures.textContent = "[ "
     for(const [feature, value] of Object.entries(ev.data["features"]))
     {
-      liveFeatures.textContent += "["+feature + "=" + value +"]"
+      liveFeatures.textContent += "["+feature + "=" + value +"]\n"
     }
     liveFeatures.textContent += " ]"
 
