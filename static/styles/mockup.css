@@ -148,3 +148,219 @@ body {
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
   } 
+
+
+
+  body {
+    font-family: 'Alatsi', sans-serif;
+    margin: 0;
+    overflow: hidden;
+    background: black;
+  }
+  
+  .profile-container {
+    position: absolute;
+    top: 8%;
+    left: 84%;
+  }
+
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .title {
+    font-size: 10vw;
+    color: white;
+  }
+  
+  canvas {
+    width: 100%;
+  }
+
+  .spotbutt {
+    background-color: #1ED760;
+    border-radius: 500px;
+    padding: 14px 32px;
+    border-color: transparent;
+    font-size : 20px;
+  }
+
+
+  .dropdown {
+    background-color: #1ED760;
+    position: absolute;
+    border-radius: 500px;
+    padding: 14px 32px;
+    top: 8%;
+    left: 8%;
+    border-color: transparent;
+    font-size : 20px;
+  }
+
+  .btn {
+    background-color: #1ED760;
+  }
+
+  .round-button {
+    width:10%;
+  }
+  .round-button-circle {
+    width: 100%;
+    height:0;
+    padding-bottom: 100%;
+    border-radius: 50%;
+    border:5px solid #a7afb9;
+    overflow:hidden;
+          
+    background: #d3d3d3; 
+    box-shadow: 0 0 3px gray;
+  }
+  .round-button-circle:hover {
+    background:#343638;
+  }
+  .round-button a {
+    display:block;
+    float:left;
+    width:100%;
+    padding-top:50%;
+    padding-bottom:50%;
+    line-height:1em;
+    margin-top:-0.5em;
+          
+    text-align:center;
+    color:#e2eaf3;
+    font-family:Verdana;
+    font-size:1.2em;
+    font-weight:bold;
+    text-decoration:none;
+  }
+
+  .profile-dropdown-content {
+    display: none;
+    position: relative;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+  }
+  .profile-dropdown:hover .profile-dropdown-content {
+    display: block;
+  }
+
+   /* The snackbar - position it at the bottom and in the middle of the screen */
+  #snackbar {
+    visibility: hidden; /* Hidden by default. Visible on click */
+    min-width: 250px; /* Set a default minimum width */
+    margin-left: -125px; /* Divide value of min-width by 2 */
+    background-color: #333; /* Black background color */
+    color: #fff; /* White text color */
+    text-align: center; /* Centered text */
+    border-radius: 2px; /* Rounded borders */
+    padding: 16px; /* Padding */
+    position: fixed; /* Sit on top of the screen */
+    z-index: 1; /* Add a z-index if needed */
+    left: 50%; /* Center the snackbar */
+    bottom: 30px; /* 30px from the bottom */
+  }
+
+  /* Show the snackbar when clicking on a button (class added with JavaScript) */
+  #snackbar.show {
+    visibility: visible; /* Show the snackbar */
+    /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+    However, delay the fade out process for 2.5 seconds */
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  }
+
+  /* Animations to fade the snackbar in and out */
+  @-webkit-keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+  }
+
+  @keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+  }
+
+  @-webkit-keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+  }
+
+  @keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+  } 
+
+
+
+#playerbox {
+  background-color: rgba(103,103,103, 0.5);
+  color: blue;
+  position: fixed;
+  border-radius: 25px;
+  top: 45%;
+  left: 25%;
+  bottom: 15%;
+  right: 25%;
+  min-width: 200px;
+}
+#song_title{
+  position: absolute;
+  top: 50%;
+  bottom: 40%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  background-color: lime;
+}
+#playback_buttons {
+  position: absolute;
+  background-color: limegreen;
+  left: 20%;
+  right: 20%;
+  bottom: 0;
+  height: 40%;
+  text-align: center;
+}
+
+.player_button {
+  background-color: white;
+  
+}
+
+#toggle_play {
+/*   border: 0; */
+  background: transparent;
+  box-sizing: border-box;
+  width: 0;
+  height: 74px;
+
+  border-color: transparent transparent transparent #202020;
+  transition: 100ms all ease;
+  cursor: pointer;
+
+  // play state
+  border-style: solid;
+  border-width: 37px 0 37px 60px;
+
+  
+}
+#toggle_play.paused {
+    border-style: double;
+    border-width: 0px 0 0px 60px;
+}
+
+#toggle_play:hover {
+  border-color: transparent transparent transparent #404040;
+}
