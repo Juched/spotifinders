@@ -104,6 +104,12 @@ function makePlayer(socketMsg){
 
 }
 
+var playpause = document.getElementById("toggle_play")
+playpause.onclick = function() {
+  playpause.classList.toggle('paused');
+  return false;
+};
+
 
 
 window.onSpotifyWebPlaybackSDKReady = () => {
@@ -115,4 +121,6 @@ window.onSpotifyWebPlaybackSDKReady = () => {
     console.log("failed to get authtok. No player created")
   });
 }
+
+
 
