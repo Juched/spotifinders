@@ -1,30 +1,11 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[15]:
-
-
 import spacy
 nlp = spacy.load("en_core_web_sm")
-
-
-# In[16]:
-
-
-#open text file in read mode
 text_file = open("emotion_text.txt", "r", encoding='utf-8')
- 
-#read whole file to a string
+
 data = text_file.read()
- 
-#close file
 text_file.close()
 
-
-# In[34]:
-
-
-# file path
+# file paths
 in_filepath = 'emotion_text.txt'
 out_filepath = 'emotion_text_replaced.txt'
 
