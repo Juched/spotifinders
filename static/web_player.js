@@ -104,11 +104,24 @@ function makePlayer(socketMsg){
 
 }
 
-var playpause = document.getElementById("toggle_play")
+// var playpause = document.getElementById("toggle_play")
+// playpause.onclick = function() {
+//   playpause.classList.toggle('paused');
+//   return false;
+// };
+
+var playpause = document.getElementById("pp_toggle")
 playpause.onclick = function() {
-  playpause.classList.toggle('paused');
+  if(playpause.classList.contains("glyphicon-play")){
+    playpause.classList.remove("glyphicon-play")
+    playpause.classList.add("glyphicon-pause")
+  } else {
+    playpause.classList.remove("glyphicon-pause")
+    playpause.classList.add("glyphicon-play")
+  }
   return false;
 };
+
 
 
 
