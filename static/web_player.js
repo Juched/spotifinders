@@ -59,8 +59,16 @@ function makePlayer(socketMsg){
   player.addListener('account_error', ({ message }) => {
       console.error(message);
   });
-  document.getElementById('start_device').onclick = function() {
+  var playpause = document.getElementById('pp_toggle')
+  playpause.onclick = function() {
     player.togglePlay();
+    if(playpause.classList.contains("glyphicon-play")){
+      playpause.classList.remove("glyphicon-play")
+      playpause.classList.add("glyphicon-pause")
+    } else {
+      playpause.classList.remove("glyphicon-pause")
+      playpause.classList.add("glyphicon-play")
+    }
   };
   document.getElementById('resume_song').onclick = function() {
     player.resume().then(() => {
@@ -110,17 +118,17 @@ function makePlayer(socketMsg){
 //   return false;
 // };
 
-var playpause = document.getElementById("pp_toggle")
-playpause.onclick = function() {
-  if(playpause.classList.contains("glyphicon-play")){
-    playpause.classList.remove("glyphicon-play")
-    playpause.classList.add("glyphicon-pause")
-  } else {
-    playpause.classList.remove("glyphicon-pause")
-    playpause.classList.add("glyphicon-play")
-  }
-  return false;
-};
+// var playpause = document.getElementById("pp_toggle")
+// playpause.onclick = function() {
+//   if(playpause.classList.contains("glyphicon-play")){
+//     playpause.classList.remove("glyphicon-play")
+//     playpause.classList.add("glyphicon-pause")
+//   } else {
+//     playpause.classList.remove("glyphicon-pause")
+//     playpause.classList.add("glyphicon-play")
+//   }
+//   return false;
+// };
 
 
 
