@@ -5,8 +5,30 @@ if (window.location.protocol == "https:") {
   var ws_scheme = "ws://";
 }
 console.log('web_player js loaded')
+
+//This function synchronizes all web player buttons depending on status of player.
+//Update Album Art
+//update Song Title
+//Synch play/pause button
+//
+function synchronizePlayer(){
+  player.getCurrentState().then(state => {
+    if (!state) {
+      console.error('User is not playing music through the Web Playback SDK');
+      return;
+    }
+  
+    var current_track = state.track_window.current_track;
+    var next_track = state.track_window.next_tracks[0];
+  
+    console.log('Currently Playing', current_track);
+    console.log('Playing Next', next_track);
+  });
+}
+
+
 // This function establishes a websocket and waits for it to get a message (the auth token)
-function connect() {
+function connect_webplayer_socket() {
   return new Promise(function(resolve, reject) {
       var server = new WebSocket(ws_scheme + location.host + '/webPlayer');
       server.onmessage = function(event) {
@@ -34,13 +56,13 @@ function makePlayer(socketMsg){
   player.addListener('ready', ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
 
-    player.togglePlay();
+    // player.togglePlay();
 
-    // const deviceServer = new WebSocket(ws_scheme + location.host + '/deviceID');
-    // deviceServer.addEventListener('open', (event) => {
-    //   deviceServer.send(device_id);
-    //   console.log('sent device id to client ' + device_id)
-    // });
+    const deviceServer = new WebSocket(ws_scheme + location.host + '/deviceID');
+    deviceServer.addEventListener('open', (event) => {
+      deviceServer.send(device_id);
+      console.log('sent device id to client ' + device_id)
+    });
 
   });
 
@@ -61,15 +83,22 @@ function makePlayer(socketMsg){
   });
   var playpause = document.getElementById('pp_toggle')
   playpause.onclick = function() {
-    player.togglePlay();
     if(playpause.classList.contains("glyphicon-play")){
-      //it's playing, so pause it
-      playpause.classList.remove("glyphicon-play")
-      playpause.classList.add("glyphicon-pause")
+      //it's paused, so play it
+      playpause.classList.remove("glyphicon-play");
+      playpause.classList.add("glyphicon-pause");
+
+      player.resume().then(() => {
+        console.log('Resumed!');
+      });
     } else {
-      //it's paused, so play
-      playpause.classList.remove("glyphicon-pause")
-      playpause.classList.add("glyphicon-play")
+      //it's currently playing, but we hit pause. So, get rid of pause icon, and pause music
+      playpause.classList.remove("glyphicon-pause");
+      playpause.classList.add("glyphicon-play");
+
+      player.pause().then(() => {
+        console.log('Paused!');
+      });
     }
   };
   document.getElementById('resume_song').onclick = function() {
@@ -108,9 +137,13 @@ function makePlayer(socketMsg){
 
   };
   console.log('all listeners added')
+  
   player.connect().then(success => {
     if (success) {
       console.log('The Web Playback SDK successfully connected to Spotify!');
+    } else {
+      console.log('booooooooooooooooo');
+
     }
   }).catch(function(err) {
     console.log("Failed to connect player. Player-connect issue, not authtok")
@@ -118,32 +151,10 @@ function makePlayer(socketMsg){
   console.log('Should have obtained confirmation about playback sdk')
 }
 
-// var playpause = document.getElementById("toggle_play")
-// playpause.onclick = function() {
-//   playpause.classList.toggle('paused');
-//   return false;
-// };
-
-// var playpause = document.getElementById("pp_toggle")
-// playpause.onclick = function() {
-//   if(playpause.classList.contains("glyphicon-play")){
-//     playpause.classList.remove("glyphicon-play")
-//     playpause.classList.add("glyphicon-pause")
-//   } else {
-//     playpause.classList.remove("glyphicon-pause")
-//     playpause.classList.add("glyphicon-play")
-//   }
-//   return false;
-// };
-
-
-
-
-
 
 window.onSpotifyWebPlaybackSDKReady = () => {
   // Waits for the socket to provide an auth code. 
-  connect().then(function(socketMsg) {
+  connect_webplayer_socket().then(function(socketMsg) {
     makePlayer(socketMsg)
   }).catch(function(err) {
     // error here (Socket never recieved the auth token)
