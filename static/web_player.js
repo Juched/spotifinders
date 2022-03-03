@@ -63,9 +63,11 @@ function makePlayer(socketMsg){
   playpause.onclick = function() {
     player.togglePlay();
     if(playpause.classList.contains("glyphicon-play")){
+      //it's playing, so pause it
       playpause.classList.remove("glyphicon-play")
       playpause.classList.add("glyphicon-pause")
     } else {
+      //it's paused, so play
       playpause.classList.remove("glyphicon-pause")
       playpause.classList.add("glyphicon-play")
     }
@@ -80,9 +82,14 @@ function makePlayer(socketMsg){
       console.log('Activated element!');
     });
   };
-  document.getElementById('skip_track').onclick = function() {
+  document.getElementById('skip_forward').onclick = function() {
     player.nextTrack().then(() => {
       console.log('Skipped to next track!');
+    });
+  };
+  document.getElementById('skip_backward').onclick = function() {
+    player.previousTrack().then(() => {
+      console.log('Skipped back to the last track!');
     });
   };
   document.getElementById('curr_state').onclick = function() {
@@ -109,7 +116,6 @@ function makePlayer(socketMsg){
     console.log("Failed to connect player. Player-connect issue, not authtok")
   });
   console.log('Should have obtained confirmation about playback sdk')
-
 }
 
 // var playpause = document.getElementById("toggle_play")
@@ -129,6 +135,8 @@ function makePlayer(socketMsg){
 //   }
 //   return false;
 // };
+
+
 
 
 
