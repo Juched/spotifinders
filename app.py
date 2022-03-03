@@ -162,8 +162,16 @@ def deviceListener(sock):
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         return redirect('/')
     spotify = spotipy.Spotify(auth_manager=auth_manager)
+    print(f"Transferring playback to device {device_id}")
+    spotify.transfer_playback(device_id=device_id)
+
+    #play from liked playlists
+
+    #immediate pause
+
     
-    spotify.start_playback(device_id=device_id, uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']) #Ideally, we start playing a song depending on what they want
+    # spotify.start_playback(device_id=device_id, uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']) #Ideally, we start playing a song depending on what they want
+    
 
 
 
