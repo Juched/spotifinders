@@ -37,7 +37,6 @@
             <div class="profile-dropdown-content">
                 <div><a href="/currently_playing">Whats playing</a></div>
                 <div><a onclick="playSong('/start_playing')">Make a hardcoded specific song play</a></div>
-                <div><a href="#" id="start_device">Start This Device</a></div>
                 <div><a onclick="startPlayer()">start the player</a></div>
                 <div><a id="curr_state">Console Log Current Player State</a></div>
 
@@ -61,13 +60,17 @@
         </div>
 
         <div id="playerbox">
-            <img id="album_art" src="">&nbsp</img>
+            <img id="album_art" src=""></img>
             <div id="song_title">No Current Song Playing</div>
-            <div id="playback_buttons">
+            <div id="playback_buttons" class="spotbutt">
               <i id="skip_backward" class="glyphicon glyphicon-step-backward"></i>
               <i id="pp_toggle" class="glyphicon glyphicon-play"></i>
               <i id="skip_forward" class="glyphicon glyphicon-step-forward"></i>
             </div>
+        </div>
+
+        <div id="mask_player">
+            <button class="spotbutt" onclick="startPlayer()">Initialize Player</button>
         </div>
 
 

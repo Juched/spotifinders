@@ -24,7 +24,7 @@ function synchronizePlayer(state){
     return;
   }
 
-  var playpause = document.getElementById('pp_toggle')
+  var playpause = document.getElementById('pp_toggle');
   if(state.paused) {
     //it's paused, make it reflect so
     playpause.classList.remove("glyphicon-pause");
@@ -35,17 +35,19 @@ function synchronizePlayer(state){
     playpause.classList.add("glyphicon-pause");
   }
 
-  
+  let artists_concat = ""
+  for (let artist of state.track_window.current_track.artists) {
+    artists_concat = artists_concat + artist.name + ", "
+  }
 
-  var songNameBox = document.getElementById('song_title')
-  songNameBox.innerText = state.track_window.current_track.name
+  var songNameBox = document.getElementById('song_title');
+  songNameBox.innerText = state.track_window.current_track.name + "\n Artist: " + artists_concat.substring(0, artists_concat.length - 2)
 
-  var albumArtBox = document.getElementById('album_art')
+  var albumArtBox = document.getElementById('album_art');
   albumArtBox.setAttribute('src',state.track_window.current_track.album.images[0].url)
 }
 function pauseButtonToggle(){
-  var playpause = document.getElementById('pp_toggle')
-
+  var playpause = document.getElementById('pp_toggle');
   if(playpause.classList.contains('glyphicon-play')){
     playpause.classList.remove("glyphicon-play");
     playpause.classList.add("glyphicon-pause");
@@ -66,7 +68,6 @@ function connect_webplayer_socket() {
       server.onerror = function(err) {
           reject(err);
       };
-
   });
 }
 
@@ -103,7 +104,7 @@ function makePlayer(socketMsg){
   });
 
   player.addListener('player_state_changed', (state) => {
-    synchronizePlayer(state)
+    synchronizePlayer(state);
   });
   player.addListener('initialization_error', ({ message }) => { 
     console.error(message);
@@ -146,12 +147,17 @@ function startPlayer() {
   // Waits for the socket to provide an auth code.
   if(isPlayerReady) {
     connect_webplayer_socket().then(function(socketMsg) {
-      makePlayer(socketMsg)
+      makePlayer(socketMsg);
     }).catch(function(err) {
       // error here (Socket never recieved the auth token)
       console.log("failed to get authtok. No player created")
     });
+
+    delMask()
   } 
+}
+function delMask(){
+  document.getElementById('mask_player').style.display = 'none';
 }
 
 

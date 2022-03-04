@@ -316,7 +316,6 @@ body {
   align-items: center;
   text-align: center;
   background-color: rgba(103,103,103, 0.5);
-  color: blue;
   position: absolute;
   border-radius: 25px;
   top: 45%;
@@ -324,28 +323,45 @@ body {
   bottom: 15%;
   right: 25%;
   min-width: 200px;
+  padding: 20px;
 }
+#mask_player {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(103,103,103, 0.8);
+  border-radius: 25px;
+  top: 45%;
+  left: 25%;
+  bottom: 15%;
+  right: 25%;
+  min-width: 200px;
+  text-align: center;
+}
+
+
 #song_title{
   text-align: center;
   background-color: lime;
+  padding: 10px;
 }
 #playback_buttons {
   display: flex;
   justify-content: space-between;
-  background-color: limegreen;
-  border: 17px solid limegreen;
-  border-radius: 40px;
-  width: 40%;
+  width: 70%;
 }
 .glyphicon {
   color: black;
-  font-size: 4em;
+  font-size: 3em;
 }
 .glyphicon:hover{
   color: rgb(50, 50, 50);
 }
 
 #album_art{
-  height: 60px;
-  width: 60px;
+  min-height: 80px;
+  min-width: 80px;
+  margin: 0 5% 0 5%;
+  border-radius: 1em;
 }
