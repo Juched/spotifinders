@@ -344,3 +344,8 @@ body {
 .glyphicon:hover{
   color: rgb(50, 50, 50);
 }
+
+#album_art{
+  height: 60px;
+  width: 60px;
+}

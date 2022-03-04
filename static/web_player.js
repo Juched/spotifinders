@@ -6,24 +6,53 @@ if (window.location.protocol == "https:") {
 }
 console.log('web_player js loaded')
 
+var isPlayerReady = false;
+onSpotifyWebPlaybackSDKReady = () => {
+  //update button
+  isPlayerReady = true;
+};
+
+
 //This function synchronizes all web player buttons depending on status of player.
 //Update Album Art
 //update Song Title
 //Synch play/pause button
 //
-function synchronizePlayer(){
-  player.getCurrentState().then(state => {
-    if (!state) {
-      console.error('User is not playing music through the Web Playback SDK');
-      return;
-    }
+function synchronizePlayer(state){
+  if (!state) {
+    console.error('User is not playing music through the Web Playback SDK');
+    return;
+  }
+
+  var playpause = document.getElementById('pp_toggle')
+  if(state.paused) {
+    //it's paused, make it reflect so
+    playpause.classList.remove("glyphicon-pause");
+    playpause.classList.add("glyphicon-play");
+  } else {
+    //it's playing, make it reflect so
+    playpause.classList.remove("glyphicon-play");
+    playpause.classList.add("glyphicon-pause");
+  }
+
   
-    var current_track = state.track_window.current_track;
-    var next_track = state.track_window.next_tracks[0];
-  
-    console.log('Currently Playing', current_track);
-    console.log('Playing Next', next_track);
-  });
+
+  var songNameBox = document.getElementById('song_title')
+  songNameBox.innerText = state.track_window.current_track.name
+
+  var albumArtBox = document.getElementById('album_art')
+  albumArtBox.setAttribute('src',state.track_window.current_track.album.images[0].url)
+}
+function pauseButtonToggle(){
+  var playpause = document.getElementById('pp_toggle')
+
+  if(playpause.classList.contains('glyphicon-play')){
+    playpause.classList.remove("glyphicon-play");
+    playpause.classList.add("glyphicon-pause");
+  } else {
+    playpause.classList.remove("glyphicon-pause");
+    playpause.classList.add("glyphicon-play");
+  }
 }
 
 
@@ -56,8 +85,6 @@ function makePlayer(socketMsg){
   player.addListener('ready', ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
 
-    // player.togglePlay();
-
     const deviceServer = new WebSocket(ws_scheme + location.host + '/deviceID');
     deviceServer.addEventListener('open', (event) => {
       deviceServer.send(device_id);
@@ -69,6 +96,14 @@ function makePlayer(socketMsg){
   // Not Ready
   player.addListener('not_ready', ({ device_id }) => {
     console.log('Device ID has gone offline', device_id);
+    player.disconnect(); //disconnect player bc we'll just make you re-make a player
+
+    //TODO: grey out stuff again to force new player
+
+  });
+
+  player.addListener('player_state_changed', (state) => {
+    synchronizePlayer(state)
   });
   player.addListener('initialization_error', ({ message }) => { 
     console.error(message);
@@ -81,34 +116,9 @@ function makePlayer(socketMsg){
   player.addListener('account_error', ({ message }) => {
       console.error(message);
   });
-  var playpause = document.getElementById('pp_toggle')
-  playpause.onclick = function() {
-    if(playpause.classList.contains("glyphicon-play")){
-      //it's paused, so play it
-      playpause.classList.remove("glyphicon-play");
-      playpause.classList.add("glyphicon-pause");
-
-      player.resume().then(() => {
-        console.log('Resumed!');
-      });
-    } else {
-      //it's currently playing, but we hit pause. So, get rid of pause icon, and pause music
-      playpause.classList.remove("glyphicon-pause");
-      playpause.classList.add("glyphicon-play");
-
-      player.pause().then(() => {
-        console.log('Paused!');
-      });
-    }
-  };
-  document.getElementById('resume_song').onclick = function() {
-    player.resume().then(() => {
-      console.log('Resumed song!');
-    });
-  };
-  document.getElementById('activate_element').onclick = function() {
-    player.activateElement().then(() => {
-      console.log('Activated element!');
+  document.getElementById('pp_toggle').onclick = function() {
+    player.togglePlay().then(function(value) {
+      console.log('Toggled playback!');
     });
   };
   document.getElementById('skip_forward').onclick = function() {
@@ -121,45 +131,27 @@ function makePlayer(socketMsg){
       console.log('Skipped back to the last track!');
     });
   };
-  document.getElementById('curr_state').onclick = function() {
-    player.getCurrentState().then(state => {
-      if (!state) {
-        console.error('User is not playing music through the Web Playback SDK');
-        return;
-      }
-    
-      var current_track = state.track_window.current_track;
-      var next_track = state.track_window.next_tracks[0];
-    
-      console.log('Currently Playing', current_track);
-      console.log('Playing Next', next_track);
-    });
 
-  };
-  console.log('all listeners added')
-  
   player.connect().then(success => {
     if (success) {
       console.log('The Web Playback SDK successfully connected to Spotify!');
-    } else {
-      console.log('booooooooooooooooo');
-
     }
-  }).catch(function(err) {
-    console.log("Failed to connect player. Player-connect issue, not authtok")
   });
-  console.log('Should have obtained confirmation about playback sdk')
 }
 
 
-window.onSpotifyWebPlaybackSDKReady = () => {
-  // Waits for the socket to provide an auth code. 
-  connect_webplayer_socket().then(function(socketMsg) {
-    makePlayer(socketMsg)
-  }).catch(function(err) {
-    // error here (Socket never recieved the auth token)
-    console.log("failed to get authtok. No player created")
-  });
+
+
+function startPlayer() {
+  // Waits for the socket to provide an auth code.
+  if(isPlayerReady) {
+    connect_webplayer_socket().then(function(socketMsg) {
+      makePlayer(socketMsg)
+    }).catch(function(err) {
+      // error here (Socket never recieved the auth token)
+      console.log("failed to get authtok. No player created")
+    });
+  } 
 }
 
 

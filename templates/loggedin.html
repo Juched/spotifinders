@@ -10,6 +10,8 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         <!-- Our js and stylesheet-->
         
+        <script src="https://sdk.scdn.co/spotify-player.js"></script>
+
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mockup.css') }}">
 
         
@@ -36,9 +38,7 @@
                 <div><a href="/currently_playing">Whats playing</a></div>
                 <div><a onclick="playSong('/start_playing')">Make a hardcoded specific song play</a></div>
                 <div><a href="#" id="start_device">Start This Device</a></div>
-                <div><a id="resume_song">Resume Song</a></div>
-                <div><a id="activate_element">Activate Player</a></div>
-                <div><a id="skip_track">Skip Track</a></div>
+                <div><a onclick="startPlayer()">start the player</a></div>
                 <div><a id="curr_state">Console Log Current Player State</a></div>
 
 
@@ -48,7 +48,6 @@
         </div>
 
 
-        <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
         <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -62,7 +61,7 @@
         </div>
 
         <div id="playerbox">
-            <div id="album_art">Album Art Here</div>
+            <img id="album_art" src="">&nbsp</img>
             <div id="song_title">No Current Song Playing</div>
             <div id="playback_buttons">
               <i id="skip_backward" class="glyphicon glyphicon-step-backward"></i>
