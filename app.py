@@ -171,19 +171,36 @@ def playlists():
     return playlists
 
 # def pickTrackFromPlaylist() # take in track ID, if empty/None, use liked songs playlist
+#This websocket is responsible for sending the auth token to the fronend in order to initialize a webplayer. See static/web_player.js
 @sock.route('/webPlayer')
 def spotifyWebPlayer(sock):
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
     auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
-        return redirect('/')
-    
-    print('Obtaining access token for web player')
+        return redirect('/')    
     token = auth_manager.get_access_token()
-    print(f'Token obtained: {token}')
-
     sock.send(token['access_token'])
-    sock.close()
+    # sock.close()
+
+#This websocket is used to first switch over Spotify to the Spotifinders Web API Device. This is what "Turns on" Our webplayer
+@sock.route('/deviceID')
+def deviceListener(sock):
+    device_id = sock.receive()
+    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+    if not auth_manager.validate_token(cache_handler.get_cached_token()):
+        return redirect('/')
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+    print(f"Transferring playback to device {device_id}")
+    spotify.transfer_playback(device_id=device_id)
+
+    #play from liked playlists
+
+    #immediate pause
+
+    
+    # spotify.start_playback(device_id=device_id, uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']) #Ideally, we start playing a song depending on what they want
+    
 
 
 
