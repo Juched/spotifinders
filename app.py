@@ -100,7 +100,7 @@ def echo(sock):
         print(feature_dict)
         sock.send(feature_dict)
 
-
+# gets the Spotipy obj
 def getSpotipy():
     try:
         
@@ -160,6 +160,7 @@ def player(audioFeatures):
     return thing
 
 
+# gets the playlists name and id
 def playlists():
     
     localSP = getSpotipy()
