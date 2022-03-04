@@ -10,11 +10,14 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         <!-- Our js and stylesheet-->
         
+        <script src="https://sdk.scdn.co/spotify-player.js"></script>
+
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mockup.css') }}">
 
         
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     </head>
     <body>
 
@@ -34,12 +37,16 @@
             <div class="profile-dropdown-content">
                 <div><a href="/currently_playing">Whats playing</a></div>
                 <div><a onclick="playSong('/start_playing')">Make a hardcoded specific song play</a></div>
+                <div><a onclick="startPlayer()">start the player</a></div>
+                <div><a id="curr_state">Console Log Current Player State</a></div>
+
+
+
                 <div><a href="/sign_out">Sign Out</a></div>
             </div>
         </div>
 
 
-        <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
         <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -52,19 +59,41 @@
             </div>
         </div>
 
-    <div id="snackbar">Bottom Text</div>
+        <div id="playerbox">
+            <img id="album_art" src=""></img>
+            <div id="song_title">No Current Song Playing</div>
+            <div id="playback_buttons" class="spotbutt">
+              <i id="skip_backward" class="glyphicon glyphicon-step-backward"></i>
+              <i id="pp_toggle" class="glyphicon glyphicon-play"></i>
+              <i id="skip_forward" class="glyphicon glyphicon-step-forward"></i>
+            </div>
+        </div>
+
+        <div id="mask_player">
+            <button class="spotbutt" onclick="startPlayer()">Initialize Player</button>
+        </div>
+
+
+        <div id="snackbar">Bottom Text</div>
           
     </body>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    <script src="{{url_for('static', filename='web_player.js')}}"></script>
+>>>>>>> playlists
     <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='bower_components/juliusjs/dist/julius.js') }}"></script>
     <script src="{{url_for('static', filename='loggedin.js')}}"></script>
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
+<<<<<<< HEAD
     <script src="spotWebPlayer.js"> </script>
 =======
     <script src="{{url_for('static', filename='mockup.js')}}"></script>
     <script src="{{url_for('static', filename='web_player.js')}}"></script>
 
+>>>>>>> playlists
+=======
 >>>>>>> playlists
 
 </html>

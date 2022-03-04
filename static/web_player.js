@@ -4,30 +4,79 @@ if (window.location.protocol == "https:") {
 } else {
   var ws_scheme = "ws://";
 }
+console.log('web_player js loaded')
 
-const webPlayerSocket = new WebSocket(ws_scheme + location.host + '/webPlayer');
-
-
-var authTok = null;
-
-// Spotify Web Player won't get its "onReady" methods set until the authToken is sent from the backend.
-
-webPlayerSocket.addEventListener('message', ev => {
-// Once we get a message (auth token), establish SDK
-  console.log(ev.data)
-  authTok = ev.data
-});
+var isPlayerReady = false;
+onSpotifyWebPlaybackSDKReady = () => {
+  //update button
+  isPlayerReady = true;
+};
 
 
+//This function synchronizes all web player buttons depending on status of player.
+//Update Album Art
+//update Song Title
+//Synch play/pause button
+//
+function synchronizePlayer(state){
+  if (!state) {
+    console.error('User is not playing music through the Web Playback SDK');
+    return;
+  }
 
-window.onSpotifyWebPlaybackSDKReady = () => {
-  while (authTok == null) {
-    console.log('awaiting authtok')
+  var playpause = document.getElementById('pp_toggle');
+  if(state.paused) {
+    //it's paused, make it reflect so
+    playpause.classList.remove("glyphicon-pause");
+    playpause.classList.add("glyphicon-play");
+  } else {
+    //it's playing, make it reflect so
+    playpause.classList.remove("glyphicon-play");
+    playpause.classList.add("glyphicon-pause");
+  }
 
-  } //await
-  console.log("obtained token: " + authTok)
+  let artists_concat = ""
+  for (let artist of state.track_window.current_track.artists) {
+    artists_concat = artists_concat + artist.name + ", "
+  }
+
+  var songNameBox = document.getElementById('song_title');
+  songNameBox.innerText = state.track_window.current_track.name + "\n Artist: " + artists_concat.substring(0, artists_concat.length - 2)
+
+  var albumArtBox = document.getElementById('album_art');
+  albumArtBox.setAttribute('src',state.track_window.current_track.album.images[0].url)
+}
+function pauseButtonToggle(){
+  var playpause = document.getElementById('pp_toggle');
+  if(playpause.classList.contains('glyphicon-play')){
+    playpause.classList.remove("glyphicon-play");
+    playpause.classList.add("glyphicon-pause");
+  } else {
+    playpause.classList.remove("glyphicon-pause");
+    playpause.classList.add("glyphicon-play");
+  }
+}
+
+
+// This function establishes a websocket and waits for it to get a message (the auth token)
+function connect_webplayer_socket() {
+  return new Promise(function(resolve, reject) {
+      var server = new WebSocket(ws_scheme + location.host + '/webPlayer');
+      server.onmessage = function(event) {
+          resolve(event.data);
+      };
+      server.onerror = function(err) {
+          reject(err);
+      };
+  });
+}
+
+function makePlayer(socketMsg){
+  // The following code block will run when the auth code is provided. Establishes the web player
+  authTok = socketMsg
 
   const token = authTok; //Auth token!
+  console.log("Creating new player with token " + authTok)
   const player = new Spotify.Player({
     name: 'Spotifinders Web Player',
     getOAuthToken: cb => { cb(token); },
@@ -36,11 +85,26 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   // Ready
   player.addListener('ready', ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
+
+    const deviceServer = new WebSocket(ws_scheme + location.host + '/deviceID');
+    deviceServer.addEventListener('open', (event) => {
+      deviceServer.send(device_id);
+      console.log('sent device id to client ' + device_id)
+    });
+
   });
 
   // Not Ready
   player.addListener('not_ready', ({ device_id }) => {
     console.log('Device ID has gone offline', device_id);
+    player.disconnect(); //disconnect player bc we'll just make you re-make a player
+
+    //TODO: grey out stuff again to force new player
+
+  });
+
+  player.addListener('player_state_changed', (state) => {
+    synchronizePlayer(state);
   });
   player.addListener('initialization_error', ({ message }) => { 
     console.error(message);
@@ -53,15 +117,48 @@ window.onSpotifyWebPlaybackSDKReady = () => {
   player.addListener('account_error', ({ message }) => {
       console.error(message);
   });
+  document.getElementById('pp_toggle').onclick = function() {
+    player.togglePlay().then(function(value) {
+      console.log('Toggled playback!');
+    });
+  };
+  document.getElementById('skip_forward').onclick = function() {
+    player.nextTrack().then(() => {
+      console.log('Skipped to next track!');
+    });
+  };
+  document.getElementById('skip_backward').onclick = function() {
+    player.previousTrack().then(() => {
+      console.log('Skipped back to the last track!');
+    });
+  };
 
-  player.connect();
+  player.connect().then(success => {
+    if (success) {
+      console.log('The Web Playback SDK successfully connected to Spotify!');
+    }
+  });
 }
 
-// var that = this;
-
-// function closeSocket(){
-//   that.webPlayerSocket.close();
-// }
 
 
-  
+
+function startPlayer() {
+  // Waits for the socket to provide an auth code.
+  if(isPlayerReady) {
+    connect_webplayer_socket().then(function(socketMsg) {
+      makePlayer(socketMsg);
+    }).catch(function(err) {
+      // error here (Socket never recieved the auth token)
+      console.log("failed to get authtok. No player created")
+    });
+
+    delMask()
+  } 
+}
+function delMask(){
+  document.getElementById('mask_player').style.display = 'none';
+}
+
+
+
