@@ -60,7 +60,7 @@ def log():
         session['uuid'] = str(uuid.uuid4())
 
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
-    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-library-read playlist-read-private user-top-read user-read-currently-playing user-read-playback-state streaming',
+    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-library-read playlist-read-private user-top-read user-read-currently-playing user-read-playback-state streaming user-modify-playback-state',
                                                 cache_handler=cache_handler, 
                                                 show_dialog=True)
 
@@ -78,7 +78,10 @@ def log():
     # Step 4. Signed in, display data
     spotify = spotipy.Spotify(auth_manager=auth_manager)
 
-    
+    # USERDICT[session.get('uuid')] = spotify
+    # # curernt time set to 0 until the player starts to play
+    # CURRENT_TIME[session.get('uuid')] = 0
+
     u_data = spotify.me()
 
     prof_pic_url = u_data['images'][0]['url']
@@ -94,7 +97,8 @@ def echo(sock):
         data = sock.receive()
         feature_dict = model.get_vector(data)
         player(feature_dict)
-        sock.send(data)
+        print(feature_dict)
+        sock.send(feature_dict)
 
 
 def getSpotipy():
@@ -166,6 +170,20 @@ def playlists():
     return playlists
 
 # def pickTrackFromPlaylist() # take in track ID, if empty/None, use liked songs playlist
+@sock.route('/webPlayer')
+def spotifyWebPlayer(sock):
+    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+    if not auth_manager.validate_token(cache_handler.get_cached_token()):
+        return redirect('/')
+    
+    print('Obtaining access token for web player')
+    token = auth_manager.get_access_token()
+    print(f'Token obtained: {token}')
+
+    sock.send(token['access_token'])
+    sock.close()
+
 
 
 @app.route('/testplayer')
@@ -183,12 +201,36 @@ def test():
 def sign_out():
     try:
         # Remove the CACHE file (.cache-test) so that a new user can authorize.
-        # probably want to remove their entry from the dictionary too
         os.remove(session_cache_path())
         session.clear()
     except OSError as e:
         print ("Error: %s - %s." % (e.filename, e.strerror))
     return redirect('/')
+
+@app.route('/currently_playing')
+def currently_playing():
+    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+    if not auth_manager.validate_token(cache_handler.get_cached_token()):
+        return redirect('/')
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+    track = spotify.current_user_playing_track()
+    if not track is None:
+        return track
+    return "No track currently playing."
+
+@app.route('/start_playing',methods=["POST"])
+def start_playing():
+    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+    if not auth_manager.validate_token(cache_handler.get_cached_token()):
+        return redirect('/')
+    spotify = spotipy.Spotify(auth_manager=auth_manager)
+    # track = spotify.current_user_playing_track()
+    spotify.start_playback(uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7'])
+
+    return "Playing"
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

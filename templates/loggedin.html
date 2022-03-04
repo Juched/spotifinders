@@ -12,7 +12,7 @@
         
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mockup.css') }}">
 
-
+        
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"/>
     </head>
@@ -32,9 +32,14 @@
         <div class="profile-dropdown profile-container">         
             <button class="spotbutt" id="pDropdown"><img width="42" height="42" src="{{ purl }}" alt="me"> &nbsp {{ pname }} </button>
             <div class="profile-dropdown-content">
-                <a href="/sign_out">Sign Out</a>
+                <div><a href="/currently_playing">Whats playing</a></div>
+                <div><a onclick="playSong('/start_playing')">Make a hardcoded specific song play</a></div>
+                <div><a href="/sign_out">Sign Out</a></div>
             </div>
         </div>
+
+
+        <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
         <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -50,10 +55,16 @@
     <div id="snackbar">Bottom Text</div>
           
     </body>
+<<<<<<< HEAD
     <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='bower_components/juliusjs/dist/julius.js') }}"></script>
     <script src="{{url_for('static', filename='loggedin.js')}}"></script>
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <script src="spotWebPlayer.js"> </script>
+=======
+    <script src="{{url_for('static', filename='mockup.js')}}"></script>
+    <script src="{{url_for('static', filename='web_player.js')}}"></script>
+
+>>>>>>> playlists
 
 </html>
