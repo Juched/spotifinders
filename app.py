@@ -1,4 +1,5 @@
 # compose_flask/app.py
+from threading import local
 from flask import Flask, render_template, session, request, redirect
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -96,6 +97,23 @@ def echo(sock):
         sock.send(data)
 
 
+def getSpotipy():
+    try:
+        
+        # standard
+        cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+        auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+        if not auth_manager.validate_token(cache_handler.get_cached_token()):
+            # return redirect('/')
+            raise Exception('Was unable to connct to your spotify account')
+
+        return spotipy.Spotify(auth_manager=auth_manager)
+
+    except Exception as e:
+        print (f"Error: {e}")
+    return None
+
+
 def player(audioFeatures):
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
@@ -136,6 +154,18 @@ def player(audioFeatures):
         print (f"Error: {e}")
 
     return thing
+
+
+def playlists():
+    
+    localSP = getSpotipy()
+    playlists = None
+    if localSP != None:
+        playlists = localSP.current_user_playlists()
+    
+    return playlists
+
+# def pickTrackFromPlaylist() # take in track ID, if empty/None, use liked songs playlist
 
 
 @app.route('/testplayer')
