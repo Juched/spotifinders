@@ -44,16 +44,23 @@
 
 
 
-        <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Playlists
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <button class="dropdown-item" href="#">Happy</button> </br>
-              <button class="dropdown-item" href="#">Sad</button> </br>
-              <button class="dropdown-item" href="#">Mad</button>
+        <div class="playlist-container">
+            <button class="spotbutt" id="playlist_drop">Playlists</button>
+            <div class="playlist-dropdown-content">
+                <div id="liked_songs_selector"><a>Liked Songs</a></div>
+                <div id="discovery_selector"><a>Discover</a></div>
+                <div id="custom_playlist_selector"><a>Custom Playlist</a>
+                    <div class="custom-p-dropdown-content"> 
+                        <div id="PLAYLIST ID HERE"><a>lol my happy playlist</a></div>
+                    </div>
+                </div>
+                <div><a>Genre or smth idk</a></div>
             </div>
         </div>
+
+        <div id="CURRENTLY_PLAYING" playlist_id="1"></div>
+
+
 
         <div id="playerbox">
             <img id="album_art" src=""></img>
