@@ -14,14 +14,13 @@
 
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mockup.css') }}">
 
-        <script>const playlists = {{ userPlaylists }}; </script>
+        <!-- <script>const playlists = {{ userPlaylists }}; </script> -->
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"/>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     </head>
     <body>
-
         <div class="container">
             <div class="round-button" onclick="toggleMic()">
                 <div class="round-button-circle">
@@ -39,9 +38,6 @@
                 <div><a href="/currently_playing">Whats playing</a></div>
                 <div><a onclick="playSong('/start_playing')">Make a hardcoded specific song play</a></div>
                 <div><a onclick="startPlayer()">start the player</a></div>
-                <div><a id="curr_state">Console Log Current Player State</a></div>
-
-
 
                 <div><a href="/sign_out">Sign Out</a></div>
             </div>
@@ -49,16 +45,23 @@
 
 
 
-        <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Playlists
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <button class="dropdown-item" href="#">Happy</button> </br>
-              <button class="dropdown-item" href="#">Sad</button> </br>
-              <button class="dropdown-item" href="#">Mad</button>
+        <div class="playlist-dropdown playlist-container">
+            <button class="spotbutt" id="playlist_drop">Playlists</button>
+            <div class="playlist-dropdown-content">
+                <div id="liked_songs_selector"><a>Liked Songs</a></div>
+                <div id="discovery_selector"><a>Discover</a></div>
+                <div id="custom_playlist_selector"><a>Custom Playlist</a>
+                    <div class="custom-p-dropdown-content"> 
+                        <div id="PLAYLIST ID HERE"><a>lol my happy playlist</a></div>
+                    </div>
+                </div>
+                <div><a>Genre or smth idk</a></div>
             </div>
         </div>
+
+        <div id="CURRENTLY_PLAYING" playlist_id="1"></div>
+
+
 
         <div id="playerbox">
             <img id="album_art" src=""></img>
@@ -71,7 +74,7 @@
         </div>
 
         <div id="mask_player">
-            <button class="spotbutt" onclick="startPlayer()">Initialize Player</button>
+            <button id="init_button" class="unclickable spotbutt" onclick="startPlayer()">Initialize Player</button>
         </div>
 
 
