@@ -7,6 +7,8 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import time
 import os
 import uuid
+import random
+import numpy as np
 
 import spotipy
 from flask_session import Session
@@ -72,7 +74,8 @@ def log():
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         # Step 2. Display sign in link when no token
         auth_url = auth_manager.get_authorize_url()
-        return render_template("index.html", auth_url=auth_url)
+        # uPlaylists = playlists()
+        return render_template("index.html", auth_url=auth_url) #, userPlaylists=uPlaylists)
         #return f'<h2><a href="{auth_url}">Sign in</a></h2>'
 
     # Step 4. Signed in, display data
@@ -117,7 +120,7 @@ def getSpotipy():
         print (f"Error: {e}")
     return None
 
-
+# using spotipy to get a close match
 def player(audioFeatures):
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
@@ -160,14 +163,72 @@ def player(audioFeatures):
     return thing
 
 
-# gets the playlists name and id
+def findClosestMatch(idealAF, playlistAFs):
+    implementedFeatures = idealAF.keys()
+    idealVector = []
+    minNorm = None
+    idealID = None
+
+    for feature in implementedFeatures:
+        idealVector.append(idealAF[feature])
+    idealVector = np.array(idealVector)
+
+    for singleTrack in playlistAFs:
+        currentVector = []
+        for feature in implementedFeatures:
+            currentVector.append(singleTrack[feature])
+        # we have the curernt audio feature vector at this point
+
+        currentMin = np.linalg.norm(np.array(currentVector) - idealVector)
+        if idealID == None or minNorm == None or currentMin < minNorm:
+            minNorm = currentMin
+            idealID = singleTrack['id']
+            print(idealID)
+
+    return idealID # some track id
+
+def trackFromPlaylist(idealAudioFeatures, playlistID):
+    localSP = getSpotipy()
+    audioFeatures = None
+
+    if localSP != None:
+        # get the songs from the playlist
+        # tracks = localSP.playlist(playlistID, fields="tracks,next")
+        tracks = localSP.playlist(playlistID)
+
+        # print(tracks)
+        trackIDs = []
+
+        for (song, i) in zip(tracks["tracks"]["items"], range(100)):
+            if song != None:
+                trackIDs.append(song['track']['id'])
+
+
+        # get the audio features
+        audioFeatures = localSP.audio_features(trackIDs)
+
+        # find the closest match
+        coolSong = findClosestMatch(idealAudioFeatures, audioFeatures)
+        # add to queue
+        if coolSong != None:
+            localSP.add_to_queue(coolSong) 
+        
+    return audioFeatures
+
+# gets the playlists name and IDs and returns them (easily replaceable for URIs too)
 def playlists():
     
     localSP = getSpotipy()
-    playlists = None
+    localPlaylists = None
+    playlists = {}
+
     if localSP != None:
-        playlists = localSP.current_user_playlists()
-    
+        localPlaylists = localSP.current_user_playlists()
+
+        if "items" in localPlaylists:
+            for p in localPlaylists["items"]:
+                playlists[p["name"]] = p["id"]
+
     return playlists
 
 # def pickTrackFromPlaylist() # take in track ID, if empty/None, use liked songs playlist
@@ -185,21 +246,35 @@ def spotifyWebPlayer(sock):
 #This websocket is used to first switch over Spotify to the Spotifinders Web API Device. This is what "Turns on" Our webplayer
 @sock.route('/deviceID')
 def deviceListener(sock):
-    device_id = sock.receive()
-    cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
-    auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
-    if not auth_manager.validate_token(cache_handler.get_cached_token()):
-        return redirect('/')
-    spotify = spotipy.Spotify(auth_manager=auth_manager)
-    print(f"Transferring playback to device {device_id}")
-    spotify.transfer_playback(device_id=device_id)
-
-    #play from liked playlists
-
-    #immediate pause
-
     
-    # spotify.start_playback(device_id=device_id, uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']) #Ideally, we start playing a song depending on what they want
+    
+    try:
+        
+        device_id = sock.receive()
+        cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
+        auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+        if not auth_manager.validate_token(cache_handler.get_cached_token()):
+            return redirect('/')
+        spotify = spotipy.Spotify(auth_manager=auth_manager)
+        print(f"Transferring playback to device {device_id}")
+        spotify.transfer_playback(device_id=device_id)
+
+        #play from liked playlists
+
+        #immediate pause
+
+
+        # this should work but I am getting 403 errors when I have commeted out...
+        savedTracks = spotify.current_user_saved_tracks()["items"]
+        firstSong = savedTracks[random.randint(0,len(savedTracks)-1)]["track"]
+        spotify.add_to_queue(firstSong["id"], device_id=device_id)
+
+        # spotify.start_playback(device_id=device_id, uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']) #Ideally, we start playing a song depending on what they want
+    
+    except Exception as e:
+        print (f"Error: {e}")
+    
+    return 
     
 
 
@@ -211,8 +286,10 @@ def test():
     audioFeatures['energy'] = .9
     audioFeatures['valence'] = .9
 
+    playlistID = '37i9dQZF1EUMDoJuT8yJsl'
 
-    return str(player(audioFeatures))
+    # return str(player(audioFeatures))
+    return str(trackFromPlaylist(audioFeatures, playlistID))
 
 
 @app.route('/sign_out')
