@@ -20,7 +20,6 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     </head>
     <body>
-
         <div class="container">
             <div class="round-button" onclick="toggleMic()">
                 <div class="round-button-circle">
@@ -38,9 +37,6 @@
                 <div><a href="/currently_playing">Whats playing</a></div>
                 <div><a onclick="playSong('/start_playing')">Make a hardcoded specific song play</a></div>
                 <div><a onclick="startPlayer()">start the player</a></div>
-                <div><a id="curr_state">Console Log Current Player State</a></div>
-
-
 
                 <div><a href="/sign_out">Sign Out</a></div>
             </div>
@@ -70,7 +66,7 @@
         </div>
 
         <div id="mask_player">
-            <button class="spotbutt" onclick="startPlayer()">Initialize Player</button>
+            <button id="init_button" class="unclickable spotbutt" onclick="startPlayer()">Initialize Player</button>
         </div>
 
 
@@ -81,6 +77,5 @@
     <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='bower_components/juliusjs/dist/julius.js') }}"></script>
     <script src="{{url_for('static', filename='loggedin.js')}}"></script>
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
 </html>
