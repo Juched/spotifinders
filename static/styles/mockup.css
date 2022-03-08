@@ -339,7 +339,10 @@ body {
   min-width: 200px;
   text-align: center;
 }
-
+.unclickable {
+  background-color: gray;
+  cursor: wait;
+}
 
 #song_title{
   text-align: center;
@@ -365,3 +368,4 @@ body {
   margin: 0 5% 0 5%;
   border-radius: 1em;
 }
+

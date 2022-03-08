@@ -4,12 +4,13 @@ if (window.location.protocol == "https:") {
 } else {
   var ws_scheme = "ws://";
 }
-console.log('web_player js loaded')
 
 var isPlayerReady = false;
 onSpotifyWebPlaybackSDKReady = () => {
   //update button
+  console.log('Spotify Web SDK ready to be initialized.')
   isPlayerReady = true;
+  document.getElementById('init_button').classList.remove("unclickable");
 };
 
 
@@ -150,11 +151,15 @@ function startPlayer() {
       makePlayer(socketMsg);
     }).catch(function(err) {
       // error here (Socket never recieved the auth token)
-      console.log("failed to get authtok. No player created")
+      console.log("failed to get authtok. No player created");
     });
 
     delMask()
-  } 
+  } else {
+    //IF the player isn't ready yet.
+    //TODO: display error message.
+    console.error("Error starting webplayer: Playback SDK is not ready");
+  }
 }
 function delMask(){
   document.getElementById('mask_player').style.display = 'none';
