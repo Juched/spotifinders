@@ -84,6 +84,9 @@ var mouse = {x: 0, y: 0};
 var numMetaballs = 30;
 var metaballs = [];
 
+var color_x = [1.0, 0.0, 0.0];
+var color_y = [0.0, 1.0, 0.0];
+
 for (var i = 0; i < numMetaballs; i++) {
   var radius = Math.random() * 60 + 10;
   metaballs.push({
@@ -128,8 +131,14 @@ sum += (radius * radius) / (dx * dx + dy * dy);
 }
 
 if (sum >= 0.99) {
-gl_FragColor = vec4(mix(vec3(x / WIDTH, y / HEIGHT, 1.0), vec3(0, 0, 0), max(0.0, 1.0 - (sum - 0.99) * 100.0)), 1.0);
-return;
+
+  float x_per = x / WIDTH;
+  float y_per = y / HEIGHT;
+  vec3 color_x = vec3(` + color_x[0] + `, ` + color_x[1] + `, ` + color_x[2] + `);
+  vec3 color_y = vec3(` + color_y[0] + `, ` + color_y[1] + `, ` + color_y[2] + `);
+  gl_FragColor = vec4(x_per*color_x + y_per*color_y, 1.0);
+
+  return;
 }
 
 gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -167,6 +176,37 @@ gl.vertexAttribPointer(positionHandle,
                       );
 
 var metaballsHandle = getUniformLocation(program, 'metaballs');
+
+function update_colors(color_x_new, color_y_new) {
+  color_x = color_x_new;
+  color_y = color_y_new;
+
+  gl = canvas.getContext('webgl');
+
+  fragmentShader = compileShader(fragmentShaderSrc, gl.FRAGMENT_SHADER);
+  
+  program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+  gl.useProgram(program);
+
+  vertexDataBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexDataBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+  
+  positionHandle = getAttribLocation(program, 'position');
+  gl.enableVertexAttribArray(positionHandle);
+  gl.vertexAttribPointer(positionHandle,
+                         2, // position is a vec2
+                         gl.FLOAT, // each component is a float
+                         gl.FALSE, // don't normalize values
+                         2 * 4, // two 4 byte float components per vertex
+                         0 // offset into each span of vertex data
+                        );
+  
+  metaballsHandle = getUniformLocation(program, 'metaballs');
+}
 
 loop();
 function loop() {
