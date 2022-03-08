@@ -35,9 +35,13 @@ recognition.onresult = function(event) {
     // After 3 seconds, remove the show class from DIV
     setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
 
+    socketData = {};
+    socketData["text"] = transcript;
+    // socketData["playlistID"] = IDDDDDD;
+
     console.log(transcript)
     console.log(confidence)
-    socket.send(transcript)
+    socket.send(socketData)
     
 };
 recognition.start();
