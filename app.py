@@ -1,5 +1,6 @@
 # compose_flask/app.py
 from threading import local
+from tkinter import E
 from flask import Flask, render_template, session, request, redirect
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -9,6 +10,7 @@ import os
 import uuid
 import random
 import numpy as np
+import json
 
 import spotipy
 from flask_session import Session
@@ -74,8 +76,8 @@ def log():
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         # Step 2. Display sign in link when no token
         auth_url = auth_manager.get_authorize_url()
-        # uPlaylists = playlists()
-        return render_template("index.html", auth_url=auth_url) #, userPlaylists=uPlaylists)
+        uPlaylists = playlists()
+        return render_template("index.html", auth_url=auth_url, userPlaylists=map(json.dumps, uPlaylists))
         #return f'<h2><a href="{auth_url}">Sign in</a></h2>'
 
     # Step 4. Signed in, display data
@@ -98,8 +100,10 @@ def echo(sock):
     model = SpotifinderModel()
     while True:
         data = sock.receive()
-        feature_dict = model.get_vector(data)
-        player(feature_dict)
+        print(data)
+        feature_dict = model.get_vector(data["text"])
+        # player(feature_dict)
+        queueFromPlaylist(feature_dict, data["playlistID"])
         print(feature_dict)
         sock.send(feature_dict)
 
@@ -121,7 +125,7 @@ def getSpotipy():
     return None
 
 # using spotipy to get a close match
-def player(audioFeatures):
+def discoverSong(audioFeatures):
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
     thing = ''
@@ -169,25 +173,35 @@ def findClosestMatch(idealAF, playlistAFs):
     minNorm = None
     idealID = None
 
-    for feature in implementedFeatures:
-        idealVector.append(idealAF[feature])
-    idealVector = np.array(idealVector)
+    try:
 
-    for singleTrack in playlistAFs:
-        currentVector = []
         for feature in implementedFeatures:
-            currentVector.append(singleTrack[feature])
-        # we have the curernt audio feature vector at this point
+            idealVector.append(idealAF[feature])
+        idealVector = np.array(idealVector)
 
-        currentMin = np.linalg.norm(np.array(currentVector) - idealVector)
-        if idealID == None or minNorm == None or currentMin < minNorm:
-            minNorm = currentMin
-            idealID = singleTrack['id']
-            print(idealID)
+        for singleTrack in playlistAFs:
+            currentVector = []
+            for feature in implementedFeatures:
+                currentVector.append(singleTrack[feature])
+            # we have the curernt audio feature vector at this point
+
+            currentMin = np.linalg.norm(np.array(currentVector) - idealVector)
+            if idealID == None or minNorm == None or currentMin < minNorm:
+                minNorm = currentMin
+                idealID = singleTrack['id']
+                print(idealID)
+    
+    except Exception as e:
+        print (f"Error: {e}")
 
     return idealID # some track id
 
-def trackFromPlaylist(idealAudioFeatures, playlistID):
+def queueFromPlaylist(idealAudioFeatures, playlistID):
+    if playlistID == None:
+        discoverSong(idealAudioFeatures)
+        return
+    
+
     localSP = getSpotipy()
     audioFeatures = None
 
@@ -210,8 +224,9 @@ def trackFromPlaylist(idealAudioFeatures, playlistID):
         # find the closest match
         coolSong = findClosestMatch(idealAudioFeatures, audioFeatures)
         # add to queue
-        if coolSong != None:
-            localSP.add_to_queue(coolSong) 
+        if localSP.current_playback() == None or localSP.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS:
+            if coolSong != None:
+                localSP.add_to_queue(coolSong) 
         
     return audioFeatures
 
@@ -227,7 +242,7 @@ def playlists():
 
         if "items" in localPlaylists:
             for p in localPlaylists["items"]:
-                playlists[p["name"]] = p["id"]
+                playlists[p["id"]] = p["name"]
 
     return playlists
 
@@ -267,7 +282,7 @@ def deviceListener(sock):
         # this should work but I am getting 403 errors when I have commeted out...
         savedTracks = spotify.current_user_saved_tracks()["items"]
         firstSong = savedTracks[random.randint(0,len(savedTracks)-1)]["track"]
-        spotify.add_to_queue(firstSong["id"], device_id=device_id)
+        spotify.add_to_queue(firstSong["id"]) # queueFromPlaylist)
 
         # spotify.start_playback(device_id=device_id, uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']) #Ideally, we start playing a song depending on what they want
     
@@ -289,7 +304,7 @@ def test():
     playlistID = '37i9dQZF1EUMDoJuT8yJsl'
 
     # return str(player(audioFeatures))
-    return str(trackFromPlaylist(audioFeatures, playlistID))
+    return str(queueFromPlaylist(audioFeatures, playlistID))
 
 
 @app.route('/sign_out')
