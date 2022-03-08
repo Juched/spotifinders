@@ -1,3 +1,4 @@
+"""App module."""
 # compose_flask/app.py
 from flask import Flask, render_template, session, request, redirect
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -25,12 +26,16 @@ SPOTIPY_CLIENT_ID = os.environ['SPOTIPY_CLIENT_ID']
 SPOTIPY_CLIENT_SECRET = os.environ['SPOTIPY_CLIENT_SECRET']
 SPOTIPY_REDIRECT_URI = os.environ['SPOTIPY_REDIRECT_URI']
 
-caches_folder = './.spotify_caches/'
-if not os.path.exists(caches_folder):
-    os.makedirs(caches_folder)
+SPOTIPY_OATH_SCOPE = ('user-library-read playlist-read-private user-top-read '
+                    'user-read-currently-playing user-read-playback-state streaming'
+                    )
+
+CACHES_FOLDER = './.spotify_caches/'
+if not os.path.exists(CACHES_FOLDER):
+    os.makedirs(CACHES_FOLDER)
 
 def session_cache_path():
-    return caches_folder + session.get('uuid')
+    return CACHES_FOLDER + session.get('uuid')
 
 
 # update the song playing every 15 seconds
@@ -49,7 +54,7 @@ def before_request():
             code = 301
             return redirect(url, code=code)
     else:
-        return 
+        return
 
 
 @app.route('/')
@@ -59,8 +64,8 @@ def log():
         session['uuid'] = str(uuid.uuid4())
 
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
-    auth_manager = spotipy.oauth2.SpotifyOAuth(scope='user-library-read playlist-read-private user-top-read user-read-currently-playing user-read-playback-state streaming',
-                                                cache_handler=cache_handler, 
+    auth_manager = spotipy.oauth2.SpotifyOAuth(scope=SPOTIPY_OATH_SCOPE,
+                                                cache_handler=cache_handler,
                                                 show_dialog=True)
 
     if request.args.get("code"):
@@ -77,7 +82,7 @@ def log():
     # Step 4. Signed in, display data
     spotify = spotipy.Spotify(auth_manager=auth_manager)
 
-    
+
     u_data = spotify.me()
 
     prof_pic_url = u_data['images'][0]['url']
@@ -101,7 +106,7 @@ def player(audioFeatures):
     # danceability, valence, energy dictionary
     thing = ''
     try:
-        
+
         # standard
         cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
         auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
@@ -111,23 +116,27 @@ def player(audioFeatures):
         localSP = spotipy.Spotify(auth_manager=auth_manager)
         # return spotify.current_user_playlists()
 
-        # 
         thing = localSP.current_playback()
 
         # play a new song if the timer allows it
-        if localSP.current_playback() == None or localSP.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS:
-            songs = localSP.recommendations(seed_genres= ['rock', 'pop', 'alternative', 'indie', 'rap'], #localSP.recommendation_genre_seeds(),  #'alternative', #, pop, alternative, indie', # just general stuff for now
+        if localSP.current_playback() == None or \
+            localSP.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS:
+
+            #localSP.recommendation_genre_seeds(),  #'alternative', #, pop, alternative, indie'
+            songs = localSP.recommendations(
+                seed_genres = ['rock', 'pop', 'alternative', 'indie', 'rap'],
                 target_danceability=audioFeatures['danceability'], 
                 target_energy=audioFeatures['energy'], 
                 target_valence=audioFeatures['valence']
                 )
 
-
-            
             # adds new suggest song to queue
             thing = songs['tracks'][0]['id']
             localSP.add_to_queue(thing)
-            if localSP.current_playback() != None: #currently_playing() != None: # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
+
+            # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
+            #currently_playing() != None:
+            if localSP.current_playback() != None:
                 localSP.next_track()
             else:
                 localSP.start_playback()

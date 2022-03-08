@@ -1,3 +1,4 @@
+"""NLP Model module."""
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
@@ -21,7 +22,7 @@ class Indexer(object):
         return len(self.objs_to_ints)
 
     def get_object(self, index):
-        if (index not in self.ints_to_objs):
+        if index not in self.ints_to_objs:
             return None
         else:
             return self.ints_to_objs[index]
@@ -30,7 +31,7 @@ class Indexer(object):
         return self.index_of(object) != -1
 
     def index_of(self, object):
-        if (object not in self.objs_to_ints):
+        if object not in self.objs_to_ints:
             return -1
         else:
             return self.objs_to_ints[object]
@@ -38,7 +39,7 @@ class Indexer(object):
     def add_and_get_index(self, object, add=True):
         if not add:
             return self.index_of(object)
-        if (object not in self.objs_to_ints):
+        if object not in self.objs_to_ints:
             new_idx = len(self.objs_to_ints)
             self.objs_to_ints[object] = new_idx
             self.ints_to_objs[new_idx] = object
@@ -53,17 +54,19 @@ class UnigramFeatureExtractor():
 
     def extract_features(self, sentence: List[str], add_to_indexer: bool = False) -> Counter:
 
-        unigram_list: List[str] = []  # Will contain non-unique list of all unigrams parsed from the sentence
+        # Contains non-unique list of all unigrams parsed from the sentence
+        unigram_list: List[str] = []
 
         for unigram in sentence:
 
             index = self._indexer.add_and_get_index(unigram.lower(), add_to_indexer)
 
-            if (index != -1):  # If unigram didn't get added to the indexer (this occurs during the testing phase)
+            # If unigram didn't get added to the indexer (this occurs during the testing phase)
+            if index != -1:
                 unigram_list.append(unigram.lower())
 
         return Counter(unigram_list)
-    
+
 # Helper function to create feature vector from feature counter
 def get_feature_vector(feature_counter: Counter, feature_extractor) -> np.ndarray:
 
@@ -88,7 +91,7 @@ class SpotifinderModel(object):
 
         # preprocess data
         data.dropna(subset = ['lyrics'], inplace=True)
-        data = data.astype({"lyrics": str}, errors='raise') 
+        data = data.astype({"lyrics": str}, errors='raise')
 
         # filter lyrics
         pre_filter_lyrics = data['lyrics'].tolist()
@@ -163,9 +166,9 @@ class SpotifinderModel(object):
 
         # Ensure values between 0 and 1
         for i, feat in enumerate(output):
-            if (feat > 1.0):
+            if feat > 1.0:
                 output[i] = 1.0
-            elif (feat < 0.0):
+            elif feat < 0.0:
                 output[i] = 0.0
 
         return {'danceability': output[0], 'energy': output[1], 'valence': output[2]}
