@@ -50,19 +50,19 @@
             <div class="playlist-dropdown-content">
                 <div id="liked_songs_selector"><a>Liked Songs</a></div>
                 <div id="discovery_selector"><a>Discover</a></div>
-                <div id="custom_playlist_selector"><a>Custom Playlist</a>
+                <div id="custom_playlist_selector"><a onclick="togglePlaylistMenu(true)">Custom Playlist</a>
                     <div class="custom-p-dropdown-content"> 
                         <!-- dynamically get the playlists of a user from the backend -->
-                        {% for playlistID in userPlaylists.keys() %}
-                            <div id={{playlistID}}><a>{{userPlaylists[playlistID]}}</a></div>
-                        {% endfor %}
+
                     </div>
                 </div>
                 <div><a>Genre or smth idk</a></div>
             </div>
         </div>
 
-        <div id="CURRENTLY_PLAYING" playlist_id="1"></div>
+
+
+
 
 
 
@@ -80,6 +80,16 @@
             <button id="init_button" class="unclickable spotbutt" onclick="startPlayer()">Initialize Player</button>
         </div>
 
+        <div id="playlist_selection_box">
+            <div class="titlebox">{{ pname }}'s playlists</div>
+            <div class="scrollbar_container">
+                {% for playlistID in userPlaylists.keys() %}
+                <div id={{playlistID}}><a>{{userPlaylists[playlistID]}}</a></div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="CURRENTLY_PLAYING" playlist_id="1"></div>
 
         <div id="snackbar">Bottom Text</div>
           

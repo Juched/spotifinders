@@ -109,6 +109,39 @@
     display: block;
   }
 
+  .custom-p-dropdown-content {
+    display: none;
+    position: relative;
+    left: 100%;
+  }
+
+  #custom_playlist_selector:hover .custom-p-dropdown-content {
+    display: block;
+  }
+  #playlist_selection_box {
+    position: fixed;
+    top: 20%;
+    left: 20%;
+    height: 50%;
+    width: 60%;
+    background-color: rgb(22,22,22);
+    overflow: hidden;
+    display: none;
+
+  }
+  .titlebox{
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+
+  }
+  .scrollbar_container{
+    Overflow-y:scroll;
+    margin: auto 5%;
+    height: 20em;
+  }
+
    /* The snackbar - position it at the bottom and in the middle of the screen */
   #snackbar {
     visibility: hidden; /* Hidden by default. Visible on click */

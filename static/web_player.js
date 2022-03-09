@@ -166,4 +166,12 @@ function delMask(){
 }
 
 
+function togglePlaylistMenu(toggleOn){
+  menu = document.getElementById("playlist_selection_box");
 
+  if(toggleOn){
+    menu.style.display = "block";
+  } else {
+    menu.style.display = "none";
+  }
+}
