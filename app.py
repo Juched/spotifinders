@@ -76,8 +76,7 @@ def log():
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         # Step 2. Display sign in link when no token
         auth_url = auth_manager.get_authorize_url()
-        uPlaylists = playlists()
-        return render_template("index.html", auth_url=auth_url, userPlaylists=map(json.dumps, uPlaylists))
+        return render_template("index.html", auth_url=auth_url)
         #return f'<h2><a href="{auth_url}">Sign in</a></h2>'
 
     # Step 4. Signed in, display data
@@ -91,7 +90,9 @@ def log():
 
     prof_pic_url = u_data['images'][0]['url']
 
-    return render_template("loggedin.html",purl=prof_pic_url, pname=u_data['display_name'])
+    uPlaylists = playlists(spotify)
+
+    return render_template("loggedin.html",purl=prof_pic_url, pname=u_data['display_name'], userPlaylists=uPlaylists) #map(json.dumps, uPlaylists))
 
 
 # called once for each thread
@@ -103,6 +104,8 @@ def echo(sock):
         print(data)
         feature_dict = model.get_vector(data["text"])
         # player(feature_dict)
+        # TODO: make sure to implement the playlistID part
+        # will just play the discover mode otherwise though if None
         queueFromPlaylist(feature_dict, data["playlistID"])
         print(feature_dict)
         sock.send(feature_dict)
@@ -205,7 +208,7 @@ def queueFromPlaylist(idealAudioFeatures, playlistID):
     localSP = getSpotipy()
     audioFeatures = None
 
-    if localSP != None:
+    if localSP != None and (localSP.current_playback() == None or localSP.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS):
         # get the songs from the playlist
         # tracks = localSP.playlist(playlistID, fields="tracks,next")
         tracks = localSP.playlist(playlistID)
@@ -224,16 +227,15 @@ def queueFromPlaylist(idealAudioFeatures, playlistID):
         # find the closest match
         coolSong = findClosestMatch(idealAudioFeatures, audioFeatures)
         # add to queue
-        if localSP.current_playback() == None or localSP.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS:
-            if coolSong != None:
-                localSP.add_to_queue(coolSong) 
+        if coolSong != None:
+            localSP.add_to_queue(coolSong) 
         
     return audioFeatures
 
 # gets the playlists name and IDs and returns them (easily replaceable for URIs too)
-def playlists():
+def playlists(spotopyManager=None):
     
-    localSP = getSpotipy()
+    localSP = spotopyManager if spotopyManager != None else getSpotipy()
     localPlaylists = None
     playlists = {}
 
