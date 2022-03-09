@@ -52,7 +52,10 @@
                 <div id="discovery_selector"><a>Discover</a></div>
                 <div id="custom_playlist_selector"><a>Custom Playlist</a>
                     <div class="custom-p-dropdown-content"> 
-                        <div id="PLAYLIST ID HERE"><a>lol my happy playlist</a></div>
+                        <!-- dynamically get the playlists of a user from the backend -->
+                        {% for playlistID in userPlaylists.keys() %}
+                            <div id={{playlistID}}><a>{{userPlaylists[playlistID]}}</a></div>
+                        {% endfor %}
                     </div>
                 </div>
                 <div><a>Genre or smth idk</a></div>
