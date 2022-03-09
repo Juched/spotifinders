@@ -229,6 +229,10 @@ def queueFromPlaylist(idealAudioFeatures, playlistID):
         # add to queue
         if coolSong != None:
             localSP.add_to_queue(coolSong) 
+            if localSP.current_playback() != None: #currently_playing() != None: # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
+                localSP.next_track()
+            else:
+                localSP.start_playback()
         
     return audioFeatures
 
