@@ -141,6 +141,13 @@
     margin: auto 5%;
     height: 20em;
   }
+  .x_button{
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    font-size: x-large;
+    cursor: pointer;
+  }
 
    /* The snackbar - position it at the bottom and in the middle of the screen */
   #snackbar {

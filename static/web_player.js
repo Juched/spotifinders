@@ -155,6 +155,11 @@ function startPlayer() {
     });
 
     delMask()
+    establishPlaylistLinks()
+
+
+
+
   } else {
     //IF the player isn't ready yet.
     //TODO: display error message.
@@ -175,3 +180,20 @@ function togglePlaylistMenu(toggleOn){
     menu.style.display = "none";
   }
 }
+
+
+
+function establishPlaylistLinks(){
+  let playlists = document.getElementsByClassName("playlist_choice")
+
+
+  for (const playlist of playlists) {
+    playlist.onclick = function() {
+      document.getElementById("CURRENTLY_PLAYING").setAttribute("playlist_id",playlist.id);
+      togglePlaylistMenu(false)
+    };
+  }
+
+}
+
+
