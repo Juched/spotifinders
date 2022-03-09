@@ -100,7 +100,7 @@ def log():
 def echo(sock):
     model = SpotifinderModel()
     while True:
-        data = sock.receive()
+        data = json.loads(sock.receive())
         print(data)
         feature_dict = model.get_vector(data["text"])
         # player(feature_dict)

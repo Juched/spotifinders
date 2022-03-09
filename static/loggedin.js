@@ -41,7 +41,7 @@ recognition.onresult = function(event) {
 
     console.log(transcript)
     console.log(confidence)
-    socket.send(socketData)
+    socket.send(JSON.stringify(socketData))
     
 };
 recognition.start();
