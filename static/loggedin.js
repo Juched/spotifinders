@@ -37,7 +37,7 @@ recognition.onresult = function(event) {
 
     socketData = {};
     socketData["text"] = transcript;
-    // socketData["playlistID"] = IDDDDDD;
+    socketData["playlistID"] = document.getElementById("CURRENTLY_PLAYING").getAttribute("playlist_id");
 
     console.log(transcript)
     console.log(confidence)
