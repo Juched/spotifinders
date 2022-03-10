@@ -294,8 +294,10 @@ def deviceListener(sock):
 
             
             if playlist_id == "discover_mode":
-                tracks = spotify.recommendations(seed_genres= ['rock', 'pop', 'alternative', 'indie', 'rap'])
-                print(tracks)
+                rec_songs_arr = spotify.recommendations(seed_genres= ['rock', 'pop', 'alternative', 'indie', 'rap'])['tracks']
+                rec_uris = [song['uri'] for song in rec_songs_arr]
+                spotify.start_playback(device_id=data['device_id'], uris=rec_uris)
+
             elif playlist_id == "liked_songs":
                 #this array is a bunch of liked songs.
                 #arrray of {added at: , track: } objecats
@@ -309,7 +311,7 @@ def deviceListener(sock):
                 selected_playlist = spotify.playlist(playlist_id)
                 spotify.start_playback(device_id=data['device_id'], context_uri=selected_playlist['uri'])
             else:
-                print("Unknown variant of PlaylistID")
+                print(f"Unknown variant of PlaylistID: {playlist_id}, \nThis should never happen!")
 
 
 
