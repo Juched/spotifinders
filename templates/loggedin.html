@@ -79,7 +79,7 @@
             <div class="titlebox">{{ pname }}'s playlists</div>
             <div class="scrollbar_container">
                 {% for playlistID in userPlaylists.keys() %}
-                <div id={{playlistID}} class="playlist_choice"><a>{{userPlaylists[playlistID]}}</a></div>
+                <div id={{playlistID}} class="playlist_choice">{{userPlaylists[playlistID]}}</div>
                 {% endfor %}
             </div>
         </div>

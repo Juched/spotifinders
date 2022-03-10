@@ -100,6 +100,9 @@
     padding: 10px;
     cursor: pointer;
   }
+  .dropdown_option:hover{
+    background-color:rgba(103,103,103, 0.8)
+  }
   .profile-dropdown-content {
     display: none;
     position: relative;
@@ -163,7 +166,19 @@
     font-size: x-large;
     cursor: pointer;
   }
+  .playlist_choice{
+    color: white;
+    cursor: pointer;
+    padding: 8px 0px;
+    border: solid #6E6E6E;
+    border-width: 2px 4px;
+    border-radius: 4px;
+    font-size: large;
+  }
 
+  .playlist_choice:hover{
+    background-color: gray;
+  }
    /* The snackbar - position it at the bottom and in the middle of the screen */
   #snackbar {
     visibility: hidden; /* Hidden by default. Visible on click */
