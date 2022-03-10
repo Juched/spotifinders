@@ -1,3 +1,6 @@
+  a {
+    cursor: pointer;
+  }
   body {
     font-family: 'Alatsi', sans-serif;
     margin: 0;
@@ -91,14 +94,19 @@
     font-weight:bold;
     text-decoration:none;
   }
-
+  .dropdown_option{
+    margin: 4px 10px;
+    font-weight: bold;
+    padding: 10px;
+    cursor: pointer;
+  }
   .profile-dropdown-content {
     display: none;
     position: relative;
     background-color: #f9f9f9;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    padding: 12px 16px;
     z-index: 1;
+    border-radius: 10px;
   }
   .profile-dropdown:hover .profile-dropdown-content {
     display: block;
@@ -109,8 +117,8 @@
     position: relative;
     background-color: #f9f9f9;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    padding: 12px 16px;
     z-index: 1;
+    border-radius: 10px;
   }
   .playlist-dropdown:hover .playlist-dropdown-content {
     display: block;
@@ -241,7 +249,11 @@
 
 #song_title{
   text-align: center;
-  background-color: lime;
+  background-color: rgba(10,10,10,0.7);
+  margin: 10px;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
   padding: 10px;
 }
 #playback_buttons {
