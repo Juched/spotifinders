@@ -300,14 +300,10 @@ def deviceListener(sock):
                 #this array is a bunch of liked songs.
                 #arrray of {added at: , track: } objecats
                 #track is {artists... album... uri...} 
-                liked_songs_arr = spotify.current_user_saved_tracks()["items"]
-
-                random_liked_song_uri = liked_songs_arr[random.randint(0,len(liked_songs_arr)-1)]['track']['uri']
-
-                spotify.start_playback(device_id=data['device_id'], uri=random_liked_song_uri)
-
-
-                print(spotify.current_user_saved_tracks())
+                liked_songs_arr = spotify.current_user_saved_tracks(limit=50)["items"]      #TODO: Research liked song limitation. CAn only retrieve 50!
+                sampled_liked_songs = random.sample(liked_songs_arr, 20)                    #TODO: see if we should sample more than 20 liked songs. Research what this does too.
+                random_liked_song_uris = [song['track']['uri'] for song in sampled_liked_songs]
+                spotify.start_playback(device_id=data['device_id'], uris=random_liked_song_uris)
             elif is_custom:
                 print(f"Custom playlist recieved: {playlist_id} ")
                 selected_playlist = spotify.playlist(playlist_id)
