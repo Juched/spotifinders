@@ -162,7 +162,7 @@ class SpotifinderModel(object):
         energy = self.energy_reg.predict(feature_vector)[0][0]
         valence = self.valence_reg.predict(feature_vector)[0][0]
 
-        output = np.array([dance, energy, valence])
+        output = np.random.rand(3,1)
 
         # Ensure values between 0 and 1
         for i, feat in enumerate(output):

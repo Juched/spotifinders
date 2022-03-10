@@ -35,9 +35,13 @@ recognition.onresult = function(event) {
     // After 3 seconds, remove the show class from DIV
     setTimeout(function(){ x.className = x.className.replace("show", ""); }, 2000);
 
+    socketData = {};
+    socketData["text"] = transcript;
+    socketData["playlistID"] = document.getElementById("CURRENTLY_PLAYING").getAttribute("playlist_id");
+
     console.log(transcript)
     console.log(confidence)
-    socket.send(transcript)
+    socket.send(JSON.stringify(socketData))
     
 };
 recognition.start();
@@ -79,3 +83,12 @@ function toggleMic()
   }
   
 }
+
+function playSong(url)
+{
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send();
+}
+
