@@ -35,11 +35,10 @@
         <div class="profile-dropdown profile-container">         
             <button class="spotbutt" id="pDropdown"><img width="42" height="42" src="{{ purl }}" alt="me"> &nbsp {{ pname }} </button>
             <div class="profile-dropdown-content">
-                <div><a href="/currently_playing">Whats playing</a></div>
-                <div><a onclick="playSong('/start_playing')">Make a hardcoded specific song play</a></div>
-                <div><a onclick="startPlayer()">start the player</a></div>
-
-                <div><a href="/sign_out">Sign Out</a></div>
+                <div class="dropdown_option"><a href="/currently_playing">Whats playing</a></div>
+                <div class="dropdown_option" onclick="playSong('/start_playing')">Make a hardcoded specific song play</div>
+                <div class="dropdown_option" onclick="startPlayer()">start the player</div>
+                <div class="dropdown_option"><a href="/sign_out">Sign Out</a></div>
             </div>
         </div>
 
@@ -48,15 +47,10 @@
         <div class="playlist-dropdown playlist-container">
             <button class="spotbutt" id="playlist_drop">Playlists</button>
             <div class="playlist-dropdown-content">
-                <div id="liked_songs_selector"><a>Liked Songs</a></div>
-                <div id="discovery_selector"><a>Discover</a></div>
-                <div id="custom_playlist_selector"><a onclick="togglePlaylistMenu(true)">Custom Playlist</a>
-                    <div class="custom-p-dropdown-content"> 
-                        <!-- dynamically get the playlists of a user from the backend -->
-
-                    </div>
-                </div>
-                <div><a>Genre or smth idk</a></div>
+                <div id="liked_songs_selector" class="dropdown_option">Liked Songs</div>
+                <div id="discovery_selector" class="dropdown_option">Discover</div>
+                <div id="custom_playlist_selector" class="dropdown_option" onclick="togglePlaylistMenu(true)">Custom Playlist</div>
+                <!-- <div><a>Genre or smth idk</a></div> -->
             </div>
         </div>
 
