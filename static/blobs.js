@@ -193,3 +193,16 @@ gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
         return attributeLocation;
     }
 }
+
+// <script src="vibrant.min.js"></script>
+//
+// <script>
+// 	var img = document.getElementById("img");
+// 	img.crossOrigin = "Anonymous";
+// 	img.addEventListener('load', function() {
+// 		var v = new Vibrant(img);
+//
+// 		console.log(v);
+// 	}
+// 	);
+// </script>
