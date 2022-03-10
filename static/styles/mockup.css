@@ -1,4 +1,4 @@
-body {
+  body {
     font-family: 'Alatsi', sans-serif;
     margin: 0;
     overflow: hidden;
@@ -10,9 +10,15 @@ body {
     top: 8%;
     left: 84%;
   }
+  .playlist-container {
+    position: absolute;
+    top: 8%;
+    left: 100% - 84%;
+  }
 
   .container {
-    display: flex;
+    display: none;
+    /* display from flex to none! this is the mic buton */
     justify-content: center;
     align-items: center;
     
@@ -22,6 +28,13 @@ body {
     width: 100vw;
     height: 100vh;
   }
+
+  .titlecontainer{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%) }
   
   .title {
     font-size: 10vw;
@@ -30,24 +43,13 @@ body {
   
   canvas {
     width: 100%;
+    height: 100%;
   }
 
   .spotbutt {
     background-color: #1ED760;
     border-radius: 500px;
     padding: 14px 32px;
-    border-color: transparent;
-    font-size : 20px;
-  }
-
-
-  .dropdown {
-    background-color: #1ED760;
-    position: absolute;
-    border-radius: 500px;
-    padding: 14px 32px;
-    top: 8%;
-    left: 8%;
     border-color: transparent;
     font-size : 20px;
   }
@@ -94,13 +96,64 @@ body {
     display: none;
     position: relative;
     background-color: #f9f9f9;
-    min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     padding: 12px 16px;
     z-index: 1;
   }
   .profile-dropdown:hover .profile-dropdown-content {
     display: block;
+  }
+
+  .playlist-dropdown-content {
+    display: none;
+    position: relative;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+  }
+  .playlist-dropdown:hover .playlist-dropdown-content {
+    display: block;
+  }
+
+  .custom-p-dropdown-content {
+    display: none;
+    position: relative;
+    left: 100%;
+  }
+
+  #custom_playlist_selector:hover .custom-p-dropdown-content {
+    display: block;
+  }
+  #playlist_selection_box {
+    position: fixed;
+    top: 20%;
+    left: 20%;
+    height: 50%;
+    width: 60%;
+    background-color: rgb(22,22,22);
+    overflow: hidden;
+    display: none;
+
+  }
+  .titlebox{
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+
+  }
+  .scrollbar_container{
+    Overflow-y:scroll;
+    margin: auto 5%;
+    height: 20em;
+  }
+  .x_button{
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    font-size: x-large;
+    cursor: pointer;
   }
 
    /* The snackbar - position it at the bottom and in the middle of the screen */
@@ -148,3 +201,66 @@ body {
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
   } 
+
+
+
+#playerbox {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  text-align: center;
+  background-color: rgba(103,103,103, 0.5);
+  position: absolute;
+  border-radius: 25px;
+  top: 45%;
+  left: 25%;
+  bottom: 15%;
+  right: 25%;
+  min-width: 200px;
+  padding: 20px;
+}
+#mask_player {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(103,103,103, 0.8);
+  border-radius: 25px;
+  top: 45%;
+  left: 25%;
+  bottom: 15%;
+  right: 25%;
+  min-width: 200px;
+  text-align: center;
+}
+.unclickable {
+  background-color: gray;
+  cursor: wait;
+}
+
+#song_title{
+  text-align: center;
+  background-color: lime;
+  padding: 10px;
+}
+#playback_buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 70%;
+}
+.glyphicon {
+  color: black;
+  font-size: 3em;
+}
+.glyphicon:hover{
+  color: rgb(50, 50, 50);
+}
+
+#album_art{
+  min-height: 80px;
+  min-width: 80px;
+  margin: 0 5% 0 5%;
+  border-radius: 1em;
+}
+
