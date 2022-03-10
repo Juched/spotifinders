@@ -103,10 +103,8 @@ def echo(sock):
         data = json.loads(sock.receive())
         print(data)
         feature_dict = model.get_vector(data["text"])
-        # player(feature_dict)
-        # TODO: make sure to implement the playlistID part
-        # will just play the discover mode otherwise though if None
-        queueFromPlaylist(feature_dict, data["playlistID"])
+
+        queueFromPlaylist(feature_dict, data)
         print(feature_dict)
         sock.send(feature_dict)
 
@@ -199,8 +197,13 @@ def findClosestMatch(idealAF, playlistAFs):
 
     return idealID # some track id
 
-def queueFromPlaylist(idealAudioFeatures, playlistID):
-    if playlistID == None:
+#Method that starts play
+def queueFromPlaylist(idealAudioFeatures, data):
+    playlistID = data["playlistID"]
+
+    #In the case this is a new playlist, we don't need to recommend anything (as of right now). Just transfer playback
+
+    if playlistID == "discover_mode":
         discoverSong(idealAudioFeatures)
         return
     
@@ -265,20 +268,54 @@ def spotifyWebPlayer(sock):
     # sock.close()
 
 #This websocket is used to first switch over Spotify to the Spotifinders Web API Device. This is what "Turns on" Our webplayer
+#This websocket is called FIRST when the server first loads and THEN every time the user selects a playlist.
 @sock.route('/deviceID')
 def deviceListener(sock):
-    
-    
     try:
         
-        device_id = sock.receive()
         cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
         auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
         if not auth_manager.validate_token(cache_handler.get_cached_token()):
             return redirect('/')
         spotify = spotipy.Spotify(auth_manager=auth_manager)
-        print(f"Transferring playback to device {device_id}")
-        spotify.transfer_playback(device_id=device_id)
+
+
+
+        data = json.loads(sock.receive())
+        print(f"Transferring playback to device {data['device_id']}")
+        spotify.transfer_playback(device_id=data['device_id'])
+
+
+
+        while(True):
+            data = json.loads(sock.receive())
+            playlist_id = data['playlist_id']
+            is_custom = data['isCustomUserPlaylist']
+
+            
+            if playlist_id == "discover_mode":
+                tracks = spotify.recommendations(seed_genres= ['rock', 'pop', 'alternative', 'indie', 'rap'])
+                print(tracks)
+            elif playlist_id == "liked_songs":
+                #this array is a bunch of liked songs.
+                #arrray of {added at: , track: } objecats
+                #track is {artists... album... uri...} 
+                liked_songs_arr = spotify.current_user_saved_tracks()["items"]
+
+                random_liked_song_uri = liked_songs_arr[random.randint(0,len(liked_songs_arr)-1)]['track']['uri']
+
+                spotify.start_playback(device_id=data['device_id'], uri=random_liked_song_uri)
+
+
+                print(spotify.current_user_saved_tracks())
+            elif is_custom:
+                print(f"Custom playlist recieved: {playlist_id} ")
+                selected_playlist = spotify.playlist(playlist_id)
+                spotify.start_playback(device_id=data['device_id'], context_uri=selected_playlist['uri'])
+            else:
+                print("Unknown variant of PlaylistID")
+
+
 
         #play from liked playlists
 
@@ -296,6 +333,12 @@ def deviceListener(sock):
         print (f"Error: {e}")
     
     return 
+def startPlay(tracks_array, spotify):
+    song = tracks_array[random.randint(0,len(tracks_array)-1)]
+
+    
+
+
     
 
 
