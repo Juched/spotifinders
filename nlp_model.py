@@ -3,7 +3,8 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from typing import List
-
+import yaml
+from yaml import Loader, Dumper
 from collections import Counter
 
 class Indexer(object):
@@ -93,6 +94,25 @@ class SpotifinderModel(object):
         # filter lyrics
         pre_filter_lyrics = data['lyrics'].tolist()
         lyrics = []
+        
+        self.ecstacy = 0
+        self.admiration = 0
+        self.terror = 0
+        self.amazement = 0
+        self.grief = 0
+        self.loathing = 0
+        self.rage = 0
+        self.vigilance = 0
+        with open('cfg/config.yaml', 'r')  as f:
+            config = yaml.load(f, Loader=Loader)
+        self.ecstacy = config['ecstacy']
+        self.admiration = config['admiration']
+        self.terror = config['terror']
+        self.amazement = config['amazement']
+        self.grief = config['grief']
+        self.loathing = config['loathing']
+        self.rage = config['rage']
+        self.vigilance = config['vigilance']
 
         for song in pre_filter_lyrics:
             song = song.replace('\n', ' ')

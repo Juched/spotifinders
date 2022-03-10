@@ -6,3 +6,4 @@ flask-sock
 gunicorn
 pandas
 scikit-learn
+pyyaml
