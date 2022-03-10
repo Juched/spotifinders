@@ -13,12 +13,36 @@ window.addEventListener("resize", () => {
     }, 100);
 });
 
+var img = document.getElementById("album_art");
+img.crossOrigin = "Anonymous";
+
 function update_colors(color_x_new, color_y_new) {
   color_x = color_x_new;
   color_y = color_y_new;
 
   setupBackground(currentBackgroundId);
 }
+
+img.addEventListener('load', function() {
+    var v = new Vibrant(img);
+
+    album_color_1 = v.VibrantSwatch.rgb;
+    album_color_2 = v.DarkVibrantSwatch.rgb;
+
+    album_color_1[0] = album_color_1[0] / 255.0;
+    album_color_1[1] = album_color_1[1] / 255.0;
+    album_color_1[2] = album_color_1[2] / 255.0;
+
+    album_color_2[0] = album_color_2[0] / 255.0;
+    album_color_2[1] = album_color_2[1] / 255.0;
+    album_color_2[2] = album_color_2[2] / 255.0;
+
+    if (album_color_1[0] != color_x[0] && album_color_1[1] != color_x[1] && album_color_1[2] != color_x[2] && album_color_2[0] != color_y[0] && album_color_2[1] != color_y[1] && album_color_2[2] != color_y[2])
+    {
+        update_colors(album_color_1, album_color_2);
+    }
+}
+);
 
 function setupBackground(ourBackgroundId) {
     if (currentBackgroundId !== ourBackgroundId) {
@@ -193,16 +217,3 @@ gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
         return attributeLocation;
     }
 }
-
-// <script src="vibrant.min.js"></script>
-//
-// <script>
-// 	var img = document.getElementById("img");
-// 	img.crossOrigin = "Anonymous";
-// 	img.addEventListener('load', function() {
-// 		var v = new Vibrant(img);
-//
-// 		console.log(v);
-// 	}
-// 	);
-// </script>
