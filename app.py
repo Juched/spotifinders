@@ -106,6 +106,7 @@ def echo(sock):
 
         queueFromPlaylist(feature_dict, data)
         print(feature_dict)
+        # print(data)
         sock.send(feature_dict)
 
 # gets the Spotipy obj
@@ -130,6 +131,7 @@ def discoverSong(audioFeatures):
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
     thing = ''
+    print('discovery mode!')
     try:
         
         # standard
@@ -203,11 +205,12 @@ def queueFromPlaylist(idealAudioFeatures, data):
 
     #In the case this is a new playlist, we don't need to recommend anything (as of right now). Just transfer playback
 
-    if playlistID == "discover_mode":
+    if playlistID == "discover_mode" or playlistID == 1 or playlistID == "liked_songs" or playlistID == "1":
         discoverSong(idealAudioFeatures)
         return
     
-
+    
+    
     localSP = getSpotipy()
     audioFeatures = None
 
@@ -215,18 +218,21 @@ def queueFromPlaylist(idealAudioFeatures, data):
         # get the songs from the playlist
         # tracks = localSP.playlist(playlistID, fields="tracks,next")
         tracks = localSP.playlist(playlistID)
+        # print('Custom playlist!')
 
         # print(tracks)
         trackIDs = []
 
         for (song, i) in zip(tracks["tracks"]["items"], range(100)):
             if song != None:
-                trackIDs.append(song['track']['id'])
+                trackIDs.append(song['track']['uri'])
 
-
+        print(trackIDs)
         # get the audio features
-        audioFeatures = localSP.audio_features(trackIDs)
+        audioFeatures = localSP.audio_features(tracks=trackIDs)
 
+        # print('got audio features! print here:')
+        # print(audioFeatures)
         # find the closest match
         coolSong = findClosestMatch(idealAudioFeatures, audioFeatures)
         # add to queue
@@ -283,6 +289,7 @@ def deviceListener(sock):
 
         data = json.loads(sock.receive())
         print(f"Transferring playback to device {data['device_id']}")
+
         spotify.transfer_playback(device_id=data['device_id'])
 
 
