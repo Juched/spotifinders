@@ -1,4 +1,5 @@
 """NLP Model module."""
+from ast import AsyncFunctionDef
 from collections import Counter
 from typing import List
 import pandas as pd
@@ -88,12 +89,8 @@ def get_feature_vector(feature_counter: Counter, feature_extractor) -> np.ndarra
 
     return feature_vector
 
-def do_nothing():
-    """Do nothing."""
-    pass
-
-"""Spotifinder NLP Model"""
 class SpotifinderModel():
+    """Spotifinder NLP Model"""
 
     def __init__(self):
         self.indexer = Indexer()
@@ -119,7 +116,7 @@ class SpotifinderModel():
 
         # get feature vectors
         counter_list = []
-        for i, song in enumerate(lyrics):
+        for song in lyrics:
             words = song.split(' ')
             counter = self.uni_fv.extract_features(words, True)
             counter_list.append(counter)
@@ -130,25 +127,26 @@ class SpotifinderModel():
             feature_vector = np.where(feature_vector > 0, 1, 0)
             feature_vector_list.append(feature_vector)
 
-        feature_matrix = np.array(feature_vector_list)
+        feat_matrix = np.array(feature_vector_list)
 
         # danceability model
         x_train, _, y_train, _ = \
-            train_test_split(feature_matrix, data[['danceability']], test_size=0.25, random_state=44)
+            train_test_split(feat_matrix, data[['danceability']], test_size=0.25, random_state=44)
         self.dance_reg = LinearRegression().fit(x_train, y_train)
 
         # energy model
         x_train, _, y_train, _ = \
-            train_test_split(feature_matrix, data[['energy']], test_size=0.30, random_state=44)
+            train_test_split(feat_matrix, data[['energy']], test_size=0.30, random_state=44)
         self.energy_reg = LinearRegression().fit(x_train, y_train)
 
         # valence model
         x_train, _, y_train, _ = \
-            train_test_split(feature_matrix, data[['valence']], test_size=0.30, random_state=44)
+            train_test_split(feat_matrix, data[['valence']], test_size=0.30, random_state=44)
 
         self.valence_reg = LinearRegression().fit(x_train, y_train)
 
     def get_vector(self, sentence: str) -> np.array:
+        """Get spotify vector for sentence."""
 
         sentence = sentence.replace('\n', ' ')
         sentence = sentence.replace('.', ' ')
@@ -178,6 +176,9 @@ class SpotifinderModel():
                 output[i] = 0.0
 
         return {'danceability': output[0], 'energy': output[1], 'valence': output[2]}
+
+    def do_nothing():
+        """Do nothing."""
 
 if __name__ == "__main__":
 
