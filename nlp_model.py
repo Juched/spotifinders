@@ -7,6 +7,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
 class Indexer():
+    """Indexer class"""
     def __init__(self):
         self.objs_to_ints = {}
         self.ints_to_objs = {}
@@ -20,45 +21,46 @@ class Indexer():
     def __len__(self):
         return len(self.objs_to_ints)
 
-    """Get object from index"""
     def get_object(self, index):
+        """Get object from index"""
         if index not in self.ints_to_objs:
             return None
 
         return self.ints_to_objs[index]
 
-    """ Check if indexer contains object"""
     def contains(self, obj):
+        """ Check if indexer contains object"""
         return self.index_of(obj) != -1
 
-    """Get index from object"""
     def index_of(self, obj):
+        """Get index from object"""
         if obj not in self.objs_to_ints:
             return -1
 
         return self.objs_to_ints[obj]
 
-    """Add object to indexer and return index, additional param add determines whether object actually gets added"""
-    def add_and_get_index(self, object, add=True):
+    def add_and_get_index(self, obj, add=True):
+        """Add object to indexer and return index, \
+        additional param add determines whether object actually gets added"""
         if not add:
-            return self.index_of(object)
-        if object not in self.objs_to_ints:
+            return self.index_of(obj)
+        if obj not in self.objs_to_ints:
             new_idx = len(self.objs_to_ints)
-            self.objs_to_ints[object] = new_idx
-            self.ints_to_objs[new_idx] = object
-        return self.objs_to_ints[object]
+            self.objs_to_ints[obj] = new_idx
+            self.ints_to_objs[new_idx] = obj
+        return self.objs_to_ints[obj]
 
-"""Unigram Feature extractor"""
 class UnigramFeatureExtractor():
+    """Unigram Feature extractor class"""
     def __init__(self, indexer: Indexer):
         self._indexer = indexer
 
-    """Get indexer"""
     def get_indexer(self) -> Indexer:
+        """Get indexer"""
         return self._indexer
 
-    """Extract features from sentence and return counter"""
     def extract_features(self, sentence: List[str], add_to_indexer: bool = False) -> Counter:
+        """Extract features from sentence and return counter"""
 
         # Contains non-unique list of all unigrams parsed from the sentence
         unigram_list: List[str] = []
@@ -73,8 +75,8 @@ class UnigramFeatureExtractor():
 
         return Counter(unigram_list)
 
-""""Helper function to create feature vector from feature counter"""
 def get_feature_vector(feature_counter: Counter, feature_extractor) -> np.ndarray:
+    """"Helper function to create feature vector from feature counter"""
 
     feature_vector = np.zeros(len(feature_extractor.get_indexer()) + 1)
 
@@ -85,6 +87,10 @@ def get_feature_vector(feature_counter: Counter, feature_extractor) -> np.ndarra
     feature_vector[-1] = 1
 
     return feature_vector
+
+def do_nothing():
+    """Do nothing."""
+    pass
 
 """Spotifinder NLP Model"""
 class SpotifinderModel():
@@ -101,10 +107,9 @@ class SpotifinderModel():
         data = data.astype({"lyrics": str}, errors='raise')
 
         # filter lyrics
-        pre_filter_lyrics = data['lyrics'].tolist()
         lyrics = []
 
-        for song in pre_filter_lyrics:
+        for song in data['lyrics'].tolist():
             song = song.replace('\n', ' ')
             song = song.replace('.', ' ')
             song = song.replace(',', ' ')
@@ -128,15 +133,18 @@ class SpotifinderModel():
         feature_matrix = np.array(feature_vector_list)
 
         # danceability model
-        x_train, x_test, y_train, y_test = train_test_split(feature_matrix, data[['danceability']], test_size=0.25, random_state=44)
+        x_train, _, y_train, _ = \
+            train_test_split(feature_matrix, data[['danceability']], test_size=0.25, random_state=44)
         self.dance_reg = LinearRegression().fit(x_train, y_train)
 
         # energy model
-        x_train, x_test, y_train, y_test = train_test_split(feature_matrix, data[['energy']], test_size=0.30, random_state=44)
+        x_train, _, y_train, _ = \
+            train_test_split(feature_matrix, data[['energy']], test_size=0.30, random_state=44)
         self.energy_reg = LinearRegression().fit(x_train, y_train)
 
         # valence model
-        x_train, x_test, y_train, y_test = train_test_split(feature_matrix, data[['valence']], test_size=0.30, random_state=44)
+        x_train, _, y_train, _ = \
+            train_test_split(feature_matrix, data[['valence']], test_size=0.30, random_state=44)
 
         self.valence_reg = LinearRegression().fit(x_train, y_train)
 
@@ -160,7 +168,7 @@ class SpotifinderModel():
         # energy = self.energy_reg.predict(feature_vector)[0][0]
         # valence = self.valence_reg.predict(feature_vector)[0][0]
 
-        output = np.random.rand(3,1)
+        output = np.random.rand(3)
 
         # Ensure values between 0 and 1
         for i, feat in enumerate(output):
@@ -175,7 +183,7 @@ if __name__ == "__main__":
 
     model = SpotifinderModel()
 
-    sent_1 = "Brown guilty eyes and\n\
+    SENT_1 = "Brown guilty eyes and\n\
             Little white lies, yeah\n\
             I played dumb but I always knew\n\
             That you talked to her\n\
@@ -193,7 +201,7 @@ if __name__ == "__main__":
             It took you two weeks to go off and date her\n\
             Guess you didn't cheat, but you're still a traitor"
 
-    sent_2 = "Remember the words you told me, love me 'til the day I die\n\
+    SENT_2 = "Remember the words you told me, love me 'til the day I die\n\
             Surrender my everything 'cause you made me believe you're mine\n\
             Yeah, you used to call me baby, now you calling me by name\n\
             Takes one to know one, yeah\n\
@@ -226,10 +234,10 @@ if __name__ == "__main__":
             Lately our conversations end like it's the last goodbye"
 
 
-    print(model.get_vector(sent_1))
-    print(model.get_vector(sent_2))
+    print(model.get_vector(SENT_1))
+    print(model.get_vector(SENT_2))
 
-    sent_3 = "I caught it bad yesterday\n\
+    SENT_3 = "I caught it bad yesterday\n\
             You hit me with a call to your place\n\
             Ain't been out in a while anyway\n\
             Was hoping I could catch you throwing smiles in my face\n\
@@ -246,7 +254,7 @@ if __name__ == "__main__":
             Call me when you want, call me when you need\n\
             Call me out by your name, I'll be on the way like"
 
-    print(model.get_vector(sent_3))
+    print(model.get_vector(SENT_3))
 
     print(model.get_vector("I just want to go to home depot"))
 
