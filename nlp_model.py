@@ -1,5 +1,4 @@
 """NLP Model module."""
-from ast import AsyncFunctionDef
 from collections import Counter
 from typing import List
 import pandas as pd
@@ -177,7 +176,7 @@ class SpotifinderModel():
 
         return {'danceability': output[0], 'energy': output[1], 'valence': output[2]}
 
-    def do_nothing():
+    def do_nothing(self):
         """Do nothing."""
 
 if __name__ == "__main__":
