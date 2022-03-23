@@ -22,6 +22,13 @@ recognition.onspeechend = function() {
   //recognition.start()
 }
 
+//this variable keeps track of the current playlist on the JS side.
+//Whenever user changes playlist, we see a discrepancy between this variable and the HTML storage.
+//When there is a discrepancy, this indicates recent playlist chnage. We have to tell the backend to start a different playlist.
+var currentPlaylistID = document.getElementById("CURRENTLY_PLAYING").getAttribute("playlist_id"); //should be 1 at start.
+
+
+
 var that = this;
 recognition.onresult = function(event) {
     var transcript = event.results[0][0].transcript;
@@ -38,6 +45,19 @@ recognition.onresult = function(event) {
     socketData = {};
     socketData["text"] = transcript;
     socketData["playlistID"] = document.getElementById("CURRENTLY_PLAYING").getAttribute("playlist_id");
+
+    //Set the "isNew" flag. If the User has selected a new playlist, we send back "true". Otherwise, we send back "False"
+    let isNew = false;
+    if(socketData["playlistID"] != currentPlaylistID){
+      console.log("User has switched playlists! exclaim new value on backend.")
+      isNew = true;
+      currentPlaylistID = socketData["playlistID"]
+    }
+
+
+    socketData["isNew"] = isNew
+    socketData["deviceID"] = document.getElementById("CURRENTLY_PLAYING").getAttribute("device_id");
+
 
     console.log(transcript)
     console.log(confidence)

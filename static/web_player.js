@@ -4,6 +4,12 @@ if (window.location.protocol == "https:") {
 } else {
   var ws_scheme = "ws://";
 }
+const deviceServer = new WebSocket(ws_scheme + location.host + '/deviceID');
+deviceServer.addEventListener('open', (event) => {
+  console.log('Playlist Listener WebSocket Established')
+});
+var sdk_id = -1
+
 
 var isPlayerReady = false;
 onSpotifyWebPlaybackSDKReady = () => {
@@ -12,6 +18,8 @@ onSpotifyWebPlaybackSDKReady = () => {
   isPlayerReady = true;
   document.getElementById('init_button').classList.remove("unclickable");
 };
+
+
 
 
 //This function synchronizes all web player buttons depending on status of player.
@@ -85,13 +93,18 @@ function makePlayer(socketMsg){
   });
   // Ready
   player.addListener('ready', ({ device_id }) => {
-    console.log('Ready with Device ID', device_id);
+    sdk_id = device_id // set the global device_id variable 
+    console.log('Ready with Device ID', device_id, 'aka', sdk_id);
+    document.getElementById("CURRENTLY_PLAYING").setAttribute("device_id",device_id)
 
-    const deviceServer = new WebSocket(ws_scheme + location.host + '/deviceID');
-    deviceServer.addEventListener('open', (event) => {
-      deviceServer.send(device_id);
-      console.log('sent device id to client ' + device_id)
-    });
+
+    let playlistStarterData = {};
+    playlistStarterData['device_id'] = device_id;
+    playlistStarterData['playlist_id'] = document.getElementById("CURRENTLY_PLAYING").getAttribute("playlist_id");
+    playlistStarterData['isCustomUserPlaylist'] = false;
+    deviceServer.send(JSON.stringify(playlistStarterData));
+    console.log('sent device id to client ' + device_id);
+
 
   });
 
@@ -184,13 +197,38 @@ function togglePlaylistMenu(toggleOn){
 
 
 function establishPlaylistLinks(){
+
+  //Liked Songs
+  document.getElementById("liked_songs_selector").onclick = function() {
+    document.getElementById("CURRENTLY_PLAYING").setAttribute("playlist_id","liked_songs");
+    let playlistStarterData = {};
+    playlistStarterData['device_id'] = sdk_id;
+    playlistStarterData['playlist_id'] = "liked_songs";
+    playlistStarterData['isCustomUserPlaylist'] = false;
+    deviceServer.send(JSON.stringify(playlistStarterData));
+  }
+  //Discover Mode
+  document.getElementById("discovery_selector").onclick = function() {
+    document.getElementById("CURRENTLY_PLAYING").setAttribute("playlist_id","discover_mode");
+    let playlistStarterData = {};
+    playlistStarterData['device_id'] = sdk_id;
+    playlistStarterData['playlist_id'] = "discover_mode";
+    playlistStarterData['isCustomUserPlaylist'] = false;
+    deviceServer.send(JSON.stringify(playlistStarterData));
+  }
+
+  //Custom User Playlists
   let playlists = document.getElementsByClassName("playlist_choice")
-
-
   for (const playlist of playlists) {
     playlist.onclick = function() {
       document.getElementById("CURRENTLY_PLAYING").setAttribute("playlist_id",playlist.id);
-      togglePlaylistMenu(false)
+      togglePlaylistMenu(false); //make the menu disappear
+
+      let playlistStarterData = {};
+      playlistStarterData['device_id'] = sdk_id;
+      playlistStarterData['playlist_id'] = playlist.id;
+      playlistStarterData['isCustomUserPlaylist'] = true;
+      deviceServer.send(JSON.stringify(playlistStarterData));
     };
   }
 
