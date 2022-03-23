@@ -109,11 +109,10 @@ def echo(sock):
         data = json.loads(sock.receive())
         print(data)
         feature_dict = model.get_vector(data["text"])
-        # player(feature_dict)
-        # TODO: make sure to implement the playlistID part
-        # will just play the discover mode otherwise though if None
-        queueFromPlaylist(feature_dict, data["playlistID"])
+
+        queueFromPlaylist(feature_dict, data)
         print(feature_dict)
+        # print(data)
         sock.send(feature_dict)
 
 # gets the Spotipy obj
@@ -138,6 +137,7 @@ def discoverSong(audioFeatures):
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
     thing = ''
+    print('discovery mode!')
     try:
 
         # standard
@@ -209,12 +209,18 @@ def findClosestMatch(idealAF, playlistAFs):
 
     return idealID # some track id
 
-def queueFromPlaylist(idealAudioFeatures, playlistID):
-    if playlistID == None:
+#Method that starts play
+def queueFromPlaylist(idealAudioFeatures, data):
+    playlistID = data["playlistID"]
+
+    #In the case this is a new playlist, we don't need to recommend anything (as of right now). Just transfer playback
+
+    if playlistID == "discover_mode" or playlistID == 1 or playlistID == "liked_songs" or playlistID == "1":
         discoverSong(idealAudioFeatures)
         return
     
-
+    
+    
     localSP = getSpotipy()
     audioFeatures = None
 
@@ -222,18 +228,21 @@ def queueFromPlaylist(idealAudioFeatures, playlistID):
         # get the songs from the playlist
         # tracks = localSP.playlist(playlistID, fields="tracks,next")
         tracks = localSP.playlist(playlistID)
+        # print('Custom playlist!')
 
         # print(tracks)
         trackIDs = []
 
         for (song, i) in zip(tracks["tracks"]["items"], range(100)):
             if song != None:
-                trackIDs.append(song['track']['id'])
+                trackIDs.append(song['track']['uri'])
 
-
+        print(trackIDs)
         # get the audio features
-        audioFeatures = localSP.audio_features(trackIDs)
+        audioFeatures = localSP.audio_features(tracks=trackIDs)
 
+        # print('got audio features! print here:')
+        # print(audioFeatures)
         # find the closest match
         coolSong = findClosestMatch(idealAudioFeatures, audioFeatures)
         # add to queue
@@ -275,20 +284,53 @@ def spotifyWebPlayer(sock):
     # sock.close()
 
 #This websocket is used to first switch over Spotify to the Spotifinders Web API Device. This is what "Turns on" Our webplayer
+#This websocket is called FIRST when the server first loads and THEN every time the user selects a playlist.
 @sock.route('/deviceID')
 def deviceListener(sock):
-    
-    
     try:
         
-        device_id = sock.receive()
         cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
         auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
         if not auth_manager.validate_token(cache_handler.get_cached_token()):
             return redirect('/')
         spotify = spotipy.Spotify(auth_manager=auth_manager)
-        print(f"Transferring playback to device {device_id}")
-        spotify.transfer_playback(device_id=device_id)
+
+
+
+        data = json.loads(sock.receive())
+        print(f"Transferring playback to device {data['device_id']}")
+
+        spotify.transfer_playback(device_id=data['device_id'])
+
+
+
+        while(True):
+            data = json.loads(sock.receive())
+            playlist_id = data['playlist_id']
+            is_custom = data['isCustomUserPlaylist']
+
+            
+            if playlist_id == "discover_mode":
+                rec_songs_arr = spotify.recommendations(seed_genres= ['rock', 'pop', 'alternative', 'indie', 'rap'])['tracks']
+                rec_uris = [song['uri'] for song in rec_songs_arr]
+                spotify.start_playback(device_id=data['device_id'], uris=rec_uris)
+
+            elif playlist_id == "liked_songs":
+                #this array is a bunch of liked songs.
+                #arrray of {added at: , track: } objecats
+                #track is {artists... album... uri...} 
+                liked_songs_arr = spotify.current_user_saved_tracks(limit=50)["items"]      #TODO: Research liked song limitation. CAn only retrieve 50!
+                sampled_liked_songs = random.sample(liked_songs_arr, 20)                    #TODO: see if we should sample more than 20 liked songs. Research what this does too.
+                random_liked_song_uris = [song['track']['uri'] for song in sampled_liked_songs]
+                spotify.start_playback(device_id=data['device_id'], uris=random_liked_song_uris)
+            elif is_custom:
+                print(f"Custom playlist recieved: {playlist_id} ")
+                selected_playlist = spotify.playlist(playlist_id)
+                spotify.start_playback(device_id=data['device_id'], context_uri=selected_playlist['uri'])
+            else:
+                print(f"Unknown variant of PlaylistID: {playlist_id}, \nThis should never happen!")
+
+
 
         #play from liked playlists
 
@@ -306,6 +348,12 @@ def deviceListener(sock):
         print (f"Error: {e}")
     
     return 
+def startPlay(tracks_array, spotify):
+    song = tracks_array[random.randint(0,len(tracks_array)-1)]
+
+    
+
+
     
 
 
