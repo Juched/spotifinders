@@ -341,7 +341,18 @@ def device_listener(socket):
             data = json.loads(socket.receive())
             print(f"Transferring playback to device {data['device_id']}")
 
-            spotify.transfer_playback(device_id=data["device_id"])
+            try:
+                spotify.transfer_playback(device_id=data["device_id"])
+            except Exception as exe:
+                #TODO: Make this exception choose from "Liked" or "Discovery" mode
+                #TODO: Broaden this error of transferring playback. Possible glitch whenever user manually selects illegal song.
+                    #Try: frontend errors when illegal song
+                spotify.start_playback(
+                    device_id=data["device_id"], \
+                    uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']
+                )
+
+            print("Transferred Playback!!!!!!!")
 
             while True:
                 data = json.loads(socket.receive())
@@ -400,6 +411,8 @@ def device_listener(socket):
             # spotify.start_playback(device_id=device_id, \
             # uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7'])
             # Ideally, we start playing a song depending on what they want
+        else:
+            print(f"Error: spotify not loaded for user")
 
     except Exception as ex:
         print(f"Error: {ex}")
