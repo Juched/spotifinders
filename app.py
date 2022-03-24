@@ -21,7 +21,7 @@ import spotipy
 from flask_session import Session
 from flask_sock import Sock
 
-from nlp_model import SpotifinderModel
+from models.basic_model import SpotifinderModel
 
 app = Flask(__name__)
 sock = Sock(app)
@@ -469,5 +469,4 @@ def start_playing():
 
 
 if __name__ == "__main__":
-    """main"""
     app.run(host="0.0.0.0", debug=True)
