@@ -6,8 +6,6 @@
 # import scipy as sp
 # import time
 
-from flask import Flask, render_template, session, request, redirect
-from spotipy.oauth2 import SpotifyClientCredentials
 
 
 import os
@@ -15,6 +13,11 @@ import uuid
 import random
 import numpy as np
 import json
+
+
+
+from flask import Flask, render_template, session, request, redirect
+from spotipy.oauth2 import SpotifyClientCredentials
 
 import spotipy
 from flask_session import Session
@@ -115,18 +118,18 @@ def log():
 
 # called once for each thread
 @sock.route('/echo')
-def echo(sock):
+def echo(socket):
     """ websocket route to get the speech to throw in the model and then update a song """
     model = SpotifinderModel()
     while True:
-        data = json.loads(sock.receive())
+        data = json.loads(socket.receive())
         print(data)
         feature_dict = model.get_vector(data["text"])
 
         queue_from_playlist(feature_dict, data)
         print(feature_dict)
         # print(data)
-        sock.send(feature_dict)
+        socket.send(feature_dict)
 
 # gets the Spotipy obj
 def get_spotipy():
@@ -135,15 +138,15 @@ def get_spotipy():
 
         # standard
         cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
-        auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
+        auth_manager = SpotifyClientCredentials.SpotifyOAuth(cache_handler=cache_handler)
         if not auth_manager.validate_token(cache_handler.get_cached_token()):
             # return redirect('/')
             raise Exception('Was unable to connct to your spotify account')
 
         return spotipy.Spotify(auth_manager=auth_manager)
 
-    except Exception as e:
-        print (f"Error: {e}")
+    except Exception as ex:
+        print (f"Error: {ex}")
     return None
 
 # using spotipy to get a close match
@@ -248,7 +251,7 @@ def queue_from_playlist(ideal_audio_features, data):
         track_ids = []
 
         for (song, i) in zip(tracks["tracks"]["items"], range(100)):
-            if song is not None:
+            if i >= 0 and song is not None:
                 track_ids.append(song['track']['uri'])
 
         print(track_ids)
@@ -277,16 +280,16 @@ def playlists(spotipy_manager=None):
     """ gets the playlists name and IDs and returns them (easily replaceable for URIs too) """
     local_spotify = spotipy_manager if spotipy_manager is not None else get_spotipy()
     local_playlists = None
-    playlists = {}
+    playlists_summary = {}
 
     if local_spotify is not None:
         local_playlists = local_spotify.current_user_playlists()
 
         if "items" in local_playlists:
             for single_playlist in local_playlists["items"]:
-                playlists[single_playlist["id"]] = single_playlist["name"]
+                playlists_summary[single_playlist["id"]] = single_playlist["name"]
 
-    return playlists
+    return playlists_summary
 
 # def pickTrackFromPlaylist() # take in track ID, if empty/None, use liked songs playlist.
 # This websocket is responsible for sending the auth token to the fronend in order to initialize
@@ -345,7 +348,8 @@ def device_listener(socket):
                     # TO DO: Research liked song limitation. CAn only retrieve 50!
                     liked_songs_arr = spotify.current_user_saved_tracks(limit=50)["items"]
 
-                    # TO DO: See if we should sample more than 20 liked songs. Research what this does.
+                    # TO DO: See if we should sample more than 20 liked songs.
+                    # Research what this does.
                     sampled_liked_songs = random.sample(liked_songs_arr, 20)
 
                     random_liked_song_uris = [song['track']['uri'] for song in sampled_liked_songs]
@@ -356,7 +360,8 @@ def device_listener(socket):
                     spotify.start_playback(device_id=data['device_id'],
                                             context_uri=selected_playlist['uri'])
                 else:
-                    print(f"Unknown variant of PlaylistID: {playlist_id}, \nThis should never happen!")
+                    print(f"Unknown variant of PlaylistID: {playlist_id}, \
+                    \nThis should never happen!")
 
             #play from liked playlists
 
@@ -367,13 +372,13 @@ def device_listener(socket):
             first_song = saved_tracks[random.randint(0,len(saved_tracks)-1)]["track"]
             spotify.add_to_queue(first_song["id"]) # queueFromPlaylist)
 
-            # spotify.start_playback(device_id=device_id,uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7'])
+            # spotify.start_playback(device_id=device_id, \
+            # uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7'])
             # Ideally, we start playing a song depending on what they want
 
     except Exception as ex:
         print (f"Error: {ex}")
 
-    return
 
 # def start_play(tracks_array, spotify):
 #     """ starts the playback of a random song """
