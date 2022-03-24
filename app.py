@@ -43,6 +43,7 @@ if not os.path.exists(CACHES_FOLDER):
     os.makedirs(CACHES_FOLDER)
 
 def session_cache_path():
+    """ sets up the session cache """
     return CACHES_FOLDER + session.get('uuid')
 
 
@@ -55,9 +56,10 @@ UPDATE_SONG_TIME_MS = 15 * 1000
 
 @app.before_request
 def before_request():
+    """ code to execute prior """
     if 'localhost' not in SPOTIPY_REDIRECT_URI:
         scheme = request.headers.get('X-Forwarded-Proto')
-        if scheme and scheme == 'http' and request.url.startswith('http://'):
+        if scheme and scheme is 'http' and request.url.startswith('http://'):
             url = request.url.replace('http://', 'https://', 1)
             code = 301
             return redirect(url, code=code)
@@ -98,31 +100,33 @@ def log():
 
     prof_pic_url = u_data['images'][0]['url']
 
-    uPlaylists = playlists(spotify)
+    u_playlists = playlists(spotify)
 
     return render_template("loggedin.html", \
                             purl=prof_pic_url, \
                             pname=u_data['display_name'], \
-                            userPlaylists=uPlaylists) \
+                            user_playlists=u_playlists) \
                             #map(json.dumps, uPlaylists))
 
 
 # called once for each thread
 @sock.route('/echo')
 def echo(sock):
+    """ websocket route to get the speech to throw in the model and then update a song """
     model = SpotifinderModel()
     while True:
         data = json.loads(sock.receive())
         print(data)
         feature_dict = model.get_vector(data["text"])
 
-        queueFromPlaylist(feature_dict, data)
+        queue_from_playlist(feature_dict, data)
         print(feature_dict)
         # print(data)
         sock.send(feature_dict)
 
 # gets the Spotipy obj
-def getSpotipy():
+def get_spotipy():
+    """ Retreives the current users spotipy object, which contains the spotify info as well """
     try:
 
         # standard
@@ -139,103 +143,100 @@ def getSpotipy():
     return None
 
 # using spotipy to get a close match
-def discoverSong(audioFeatures):
+def discover_song(audio_features):
+    """ discovers a song from spotify """
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
     thing = ''
     print('discovery mode!')
     try:
 
-        # standard
-        cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
-        auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
-        if not auth_manager.validate_token(cache_handler.get_cached_token()):
-            return redirect('/')
-
-        localSP = spotipy.Spotify(auth_manager=auth_manager)
+        # standard    
+        spotipy = get_spotipy()
         # return spotify.current_user_playlists()
 
-        thing = localSP.current_playback()
 
         # play a new song if the timer allows it
-        if localSP.current_playback() == None or \
-            localSP.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS:
+        if spotipy is not  None and (spotipy.current_playback() is None or \
+            spotipy.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS):
 
             #localSP.recommendation_genre_seeds(),  #'alternative', #, pop, alternative, indie'
-            songs = localSP.recommendations(
+            songs = spotipy.recommendations(
                 seed_genres = ['rock', 'pop', 'alternative', 'indie', 'rap'],
-                target_danceability=audioFeatures['danceability'],
-                target_energy=audioFeatures['energy'],
-                target_valence=audioFeatures['valence']
+                target_danceability=audio_features['danceability'],
+                target_energy=audio_features['energy'],
+                target_valence=audio_features['valence']
                 )
 
             # adds new suggest song to queue
             thing = songs['tracks'][0]['id']
-            localSP.add_to_queue(thing)
+            spotipy.add_to_queue(thing)
 
             # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
             #currently_playing() != None:
-            if localSP.current_playback() != None:
-                localSP.next_track()
+            if spotipy.current_playback() != None:
+                spotipy.next_track()
             else:
-                localSP.start_playback()
+                spotipy.start_playback()
 
-    except Exception as e:
-        print (f"Error: {e}")
+    except Exception as ex:
+        print (f"Error: {ex}")
 
     return thing
 
 
-def findClosestMatch(idealAF, playlistAFs):
-    implementedFeatures = idealAF.keys()
-    idealVector = []
-    minNorm = None
-    idealID = None
+def find_closest_match(ideal_features, playlist_features):
+    """ from a list of songs features, and the ideal features, function will return the clostest song to the ideal """
+    implemented_features = ideal_features.keys()
+    ideal_vector = []
+    min_norm = None
+    ideal_id = None
 
     try:
 
-        for feature in implementedFeatures:
-            idealVector.append(idealAF[feature])
-        idealVector = np.array(idealVector)
+        for feature in implemented_features:
+            ideal_vector.append(ideal_features[feature])
+        ideal_vector = np.array(ideal_vector)
 
-        for singleTrack in playlistAFs:
-            currentVector = []
-            for feature in implementedFeatures:
-                currentVector.append(singleTrack[feature])
+        for single_track in playlist_features:
+            current_vector = []
+            for feature in implemented_features:
+                current_vector.append(single_track[feature])
             # we have the curernt audio feature vector at this point
 
-            currentMin = np.linalg.norm(np.array(currentVector) - idealVector)
-            if idealID == None or minNorm == None or currentMin < minNorm:
-                minNorm = currentMin
-                idealID = singleTrack['id']
-                print(idealID)
+            current_min = np.linalg.norm(np.array(current_vector) - ideal_vector)
+            if ideal_id is None or min_norm is None or current_min < min_norm:
+                min_norm = current_min
+                ideal_id = single_track['id']
+                print(ideal_id)
 
-    except Exception as e:
-        print (f"Error: {e}")
+    except Exception as ex:
+        print (f"Error: {ex}")
 
-    return idealID # some track id
+    return ideal_id # some track id
 
 #Method that starts play
-def queueFromPlaylist(idealAudioFeatures, data):
-    playlistID = data["playlistID"]
+def queue_from_playlist(ideal_audio_features, data):
+    """ queues a song based on the ideal audio features """
+    playlist_id = data["playlistID"]
 
-    if (playlistID == "discover_mode" or
-        playlistID == 1 or
-        playlistID == "liked_songs" or
-        playlistID == "1"):
+    if (playlist_id is "discover_mode" or
+        playlist_id is 1 or
+        playlist_id is "liked_songs" or
+        playlist_id is "1"):
         # In the case this is a new playlist, we don't need to recommend anything
         # (as of right now). Just transfer playback
-        discoverSong(idealAudioFeatures)
+        discover_song(ideal_audio_features)
         return
 
-    localSP = getSpotipy()
-    audioFeatures = None
+    local_spotipy = get_spotipy()
+    audio_features = None
 
-    if (localSP != None and (localSP.current_playback() == None or
-        localSP.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS)):
+    if (local_spotipy is not None and (local_spotipy.current_playback() is None or
+        local_spotipy.current_playback()['progress_ms'] >= UPDATE_SONG_TIME_MS)):
         # get the songs from the playlist
         # tracks = localSP.playlist(playlistID, fields="tracks,next")
-        tracks = localSP.playlist(playlistID)
+        tracks = local_spotipy.playlist(playlist_id)
         # print('Custom playlist!')
 
         # print(tracks)
@@ -247,37 +248,37 @@ def queueFromPlaylist(idealAudioFeatures, data):
 
         print(trackIDs)
         # get the audio features
-        audioFeatures = localSP.audio_features(tracks=trackIDs)
+        audio_features = local_spotipy.audio_features(tracks=trackIDs)
 
         # print('got audio features! print here:')
         # print(audioFeatures)
         # find the closest match
-        coolSong = findClosestMatch(idealAudioFeatures, audioFeatures)
+        coolSong = find_closest_match(ideal_audio_features, audio_features)
         # add to queue
         if coolSong != None:
-            localSP.add_to_queue(coolSong)
+            local_spotipy.add_to_queue(coolSong)
 
             #currently_playing() != None:
             # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
-            if localSP.current_playback() != None:
-                localSP.next_track()
+            if local_spotipy.current_playback() != None:
+                local_spotipy.next_track()
             else:
-                localSP.start_playback()
+                local_spotipy.start_playback()
 
-    return audioFeatures
+    return audio_features
 
 # gets the playlists name and IDs and returns them (easily replaceable for URIs too)
-def playlists(spotopyManager=None):
-
-    localSP = spotopyManager if spotopyManager != None else getSpotipy()
-    localPlaylists = None
+def playlists(spotipy_manager=None):
+    """ gets the playlists name and IDs and returns them (easily replaceable for URIs too) """
+    spotipy = spotipy_manager if spotipy_manager is not None else get_spotipy()
+    local_playlists = None
     playlists = {}
 
-    if localSP != None:
-        localPlaylists = localSP.current_user_playlists()
+    if spotipy is not None:
+        local_playlists = spotipy.current_user_playlists()
 
-        if "items" in localPlaylists:
-            for p in localPlaylists["items"]:
+        if "items" in local_playlists:
+            for p in local_playlists["items"]:
                 playlists[p["id"]] = p["name"]
 
     return playlists
@@ -287,6 +288,10 @@ def playlists(spotopyManager=None):
 # a webplayer. See static/web_player.js
 @sock.route('/webPlayer')
 def spotifyWebPlayer(sock):
+    """ 
+        This websocket is responsible for sending the auth token to the fronend in order to initialize 
+        a webplayer. See static/web_player.js 
+    """
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
     auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
@@ -301,6 +306,12 @@ def spotifyWebPlayer(sock):
 # and THEN every time the user selects a playlist.
 @sock.route('/deviceID')
 def deviceListener(sock):
+    """
+        This websocket is used to first switch over Spotify to the Spotifinders Web API Device.
+        This is what "Turns on" Our webplayer.
+        This websocket is called FIRST when the server first loads
+        and THEN every time the user selects a playlist.
+    """
     try:
 
         cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
@@ -314,26 +325,26 @@ def deviceListener(sock):
 
         spotify.transfer_playback(device_id=data['device_id'])
 
-        while(True):
+        while True:
             data = json.loads(sock.receive())
             playlist_id = data['playlist_id']
             is_custom = data['isCustomUserPlaylist']
 
 
-            if playlist_id == "discover_mode":
+            if playlist_id is "discover_mode":
                 rec_songs_arr = spotify.recommendations(seed_genres = SEED_GENRES)['tracks']
                 rec_uris = [song['uri'] for song in rec_songs_arr]
                 spotify.start_playback(device_id=data['device_id'], uris=rec_uris)
 
-            elif playlist_id == "liked_songs":
+            elif playlist_id is "liked_songs":
                 #this array is a bunch of liked songs.
                 #arrray of {added at: , track: } objecats
                 #track is {artists... album... uri...}
 
-                # TODO: Research liked song limitation. CAn only retrieve 50!
+                # TO DO: Research liked song limitation. CAn only retrieve 50!
                 liked_songs_arr = spotify.current_user_saved_tracks(limit=50)["items"]
 
-                # TODO: See if we should sample more than 20 liked songs. Research what this does.
+                # TO DO: See if we should sample more than 20 liked songs. Research what this does.
                 sampled_liked_songs = random.sample(liked_songs_arr, 20)
 
                 random_liked_song_uris = [song['track']['uri'] for song in sampled_liked_songs]
@@ -358,30 +369,33 @@ def deviceListener(sock):
         # spotify.start_playback(device_id=device_id,uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7'])
         # Ideally, we start playing a song depending on what they want
 
-    except Exception as e:
-        print (f"Error: {e}")
+    except Exception as ex:
+        print (f"Error: {ex}")
 
     return
 
-def startPlay(tracks_array, spotify):
+def start_play(tracks_array, spotify):
+    """ starts the playback of a random song """
     song = tracks_array[random.randint(0,len(tracks_array)-1)]
 
 
 @app.route('/testplayer')
 def test():
-    audioFeatures = {}
-    audioFeatures['danceability'] = .88
-    audioFeatures['energy'] = .9
-    audioFeatures['valence'] = .9
+    """ just a useful test route for testing purposes """
+    audio_features = {}
+    audio_features['danceability'] = .88
+    audio_features['energy'] = .9
+    audio_features['valence'] = .9
 
-    playlistID = '37i9dQZF1EUMDoJuT8yJsl'
+    playlist_id = '37i9dQZF1EUMDoJuT8yJsl'
 
     # return str(player(audioFeatures))
-    return str(queueFromPlaylist(audioFeatures, playlistID))
+    return str(queue_from_playlist(audio_features, playlist_id))
 
 
 @app.route('/sign_out')
 def sign_out():
+    """ sign out logic """
     try:
         # Remove the CACHE file (.cache-test) so that a new user can authorize.
         os.remove(session_cache_path())
@@ -392,6 +406,7 @@ def sign_out():
 
 @app.route('/currently_playing')
 def currently_playing():
+    """ returns what is currently playing for the user """
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
     auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
@@ -404,6 +419,7 @@ def currently_playing():
 
 @app.route('/start_playing',methods=["POST"])
 def start_playing():
+    """ post method to start the playing of a song """
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
     auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
@@ -415,5 +431,6 @@ def start_playing():
     return "Playing"
 
 
-if __name__ == "__main__":
+if __name__ is "__main__":
+    """ main """
     app.run(host="0.0.0.0", debug=True)
