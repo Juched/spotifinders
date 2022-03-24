@@ -15,7 +15,7 @@ import numpy as np
 
 
 from flask import Flask, render_template, session, request, redirect
-from spotipy.oauth2 import SpotifyClientCredentials
+# from spotipy.oauth2 import SpotifyClientCredentials
 
 import spotipy
 from flask_session import Session
@@ -432,7 +432,7 @@ def sign_out():
         os.remove(session_cache_path())
         session.clear()
     except OSError as ex:
-        print("Error: %s - %s." % (ex.filename, ex.strerror))
+        print(f"Error: {ex.filename} - {ex.strerror}.")
     return redirect("/")
 
 
@@ -469,5 +469,4 @@ def start_playing():
 
 
 if __name__ == "__main__":
-    """main"""
     app.run(host="0.0.0.0", debug=True)
