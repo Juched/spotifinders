@@ -62,10 +62,10 @@ recognition.onresult = function(event) {
     console.log(transcript)
     console.log(confidence)
     socket.send(JSON.stringify(socketData))
-    
+
 };
 recognition.start();
-         
+
 //}
 
 // This runs when the speech recognition service starts
@@ -101,7 +101,7 @@ function toggleMic()
   } else {
     document.getElementById("mic_icon").style.paddingLeft = "0%"
   }
-  
+
 }
 
 function playSong(url)
