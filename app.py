@@ -118,7 +118,7 @@ def echo(sock):
 # gets the Spotipy obj
 def getSpotipy():
     try:
-        
+
         # standard
         cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
         auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
@@ -158,8 +158,8 @@ def discoverSong(audioFeatures):
             #localSP.recommendation_genre_seeds(),  #'alternative', #, pop, alternative, indie'
             songs = localSP.recommendations(
                 seed_genres = ['rock', 'pop', 'alternative', 'indie', 'rap'],
-                target_danceability=audioFeatures['danceability'], 
-                target_energy=audioFeatures['energy'], 
+                target_danceability=audioFeatures['danceability'],
+                target_energy=audioFeatures['energy'],
                 target_valence=audioFeatures['valence']
                 )
 
@@ -203,7 +203,7 @@ def findClosestMatch(idealAF, playlistAFs):
                 minNorm = currentMin
                 idealID = singleTrack['id']
                 print(idealID)
-    
+
     except Exception as e:
         print (f"Error: {e}")
 
@@ -218,9 +218,9 @@ def queueFromPlaylist(idealAudioFeatures, data):
     if playlistID == "discover_mode" or playlistID == 1 or playlistID == "liked_songs" or playlistID == "1":
         discoverSong(idealAudioFeatures)
         return
-    
-    
-    
+
+
+
     localSP = getSpotipy()
     audioFeatures = None
 
@@ -247,17 +247,17 @@ def queueFromPlaylist(idealAudioFeatures, data):
         coolSong = findClosestMatch(idealAudioFeatures, audioFeatures)
         # add to queue
         if coolSong != None:
-            localSP.add_to_queue(coolSong) 
+            localSP.add_to_queue(coolSong)
             if localSP.current_playback() != None: #currently_playing() != None: # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
                 localSP.next_track()
             else:
                 localSP.start_playback()
-        
+
     return audioFeatures
 
 # gets the playlists name and IDs and returns them (easily replaceable for URIs too)
 def playlists(spotopyManager=None):
-    
+
     localSP = spotopyManager if spotopyManager != None else getSpotipy()
     localPlaylists = None
     playlists = {}
@@ -278,7 +278,7 @@ def spotifyWebPlayer(sock):
     cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
     auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
-        return redirect('/')    
+        return redirect('/')
     token = auth_manager.get_access_token()
     sock.send(token['access_token'])
     # sock.close()
@@ -288,7 +288,7 @@ def spotifyWebPlayer(sock):
 @sock.route('/deviceID')
 def deviceListener(sock):
     try:
-        
+
         cache_handler = spotipy.cache_handler.CacheFileHandler(cache_path=session_cache_path())
         auth_manager = spotipy.oauth2.SpotifyOAuth(cache_handler=cache_handler)
         if not auth_manager.validate_token(cache_handler.get_cached_token()):
@@ -309,7 +309,7 @@ def deviceListener(sock):
             playlist_id = data['playlist_id']
             is_custom = data['isCustomUserPlaylist']
 
-            
+
             if playlist_id == "discover_mode":
                 rec_songs_arr = spotify.recommendations(seed_genres= ['rock', 'pop', 'alternative', 'indie', 'rap'])['tracks']
                 rec_uris = [song['uri'] for song in rec_songs_arr]
@@ -318,7 +318,7 @@ def deviceListener(sock):
             elif playlist_id == "liked_songs":
                 #this array is a bunch of liked songs.
                 #arrray of {added at: , track: } objecats
-                #track is {artists... album... uri...} 
+                #track is {artists... album... uri...}
                 liked_songs_arr = spotify.current_user_saved_tracks(limit=50)["items"]      #TODO: Research liked song limitation. CAn only retrieve 50!
                 sampled_liked_songs = random.sample(liked_songs_arr, 20)                    #TODO: see if we should sample more than 20 liked songs. Research what this does too.
                 random_liked_song_uris = [song['track']['uri'] for song in sampled_liked_songs]
@@ -343,18 +343,18 @@ def deviceListener(sock):
         spotify.add_to_queue(firstSong["id"]) # queueFromPlaylist)
 
         # spotify.start_playback(device_id=device_id, uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']) #Ideally, we start playing a song depending on what they want
-    
+
     except Exception as e:
         print (f"Error: {e}")
-    
-    return 
+
+    return
 def startPlay(tracks_array, spotify):
     song = tracks_array[random.randint(0,len(tracks_array)-1)]
 
-    
 
 
-    
+
+
 
 
 
