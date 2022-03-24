@@ -14,7 +14,7 @@
 
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mockup.css') }}">
 
-        <!-- <script>const playlists = {{ userPlaylists }}; </script> -->
+        <!-- <script>const playlists = {{ user_playlists }}; </script> -->
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"/>
@@ -78,8 +78,8 @@
             <div class="x_button" onclick="togglePlaylistMenu(false)">&#10006</div>
             <div class="titlebox">{{ pname }}'s playlists</div>
             <div class="scrollbar_container">
-                {% for playlistID in userPlaylists.keys() %}
-                <div id={{playlistID}} class="playlist_choice">{{userPlaylists[playlistID]}}</div>
+                {% for playlistID in user_playlists.keys() %}
+                <div id={{playlistID}} class="playlist_choice">{{user_playlists[playlistID]}}</div>
                 {% endfor %}
             </div>
         </div>
