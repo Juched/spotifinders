@@ -1,9 +1,9 @@
 """Spotify Web Requester module."""
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
+# import spotipy
+# from spotipy.oauth2 import SpotifyClientCredentials
 
-def requestSong():
-    sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials()) #.Spotify()
+# def requestSong():
+#     sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials()) #.Spotify()
     # start_playback()
     # add_to_queue()
     # get the URL for an artist image given the artist’s name

@@ -1,5 +1,5 @@
 <html>
-    <head>        
+    <head>
         <!-- Bootstrap linking-->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!-- Latest compiled and minified CSS -->
@@ -9,7 +9,7 @@
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         <!-- Our js and stylesheet-->
-        
+
         <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mockup.css') }}">
@@ -31,8 +31,8 @@
                 </div>
             </div>
         </div>
-        
-        <div class="profile-dropdown profile-container">         
+
+        <div class="profile-dropdown profile-container">
             <button class="spotbutt" id="pDropdown"><img width="42" height="42" src="{{ purl }}" alt="me"> &nbsp {{ pname }} </button>
             <div class="profile-dropdown-content">
                 <div class="dropdown_option"><a href="/currently_playing">Whats playing</a></div>
@@ -87,7 +87,7 @@
         <div id="CURRENTLY_PLAYING" playlist_id="1" device_id=""></div>
 
         <div id="snackbar">Bottom Text</div>
-          
+
     </body>
     <script src="{{url_for('static', filename='web_player.js')}}"></script>
     <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.js') }}"></script>

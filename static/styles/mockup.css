@@ -7,7 +7,7 @@
     overflow: hidden;
     background: black;
   }
-  
+
   .profile-container {
     position: absolute;
     top: 8%;
@@ -24,7 +24,7 @@
     /* display from flex to none! this is the mic buton */
     justify-content: center;
     align-items: center;
-    
+
     position: absolute;
     top: 0;
     left: 0;
@@ -38,12 +38,12 @@
     left: 50%;
     margin-right: -50%;
     transform: translate(-50%, -50%) }
-  
+
   .title {
     font-size: 10vw;
     color: white;
   }
-  
+
   canvas {
     width: 100%;
     height: 100%;
@@ -71,8 +71,8 @@
     border-radius: 50%;
     border:5px solid #a7afb9;
     overflow:hidden;
-          
-    background: #d3d3d3; 
+
+    background: #d3d3d3;
     box-shadow: 0 0 3px gray;
   }
   .round-button-circle:hover {
@@ -86,7 +86,7 @@
     padding-bottom:50%;
     line-height:1em;
     margin-top:-0.5em;
-          
+
     text-align:center;
     color:#e2eaf3;
     font-family:Verdana;
@@ -223,7 +223,7 @@
   @keyframes fadeout {
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
-  } 
+  }
 
 
 
