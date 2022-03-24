@@ -370,7 +370,7 @@ def device_listener(socket):
                     sampled_liked_songs = random.sample(liked_songs_arr, 20)
 
                     random_liked_song_uris = [
-                        song["track"]["uri"] for song in sampled_liked_songs
+                        dict(song)["track"]["uri"] for song in sampled_liked_songs
                     ]
                     spotify.start_playback(
                         device_id=data["device_id"], uris=random_liked_song_uris
