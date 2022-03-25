@@ -154,7 +154,7 @@ function makePlayer(socketMsg){
   });
 }
 
-async function catchMyError(err) {
+async function catchPlayerSocketError(err) {
 
   console.log("failed to get authtok. No player created. Trying again");
 
@@ -162,7 +162,7 @@ async function catchMyError(err) {
 
   connect_webplayer_socket().then(function(socketMsg) {
     makePlayer(socketMsg);
-  }).catch(catchMyError);
+  }).catch(catchPlayerSocketError);
 
 }
 
@@ -172,7 +172,7 @@ function startPlayer() {
 
     connect_webplayer_socket().then(function(socketMsg) {
       makePlayer(socketMsg);
-    }).catch(catchMyError); // TODO: Change recursive calls to iterative ones to avoid stack overflows
+    }).catch(catchPlayerSocketError); // TODO: Change recursive calls to iterative ones to avoid stack overflows
 
     delMask()
     establishPlaylistLinks()
