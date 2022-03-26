@@ -130,7 +130,7 @@ def echo(socket):
         print(data)
         feature_dict = model.get_vector(data["text"])
 
-        queue_song(feature_dict, data)
+        next_song(feature_dict, data)
         print(feature_dict)
         # print(data)
         socket.send(feature_dict)
@@ -249,7 +249,7 @@ def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager = None):
 
     return songs
 
-def play_song(cool_song, spotipy_manager=None):
+def queue_song(cool_song, spotipy_manager=None):
 
     local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
@@ -290,7 +290,7 @@ def filter_songs(songs, ideal_audio_features, spotipy_manager = None):
     return find_closest_match(ideal_audio_features, audio_features)
 
 # Method that starts play
-def queue_song(ideal_audio_features, data):
+def next_song(ideal_audio_features, data):
     """queues a song based on the ideal audio features"""
     playlist_id = data["playlistID"]
     local_spotipy = get_spotipy()
@@ -303,7 +303,7 @@ def queue_song(ideal_audio_features, data):
 
         songs = gather_song_set(playlist_id, ideal_audio_features, local_spotipy)
         cool_song = filter_songs(songs, ideal_audio_features, local_spotipy)
-        play_song(cool_song, local_spotipy)
+        queue_song(cool_song, local_spotipy)
 
     return ideal_audio_features
 
@@ -444,7 +444,7 @@ def test():
     playlist_id = "37i9dQZF1EUMDoJuT8yJsl"
 
     # return str(player(audioFeatures))
-    return str(queue_song(audio_features, playlist_id))
+    return str(next_song(audio_features, playlist_id))
 
 
 @app.route("/sign_out")
