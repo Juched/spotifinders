@@ -249,20 +249,7 @@ def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager = None):
 
     return songs
 
-def queue_song(cool_song, spotipy_manager=None):
 
-    local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
-
-    # add to queue
-    if cool_song is not None:
-        local_spotipy.add_to_queue(cool_song)
-
-        # currently_playing() is not None:
-        # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
-        if local_spotipy.current_playback() is not None:
-            local_spotipy.next_track()
-        else:
-            local_spotipy.start_playback()
 
 def filter_songs(songs, ideal_audio_features, spotipy_manager = None):
     """ filters down the possible set of songs to the ideal one, return best match """
@@ -288,6 +275,21 @@ def filter_songs(songs, ideal_audio_features, spotipy_manager = None):
     # print(audioFeatures)
     # find the closest match
     return find_closest_match(ideal_audio_features, audio_features)
+
+def queue_song(cool_song, spotipy_manager=None):
+    """ takes the song given and queues and plays the song """
+    local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
+
+    # add to queue
+    if cool_song is not None:
+        local_spotipy.add_to_queue(cool_song)
+
+        # currently_playing() is not None:
+        # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
+        if local_spotipy.current_playback() is not None:
+            local_spotipy.next_track()
+        else:
+            local_spotipy.start_playback()
 
 # Method that starts play
 def next_song(ideal_audio_features, data):
