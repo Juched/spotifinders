@@ -291,7 +291,9 @@ def queue_song(cool_song, spotipy_manager=None):
         else:
             local_spotipy.start_playback()
 
-# Method that starts play
+# Method that obtains and plays the next song given the circumstances
+# Parameter idea_audio_features is the model's vector interpretation of the conversation
+# Parameter data is the JSON packet sent back from the websocket. Includes playlistID
 def next_song(ideal_audio_features, data):
     """queues a song based on the ideal audio features"""
     playlist_id = data["playlistID"]
@@ -301,6 +303,7 @@ def next_song(ideal_audio_features, data):
     if local_spotipy is not None and (
             local_spotipy.current_playback() is None
             or local_spotipy.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
+            #TODO: Maybe implement here to change if conversation is changed enough?
         ):
 
         songs = gather_song_set(playlist_id, ideal_audio_features, local_spotipy)
@@ -377,8 +380,6 @@ def device_listener(socket):
                     uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']
                 )
 
-            print("Transferred Playback!!!!!!!")
-
             while True:
                 data = json.loads(socket.receive())
                 playlist_id = data["playlist_id"]
@@ -396,12 +397,12 @@ def device_listener(socket):
                     # arrray of {added at: , track: } objecats
                     # track is {artists... album... uri...}
 
-                    # TO DO: Research liked song limitation. CAn only retrieve 50!
+                    # TODO: Research liked song limitation. CAn only retrieve 50!
                     liked_songs_arr = spotify.current_user_saved_tracks(limit=50)[
                         "items"
                     ]
 
-                    # TO DO: See if we should sample more than 20 liked songs.
+                    # TODO: See if we should sample more than 20 liked songs.
                     # Research what this does.
                     sampled_liked_songs = random.sample(liked_songs_arr, 20)
 
