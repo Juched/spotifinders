@@ -130,7 +130,7 @@ def echo(socket):
         print(data)
         feature_dict = model.get_vector(data["text"])
 
-        queue_from_playlist(feature_dict, data)
+        next_song(feature_dict, data)
         print(feature_dict)
         # print(data)
         socket.send(feature_dict)
@@ -158,16 +158,16 @@ def get_spotipy():
 
 
 # using spotipy to get a close match
-def discover_song(audio_features):
+def discover_song(audio_features, spotipy_manager=None):
     """discovers a song from spotify"""
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
-    thing = ""
+    songs = None
     print("discovery mode!")
     try:
 
         # standard
-        local_spotify = get_spotipy()
+        local_spotify = get_spotipy() if spotipy_manager is None else spotipy_manager
         # return spotify.current_user_playlists()
 
         # play a new song if the timer allows it
@@ -182,23 +182,24 @@ def discover_song(audio_features):
                 target_danceability=audio_features["danceability"],
                 target_energy=audio_features["energy"],
                 target_valence=audio_features["valence"],
+                limit=100,
             )
 
             # adds new suggest song to queue
-            thing = songs["tracks"][0]["id"]
-            local_spotify.add_to_queue(thing)
+            # thing = songs["tracks"][0]["id"]
+            # local_spotify.add_to_queue(thing)
 
             # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
             # currently_playing() is not None:
-            if local_spotify.current_playback() is not None:
-                local_spotify.next_track()
-            else:
-                local_spotify.start_playback()
+            # if local_spotify.current_playback() is not None:
+            #     local_spotify.next_track()
+            # else:
+            #     local_spotify.start_playback()
 
     except Exception as ex:
         print(f"Error: {ex}")
 
-    return thing
+    return songs
 
 
 def find_closest_match(ideal_features, playlist_features):
@@ -232,57 +233,81 @@ def find_closest_match(ideal_features, playlist_features):
 
     return ideal_id  # some track id
 
+def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager = None):
+    """ Obtains a list of songs depending what playlist is selected """
+    local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
-# Method that starts play
-def queue_from_playlist(ideal_audio_features, data):
-    """queues a song based on the ideal audio features"""
-    playlist_id = data["playlistID"]
+    if playlist_id in ["discover_mode", 1, "1"]: # OR WAHATEVER WE WANTED
+        songs = discover_song(ideal_audio_features, local_spotipy)
 
-    if playlist_id in ["discover_mode", 1, "liked_songs", "1"]:
-        # In the case this is a new playlist, we don't need to recommend anything
-        # (as of right now). Just transfer playback
-        discover_song(ideal_audio_features)
-        return
+    elif playlist_id in ["discover_mode", 1, "liked_songs", "1"]:
+        songs = local_spotipy.current_user_saved_tracks(limit=100)
 
-    local_spotipy = get_spotipy()
+    else:
+        tracks = local_spotipy.playlist(playlist_id)
+        songs = tracks["tracks"]["items"]
+
+    return songs
+
+
+
+def filter_songs(songs, ideal_audio_features, spotipy_manager = None):
+    """ filters down the possible set of songs to the ideal one, return best match """
+    local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
+
     audio_features = None
 
+
+    # get the songs from the playlist
+    # tracks = local_spotipy.playlist(playlist_id)
+
+    track_ids = []
+
+    for (song, i) in zip(songs, range(100)):
+        if i >= 0 and song is not None:
+            track_ids.append(song["track"]["uri"])
+
+    # print(track_ids)
+    # get the audio features
+    audio_features = local_spotipy.audio_features(tracks=track_ids)
+
+    # print('got audio features! print here:')
+    # print(audioFeatures)
+    # find the closest match
+    return find_closest_match(ideal_audio_features, audio_features)
+
+def queue_song(cool_song, spotipy_manager=None):
+    """ takes the song given and queues and plays the song """
+    local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
+
+    # add to queue
+    if cool_song is not None:
+        local_spotipy.add_to_queue(cool_song)
+
+        # currently_playing() is not None:
+        # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
+        if local_spotipy.current_playback() is not None:
+            local_spotipy.next_track()
+        else:
+            local_spotipy.start_playback()
+
+# Method that starts play
+def next_song(ideal_audio_features, data):
+    """queues a song based on the ideal audio features"""
+    playlist_id = data["playlistID"]
+    local_spotipy = get_spotipy()
+
+
     if local_spotipy is not None and (
-        local_spotipy.current_playback() is None
-        or local_spotipy.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
-    ):
-        # get the songs from the playlist
-        # tracks = localSP.playlist(playlistID, fields="tracks,next")
-        tracks = local_spotipy.playlist(playlist_id)
-        # print('Custom playlist!')
+            local_spotipy.current_playback() is None
+            or local_spotipy.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
+        ):
 
-        # print(tracks)
-        track_ids = []
+        songs = gather_song_set(playlist_id, ideal_audio_features, local_spotipy)
+        cool_song = filter_songs(songs, ideal_audio_features, local_spotipy)
+        queue_song(cool_song, local_spotipy)
 
-        for (song, i) in zip(tracks["tracks"]["items"], range(100)):
-            if i >= 0 and song is not None:
-                track_ids.append(song["track"]["uri"])
-
-        print(track_ids)
-        # get the audio features
-        audio_features = local_spotipy.audio_features(tracks=track_ids)
-
-        # print('got audio features! print here:')
-        # print(audioFeatures)
-        # find the closest match
-        cool_song = find_closest_match(ideal_audio_features, audio_features)
-        # add to queue
-        if cool_song is not None:
-            local_spotipy.add_to_queue(cool_song)
-
-            # currently_playing() is not None:
-            # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
-            if local_spotipy.current_playback() is not None:
-                local_spotipy.next_track()
-            else:
-                local_spotipy.start_playback()
-
-    return audio_features
+    return ideal_audio_features
 
 
 # gets the playlists name and IDs and returns them (easily replaceable for URIs too)
@@ -434,7 +459,7 @@ def test():
     playlist_id = "37i9dQZF1EUMDoJuT8yJsl"
 
     # return str(player(audioFeatures))
-    return str(queue_from_playlist(audio_features, playlist_id))
+    return str(next_song(audio_features, playlist_id))
 
 
 @app.route("/sign_out")
