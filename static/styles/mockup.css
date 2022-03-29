@@ -136,7 +136,7 @@
   #custom_playlist_selector:hover .custom-p-dropdown-content {
     display: block;
   }
-  #playlist_selection_box {
+  .popup_box {
     position: fixed;
     top: 20%;
     left: 20%;
@@ -291,3 +291,17 @@
   border-radius: 1em;
 }
 
+.toggle_off {
+  background-color: gray;
+  cursor: pointer;
+}
+.toggle_on {
+  background-color: lightgray;
+  cursor: pointer;
+}
+.menubg {
+  background-color:rgb(0, 0, 0);
+}
+#typebox {
+  display: none;
+}
