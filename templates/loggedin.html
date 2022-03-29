@@ -59,7 +59,7 @@
 
 
 
-        <div id="playerbox">
+        <div id="playerbox" class="webplayer_bkg">
             <img id="album_art" src=""></img>
             <div id="song_title">No Current Song Playing</div>
             <div id="playback_buttons" class="spotbutt">
@@ -67,9 +67,13 @@
               <i id="pp_toggle" class="glyphicon glyphicon-play"></i>
               <i id="skip_forward" class="glyphicon glyphicon-step-forward"></i>
             </div>
+
+            <div id="typebox">
+                <input type="text" id="input_field">
+            </div>
         </div>
 
-        <div id="mask_player">
+        <div id="mask_player" class="webplayer_bkg">
             <button id="init_button" class="unclickable spotbutt" onclick="startPlayer()">Initialize Player</button>
         </div>
 
@@ -88,14 +92,20 @@
 
             <div class="titlebox">Player Status: <span id="debug_player_status">Not Connected</span></div>
             <div class="menu_bg" id="debug_options_container">
-                <div class="toggle_off" id="type_toggle" onclick="toggleTypeMode()">Enable Type-In Mode</div>
-                <div>Currently Playing</div>
+                <div class="menu_col">
+                    <div class="toggle_off" id="type_toggle" onclick="toggleTypeMode()">Enable Type-In Mode</div>
+                    <div class="dropdown_option" >Currently Playing</div>
+                </div>
+                <div class="menu_col">
+                    <div class="dropdown_option">Do something</div>
+                    <div class="dropdown_option">another thing</div>
+
+                </div>
+
             </div>
         </div>
 
-        <div id="typebox">
-            <input type="text" id="input_field">
-        </div>
+
 
 
 
