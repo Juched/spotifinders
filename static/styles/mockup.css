@@ -101,8 +101,27 @@
     cursor: pointer;
   }
   .dropdown_option:hover{
-    background-color:rgba(103,103,103, 0.8)
+    background-color:rgba(103,103,103, 0.8);
   }
+
+  .dropdown_option.toggle_off:hover {
+    background-color:white
+  }
+  .dropdown_option.toggle_off:hover {
+    background-color:darkgray
+  }
+
+  .toggle_off {
+    cursor: pointer;
+  }
+  .toggle_on {
+    background-color: lightgray;
+    cursor: pointer;
+  }
+
+
+
+
   .profile-dropdown-content {
     display: none;
     position: relative;
@@ -284,16 +303,10 @@
   max-height: 150px;
 }
 
-.toggle_off {
-  background-color: gray;
-  cursor: pointer;
-}
-.toggle_on {
-  background-color: lightgray;
-  cursor: pointer;
-}
+
 .menubg {
-  padding: 30px;
+  display:flex;
+  justify-content: space-evenly;
 }
 #typebox {
   display: none;
