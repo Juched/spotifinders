@@ -373,13 +373,8 @@ def device_listener(socket):
                     # arrray of {added at: , track: } objecats
                     # track is {artists... album... uri...}
 
-<<<<<<< HEAD
                     # TO DO: Research liked song limitation. CAn only retrieve 50!
                     liked_songs_arr = spotify.current_user_saved_tracks(limit=100)[
-=======
-                    # TODO: Research liked song limitation. CAn only retrieve 50!
-                    liked_songs_arr = spotify.current_user_saved_tracks(limit=50)[
->>>>>>> button_correction
                         "items"
                     ]
 
