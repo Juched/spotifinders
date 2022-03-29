@@ -16,7 +16,7 @@
   .playlist-container {
     position: absolute;
     top: 8%;
-    left: 100% - 84%;
+    left: 16%;
   }
 
   .container {
@@ -101,8 +101,27 @@
     cursor: pointer;
   }
   .dropdown_option:hover{
-    background-color:rgba(103,103,103, 0.8)
+    background-color:rgba(103,103,103, 0.8);
   }
+
+  .dropdown_option.toggle_off:hover {
+    background-color:white
+  }
+  .dropdown_option.toggle_off:hover {
+    background-color:darkgray
+  }
+
+  .toggle_off {
+    cursor: pointer;
+  }
+  .toggle_on {
+    background-color: lightgray;
+    cursor: pointer;
+  }
+
+
+
+
   .profile-dropdown-content {
     display: none;
     position: relative;
@@ -136,7 +155,7 @@
   #custom_playlist_selector:hover .custom-p-dropdown-content {
     display: block;
   }
-  #playlist_selection_box {
+  .popup_box {
     position: fixed;
     top: 20%;
     left: 20%;
@@ -226,36 +245,28 @@
   }
 
 
-
+.webplayer_bkg {
+  background-color: rgba(103,103,103, 0.5);
+  border-radius: 25px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 500px;
+  padding: 20px;
+  text-align: center;
+}
 #playerbox {
-  display: flex;
+  position: absolute;
+  display: none;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  text-align: center;
-  background-color: rgba(103,103,103, 0.5);
-  position: absolute;
-  border-radius: 25px;
-  top: 45%;
-  left: 25%;
-  bottom: 15%;
-  right: 25%;
-  min-width: 200px;
-  padding: 20px;
 }
 #mask_player {
   position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(103,103,103, 0.8);
-  border-radius: 25px;
-  top: 45%;
-  left: 25%;
-  bottom: 15%;
-  right: 25%;
-  min-width: 200px;
-  text-align: center;
 }
 .unclickable {
   background-color: gray;
@@ -289,5 +300,14 @@
   min-width: 80px;
   margin: 0 5% 0 5%;
   border-radius: 1em;
+  max-height: 150px;
 }
 
+
+.menubg {
+  display:flex;
+  justify-content: space-evenly;
+}
+#typebox {
+  display: none;
+}

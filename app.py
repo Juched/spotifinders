@@ -266,7 +266,9 @@ def queue_song(cool_song, spotipy_manager=None):
         else:
             local_spotipy.start_playback()
 
-# Method that starts play
+# Method that obtains and plays the next song given the circumstances
+# Parameter idea_audio_features is the model's vector interpretation of the conversation
+# Parameter data is the JSON packet sent back from the websocket. Includes playlistID
 def next_song(ideal_audio_features, data):
     """queues a song based on the ideal audio features"""
     playlist_id = data["playlistID"]
@@ -277,6 +279,7 @@ def next_song(ideal_audio_features, data):
     if local_spotipy is not None and (
             local_spotipy.current_playback() is None
             or local_spotipy.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
+            #TODO: Maybe implement here to change if conversation is changed enough?
         ):
 
         songs = gather_song_set(playlist_id, ideal_audio_features, local_spotipy)
@@ -342,7 +345,16 @@ def device_listener(socket):
             data = json.loads(socket.receive())
             print(f"Transferring playback to device {data['device_id']}")
 
-            spotify.transfer_playback(device_id=data["device_id"])
+            try:
+                spotify.transfer_playback(device_id=data["device_id"])
+            except Exception as exe:
+                #TODO: Make this exception choose from "Liked" or "Discovery" mode
+                #TODO: Broaden this error of transferring playback. Possible glitch whenever user manually selects illegal song.
+                    #Try: frontend errors when illegal song
+                spotify.start_playback(
+                    device_id=data["device_id"], \
+                    uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']
+                )
 
             while True:
                 data = json.loads(socket.receive())
@@ -361,12 +373,17 @@ def device_listener(socket):
                     # arrray of {added at: , track: } objecats
                     # track is {artists... album... uri...}
 
+<<<<<<< HEAD
                     # TO DO: Research liked song limitation. CAn only retrieve 50!
                     liked_songs_arr = spotify.current_user_saved_tracks(limit=100)[
+=======
+                    # TODO: Research liked song limitation. CAn only retrieve 50!
+                    liked_songs_arr = spotify.current_user_saved_tracks(limit=50)[
+>>>>>>> button_correction
                         "items"
                     ]
 
-                    # TO DO: See if we should sample more than 20 liked songs.
+                    # TODO: See if we should sample more than 20 liked songs.
                     # Research what this does.
                     sampled_liked_songs = random.sample(liked_songs_arr, 20)
 
@@ -401,6 +418,8 @@ def device_listener(socket):
             # spotify.start_playback(device_id=device_id, \
             # uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7'])
             # Ideally, we start playing a song depending on what they want
+        else:
+            print(f"Error: spotify not loaded for user")
 
     except Exception as ex:
         print(f"Error: {ex}")

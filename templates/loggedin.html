@@ -36,8 +36,7 @@
             <button class="spotbutt" id="pDropdown"><img width="42" height="42" src="{{ purl }}" alt="me"> &nbsp {{ pname }} </button>
             <div class="profile-dropdown-content">
                 <div class="dropdown_option"><a href="/currently_playing">Whats playing</a></div>
-                <div class="dropdown_option" onclick="playSong('/start_playing')">Make a hardcoded specific song play</div>
-                <div class="dropdown_option" onclick="startPlayer()">start the player</div>
+                <div class="dropdown_option" id="debug_menu_selector" onclick="toggleDebugMenu(true)">Debug Menu</div>
                 <div class="dropdown_option"><a href="/sign_out">Sign Out</a></div>
             </div>
         </div>
@@ -60,7 +59,7 @@
 
 
 
-        <div id="playerbox">
+        <div id="playerbox" class="webplayer_bkg">
             <img id="album_art" src=""></img>
             <div id="song_title">No Current Song Playing</div>
             <div id="playback_buttons" class="spotbutt">
@@ -68,13 +67,17 @@
               <i id="pp_toggle" class="glyphicon glyphicon-play"></i>
               <i id="skip_forward" class="glyphicon glyphicon-step-forward"></i>
             </div>
+
+            <div id="typebox">
+                <input type="text" id="input_field">
+            </div>
         </div>
 
-        <div id="mask_player">
+        <div id="mask_player" class="webplayer_bkg">
             <button id="init_button" class="unclickable spotbutt" onclick="startPlayer()">Initialize Player</button>
         </div>
 
-        <div id="playlist_selection_box">
+        <div id="playlist_selection_box" class="popup_box">
             <div class="x_button" onclick="togglePlaylistMenu(false)">&#10006</div>
             <div class="titlebox">{{ pname }}'s playlists</div>
             <div class="scrollbar_container">
@@ -83,6 +86,26 @@
                 {% endfor %}
             </div>
         </div>
+
+        <div id="debug_selection_box" class="popup_box">
+            <div class="x_button" onclick="toggleDebugMenu(false)">&#10006</div>
+
+            <div class="titlebox">Player Status: <span id="debug_player_status">Not Connected</span></div>
+            <div class="menu_bg" id="debug_options_container">
+                <div class="menu_col">
+                    <div class="toggle_option toggle_off" id="type_toggle" onclick="toggleTypeMode()">Enable Type-In Mode</div>
+                    <div class="dropdown_option">Currently Playing</div>
+                </div>
+                <div class="menu_col">
+                    <div class="dropdown_option">Do something</div>
+                    <div class="dropdown_option">another thing</div>
+                </div>
+            </div>
+        </div>
+
+
+
+
 
         <div id="CURRENTLY_PLAYING" playlist_id="1" device_id=""></div>
 
@@ -96,7 +119,6 @@
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <script src="spotWebPlayer.js"> </script>
     <script src="{{url_for('static', filename='mockup.js')}}"></script>
-    <script src="{{url_for('static', filename='web_player.js')}}"></script>
     <script src="{{url_for('static', filename='vibrant.min.js')}}"></script>
     <script src="{{url_for('static', filename='blobs.js')}}"></script>
 
