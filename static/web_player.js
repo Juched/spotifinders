@@ -150,6 +150,7 @@ function makePlayer(socketMsg){
   player.connect().then(success => {
     if (success) {
       console.log('The Web Playback SDK successfully connected to Spotify!');
+      document.getElementById("debug_player_status").innerHTML = "Connected"
     }
   });
 }
