@@ -168,6 +168,7 @@ function startPlayer() {
       console.log("failed to get authtok. No player created");
     });
 
+    document.getElementById("playerbox").style.display = "flex"
     delMask()
     establishPlaylistLinks()
 

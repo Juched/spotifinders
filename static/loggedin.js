@@ -149,12 +149,15 @@ function toggleTypeMode(){
   button = document.getElementById("type_toggle");
 
   if(button.classList.contains("toggle_off")){
-    //button is off. turn it on.
+    //button is currently off. user is trying to turn it on.
+    //this code runs "turn on" code for button
     button.classList.remove("toggle_off");
     button.classList.add("toggle_on");
 
     document.getElementById("typebox").style.display = "block";
   } else {
+    //button is currently on. user is trying to turn it off.
+    //this code runs "turn off" code for button
     if (button.classList.contains("toggle_on")){
       button.classList.remove("toggle_on")
     }
