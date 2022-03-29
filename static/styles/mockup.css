@@ -17,6 +17,12 @@
     margin: 7%;
   }
 
+  #index_button {
+    position: absolute;
+    right: 7%;
+    top: 7%;
+  }
+
   .container {
     display: none;
     /* display from flex to none! this is the mic buton */
@@ -302,4 +308,19 @@
 }
 #typebox {
   display: none;
+
+  position: absolute;
+  top: 100%;
+  margin: 20px;
+  padding: 0px 50px 25px;
+  border-radius: 25px;
+  background-color: rgb(30,30,30);
+  color: white;
+  text-align: center;
+
+}
+#input_field {
+  width: 300px;
+  background-color: black;
+
 }
