@@ -127,12 +127,11 @@ def echo(socket):
     model = SpotifinderModel()
     while True:
         data = json.loads(socket.receive())
-        print(data)
+
         feature_dict = model.get_vector(data["text"])
 
         next_song(feature_dict, data)
-        print(feature_dict)
-        # print(data)
+
         socket.send(feature_dict)
 
 
@@ -163,20 +162,13 @@ def discover_song(audio_features, spotipy_manager=None):
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
     songs = None
-    print("discovery mode!")
+
     try:
 
-        # standard
         local_spotify = get_spotipy() if spotipy_manager is None else spotipy_manager
-        # return spotify.current_user_playlists()
 
-        # play a new song if the timer allows it
-        if local_spotify is not None and (
-            local_spotify.current_playback() is None
-            or local_spotify.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
-        ):
+        if local_spotify is not None:
 
-            # localSP.recommendation_genre_seeds(),  #'alternative', #, pop, alternative, indie'
             songs = local_spotify.recommendations(
                 seed_genres=["rock", "pop", "alternative", "indie", "rap"],
                 target_danceability=audio_features["danceability"],
@@ -184,17 +176,6 @@ def discover_song(audio_features, spotipy_manager=None):
                 target_valence=audio_features["valence"],
                 limit=100,
             )
-
-            # adds new suggest song to queue
-            # thing = songs["tracks"][0]["id"]
-            # local_spotify.add_to_queue(thing)
-
-            # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
-            # currently_playing() is not None:
-            # if local_spotify.current_playback() is not None:
-            #     local_spotify.next_track()
-            # else:
-            #     local_spotify.start_playback()
 
     except Exception as ex:
         print(f"Error: {ex}")
@@ -226,7 +207,6 @@ def find_closest_match(ideal_features, playlist_features):
             if ideal_id is None or min_norm is None or current_min < min_norm:
                 min_norm = current_min
                 ideal_id = single_track["id"]
-                print(ideal_id)
 
     except Exception as ex:
         print(f"Error: {ex}")
@@ -257,22 +237,17 @@ def filter_songs(songs, ideal_audio_features, spotipy_manager = None):
 
     audio_features = None
 
-
     # get the songs from the playlist
-    # tracks = local_spotipy.playlist(playlist_id)
 
     track_ids = []
 
-    for (song, i) in zip(songs, range(100)):
-        if i >= 0 and song is not None:
-            track_ids.append(song["track"]["uri"])
+    for (song) in songs[:100]:
+        if song is not None:
+            track_ids.append(dict(song)["track"]["uri"])
 
-    # print(track_ids)
     # get the audio features
     audio_features = local_spotipy.audio_features(tracks=track_ids)
 
-    # print('got audio features! print here:')
-    # print(audioFeatures)
     # find the closest match
     return find_closest_match(ideal_audio_features, audio_features)
 
@@ -297,7 +272,8 @@ def next_song(ideal_audio_features, data):
     playlist_id = data["playlistID"]
     local_spotipy = get_spotipy()
 
-
+    # TO DO to remove the song update timing when we get
+    #  the proper conversation tracking in place
     if local_spotipy is not None and (
             local_spotipy.current_playback() is None
             or local_spotipy.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
@@ -386,7 +362,7 @@ def device_listener(socket):
                     # track is {artists... album... uri...}
 
                     # TO DO: Research liked song limitation. CAn only retrieve 50!
-                    liked_songs_arr = spotify.current_user_saved_tracks(limit=50)[
+                    liked_songs_arr = spotify.current_user_saved_tracks(limit=100)[
                         "items"
                     ]
 
@@ -428,11 +404,6 @@ def device_listener(socket):
 
     except Exception as ex:
         print(f"Error: {ex}")
-
-
-# def start_play(tracks_array, spotify):
-#     """ starts the playback of a random song """
-#     song = tracks_array[random.randint(0,len(tracks_array)-1)]
 
 
 @app.route("/testplayer")
