@@ -93,7 +93,7 @@ function makePlayer(socketMsg){
   });
   // Ready
   player.addListener('ready', ({ device_id }) => {
-    sdk_id = device_id // set the global device_id variable 
+    sdk_id = device_id // set the global device_id variable
     console.log('Ready with Device ID', device_id, 'aka', sdk_id);
     document.getElementById("CURRENTLY_PLAYING").setAttribute("device_id",device_id)
 
@@ -120,7 +120,7 @@ function makePlayer(socketMsg){
   player.addListener('player_state_changed', (state) => {
     synchronizePlayer(state);
   });
-  player.addListener('initialization_error', ({ message }) => { 
+  player.addListener('initialization_error', ({ message }) => {
     console.error(message);
   });
 
@@ -154,24 +154,28 @@ function makePlayer(socketMsg){
   });
 }
 
+async function catchPlayerSocketError(err) {
 
+  console.log("failed to get authtok. No player created. Trying again");
 
+  await new Promise(r => setTimeout(r, 2000));
+
+  connect_webplayer_socket().then(function(socketMsg) {
+    makePlayer(socketMsg);
+  }).catch(catchPlayerSocketError);
+
+}
 
 function startPlayer() {
   // Waits for the socket to provide an auth code.
   if(isPlayerReady) {
+
     connect_webplayer_socket().then(function(socketMsg) {
       makePlayer(socketMsg);
-    }).catch(function(err) {
-      // error here (Socket never recieved the auth token)
-      console.log("failed to get authtok. No player created");
-    });
+    }).catch(catchPlayerSocketError); // TODO: Change recursive calls to iterative ones to avoid stack overflows
 
     delMask()
     establishPlaylistLinks()
-
-
-
 
   } else {
     //IF the player isn't ready yet.
