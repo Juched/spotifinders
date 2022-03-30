@@ -232,7 +232,7 @@ def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager = None):
             intermediate_songs = tracks["tracks"]["items"]
             songs = []
 
-            for (song) in intermediate_songs[:100]:
+            for song in intermediate_songs[:100]:
                 if song is not None:
                     songs.append(dict(song)["track"]["uri"])
 
