@@ -161,24 +161,20 @@ def discover_song(audio_features, spotipy_manager=None):
     """discovers a song from spotify"""
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
-    songs = None
+    songs = []
 
-    try:
+    local_spotify = get_spotipy() if spotipy_manager is None else spotipy_manager
 
-        local_spotify = get_spotipy() if spotipy_manager is None else spotipy_manager
+    tracks = local_spotify.recommendations(
+        seed_genres=["rock", "pop", "alternative", "indie", "rap"],
+        target_danceability=audio_features["danceability"],
+        target_energy=audio_features["energy"],
+        target_valence=audio_features["valence"],
+        limit=100,
+    )
 
-        if local_spotify is not None:
-
-            songs = local_spotify.recommendations(
-                seed_genres=["rock", "pop", "alternative", "indie", "rap"],
-                target_danceability=audio_features["danceability"],
-                target_energy=audio_features["energy"],
-                target_valence=audio_features["valence"],
-                limit=100,
-            )
-
-    except Exception as ex:
-        print(f"Error: {ex}")
+    for track in tracks['tracks']:
+        songs.append(track['uri'])
 
     return songs
 
@@ -217,33 +213,44 @@ def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager = None):
     """ Obtains a list of songs depending what playlist is selected """
     local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
-    if playlist_id in ["discover_mode", 1, "1"]: # OR WAHATEVER WE WANTED
-        songs = discover_song(ideal_audio_features, local_spotipy)
+    try:
 
-    elif playlist_id in ["discover_mode", 1, "liked_songs", "1"]:
-        songs = local_spotipy.current_user_saved_tracks(limit=100)
+        if playlist_id in ["discover_mode", 1]: # OR WAHATEVER WE WANTED
+            songs = discover_song(ideal_audio_features, local_spotipy)
 
-    else:
-        tracks = local_spotipy.playlist(playlist_id)
-        songs = tracks["tracks"]["items"]
+        elif playlist_id in ["liked_songs", "1"]:
+            tracks = dict(local_spotipy.current_user_saved_tracks(limit=50))
+            songs = []
+
+            for (song) in tracks['items']:
+                if song is not None:
+                    songs.append(dict(song)["track"]["uri"])
+
+        else:
+            # get the songs from the playlist
+            tracks = local_spotipy.playlist(playlist_id)
+            intermediate_songs = tracks["tracks"]["items"]
+            songs = []
+
+            for (song) in intermediate_songs[:100]:
+                if song is not None:
+                    songs.append(dict(song)["track"]["uri"])
+
+    except Exception as ex:
+        print(f"Error: {ex}")
+        songs = ['spotify:track:4uLU6hMCjMI75M1A2tKUQC']
+        # default list of songs if something goes wrong,
+        # nothing should so this should not really be used
 
     return songs
 
 
 
-def filter_songs(songs, ideal_audio_features, spotipy_manager = None):
+def filter_songs(track_ids, ideal_audio_features, spotipy_manager = None):
     """ filters down the possible set of songs to the ideal one, return best match """
     local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
     audio_features = None
-
-    # get the songs from the playlist
-
-    track_ids = []
-
-    for (song) in songs[:100]:
-        if song is not None:
-            track_ids.append(dict(song)["track"]["uri"])
 
     # get the audio features
     audio_features = local_spotipy.audio_features(tracks=track_ids)
@@ -259,8 +266,6 @@ def queue_song(cool_song, spotipy_manager=None):
     if cool_song is not None:
         local_spotipy.add_to_queue(cool_song)
 
-        # currently_playing() is not None:
-        # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
         if local_spotipy.current_playback() is not None:
             local_spotipy.next_track()
         else:
@@ -374,7 +379,7 @@ def device_listener(socket):
                     # track is {artists... album... uri...}
 
                     # TO DO: Research liked song limitation. CAn only retrieve 50!
-                    liked_songs_arr = spotify.current_user_saved_tracks(limit=100)[
+                    liked_songs_arr = spotify.current_user_saved_tracks(limit=50)[
                         "items"
                     ]
 
