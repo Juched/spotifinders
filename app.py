@@ -222,7 +222,7 @@ def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager = None):
             tracks = dict(local_spotipy.current_user_saved_tracks(limit=50))
             songs = []
 
-            for (song) in tracks['items']:
+            for song in tracks['items']:
                 if song is not None:
                     songs.append(dict(song)["track"]["uri"])
 
@@ -352,14 +352,17 @@ def device_listener(socket):
 
             try:
                 spotify.transfer_playback(device_id=data["device_id"])
-            except Exception as exe:
-                #TODO: Make this exception choose from "Liked" or "Discovery" mode
-                #TODO: Broaden this error of transferring playback. Possible glitch whenever user manually selects illegal song.
-                    #Try: frontend errors when illegal song
+            except Exception as ex:
+                # TODO: Make this exception choose from "Liked" or "Discovery" mode
+                # TODO: Broaden this error of transferring playback.
+                # Possible glitch whenever user manually selects illegal song.
+                # Try: frontend errors when illegal song
                 spotify.start_playback(
                     device_id=data["device_id"], \
                     uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']
                 )
+                print(f"Error: {ex}")
+
 
             while True:
                 data = json.loads(socket.receive())
@@ -419,7 +422,7 @@ def device_listener(socket):
             # uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7'])
             # Ideally, we start playing a song depending on what they want
         else:
-            print(f"Error: spotify not loaded for user")
+            print("Error: spotify not loaded for user")
 
     except Exception as ex:
         print(f"Error: {ex}")
