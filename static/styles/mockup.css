@@ -8,15 +8,19 @@
     background: black;
   }
 
-  .profile-container {
-    position: absolute;
-    top: 8%;
-    left: 84%;
+
+  #top_button_bar{
+    position:absolute;
+    display: flex;
+    justify-content: space-between;
+    width: -webkit-fill-available;
+    margin: 7%;
   }
-  .playlist-container {
+
+  #index_button {
     position: absolute;
-    top: 8%;
-    left: 16%;
+    right: 7%;
+    top: 7%;
   }
 
   .container {
@@ -55,13 +59,14 @@
     padding: 14px 32px;
     border-color: transparent;
     font-size : 20px;
+    height: 80px;
   }
 
   .btn {
     background-color: #1ED760;
   }
 
-  .round-button {
+  /* .round-button {
     width:10%;
   }
   .round-button-circle {
@@ -93,7 +98,7 @@
     font-size:1.2em;
     font-weight:bold;
     text-decoration:none;
-  }
+  } */
   .dropdown_option{
     margin: 4px 10px;
     font-weight: bold;
@@ -102,13 +107,6 @@
   }
   .dropdown_option:hover{
     background-color:rgba(103,103,103, 0.8);
-  }
-
-  .dropdown_option.toggle_off:hover {
-    background-color:white
-  }
-  .dropdown_option.toggle_off:hover {
-    background-color:darkgray
   }
 
   .toggle_off {
@@ -304,10 +302,25 @@
 }
 
 
-.menubg {
-  display:flex;
+.menu_bg {
+  display: flex;
   justify-content: space-evenly;
 }
 #typebox {
   display: none;
+
+  position: absolute;
+  top: 100%;
+  margin: 20px;
+  padding: 0px 50px 25px;
+  border-radius: 25px;
+  background-color: rgb(30,30,30);
+  color: white;
+  text-align: center;
+
+}
+#input_field {
+  width: 300px;
+  background-color: black;
+
 }

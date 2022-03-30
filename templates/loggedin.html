@@ -32,27 +32,27 @@
             </div>
         </div>
 
-        <div class="profile-dropdown profile-container">
-            <button class="spotbutt" id="pDropdown"><img width="42" height="42" src="{{ purl }}" alt="me"> &nbsp {{ pname }} </button>
-            <div class="profile-dropdown-content">
-                <div class="dropdown_option"><a href="/currently_playing">Whats playing</a></div>
-                <div class="dropdown_option" id="debug_menu_selector" onclick="toggleDebugMenu(true)">Debug Menu</div>
-                <div class="dropdown_option"><a href="/sign_out">Sign Out</a></div>
+        <div id="top_button_bar">
+            <div class="playlist-dropdown">
+                <button class="spotbutt" id="playlist_drop">Playlists</button>
+                <div class="playlist-dropdown-content">
+                    <div id="liked_songs_selector" class="dropdown_option">Liked Songs</div>
+                    <div id="discovery_selector" class="dropdown_option">Discover</div>
+                    <div id="custom_playlist_selector" class="dropdown_option" onclick="togglePlaylistMenu(true)">Custom Playlist</div>
+                    <!-- <div><a>Genre or smth idk</a></div> -->
+                </div>
             </div>
-        </div>
-
-
-
-        <div class="playlist-dropdown playlist-container">
-            <button class="spotbutt" id="playlist_drop">Playlists</button>
-            <div class="playlist-dropdown-content">
-                <div id="liked_songs_selector" class="dropdown_option">Liked Songs</div>
-                <div id="discovery_selector" class="dropdown_option">Discover</div>
-                <div id="custom_playlist_selector" class="dropdown_option" onclick="togglePlaylistMenu(true)">Custom Playlist</div>
-                <!-- <div><a>Genre or smth idk</a></div> -->
+            <div class="profile-dropdown">
+                <button class="spotbutt" id="pDropdown"><img width="42" height="42" src="{{ purl }}" alt="me"> &nbsp {{ pname }} </button>
+                <div class="profile-dropdown-content">
+                    <!-- <div class="dropdown_option"><a href="/currently_playing">Whats playing</a></div> -->
+                    <div class="dropdown_option" id="debug_menu_selector" onclick="toggleDebugMenu(true)">Debug Menu</div>
+                    <div class="dropdown_option"><a href="/sign_out">Sign Out</a></div>
+                </div>
             </div>
-        </div>
 
+            
+        </div>
 
 
 
@@ -67,11 +67,15 @@
               <i id="pp_toggle" class="glyphicon glyphicon-play"></i>
               <i id="skip_forward" class="glyphicon glyphicon-step-forward"></i>
             </div>
-
             <div id="typebox">
+                <div class="titlebox">Input custom speech here:</div>
                 <input type="text" id="input_field">
             </div>
         </div>
+
+
+
+
 
         <div id="mask_player" class="webplayer_bkg">
             <button id="init_button" class="unclickable spotbutt" onclick="startPlayer()">Initialize Player</button>
@@ -93,7 +97,7 @@
             <div class="titlebox">Player Status: <span id="debug_player_status">Not Connected</span></div>
             <div class="menu_bg" id="debug_options_container">
                 <div class="menu_col">
-                    <div class="toggle_option toggle_off" id="type_toggle" onclick="toggleTypeMode()">Enable Type-In Mode</div>
+                    <div class="dropdown_option toggle_off" id="type_toggle" onclick="toggleTypeMode()">Type In Mode: Off</div>
                     <div class="dropdown_option">Currently Playing</div>
                 </div>
                 <div class="menu_col">

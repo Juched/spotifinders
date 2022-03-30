@@ -155,6 +155,7 @@ function toggleTypeMode(){
     button.classList.add("toggle_on");
 
     document.getElementById("typebox").style.display = "block";
+    button.innerHTML = "Type In Mode: On";
   } else {
     //button is currently on. user is trying to turn it off.
     //this code runs "turn off" code for button
@@ -163,6 +164,8 @@ function toggleTypeMode(){
     }
     button.classList.add("toggle_off")
     document.getElementById("typebox").style.display = "none";
+    button.innerHTML = "Type In Mode: Off";
+
     
   }
 }
