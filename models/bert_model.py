@@ -2,11 +2,12 @@
 import string
 import os
 import yaml
-from yaml import Loader, Dumper
+from yaml import Loader
 import torch
 
-from models.nlp_model import NLPModel
 from transformers import BertTokenizer, BertModel
+
+from models.nlp_model import NLPModel
 
 
 class CamembertRegressor(torch.nn.Module):
@@ -39,15 +40,14 @@ class CamembertRegressor(torch.nn.Module):
         outputs = self.camembert.forward(
             input_ids=input_ids, attention_mask=attention_mask
         )
-        labels = []
         class_label_output = outputs[1]
         outputs = self.regressor(class_label_output)
         return outputs
 
     def do_nothing(self):
         """Does nothing"""
-        nothing = 1
-        return nothing
+        self.nothing = 1
+        return self.nothing
 
 
 class BERTModel(NLPModel):
@@ -62,7 +62,7 @@ class BERTModel(NLPModel):
         Returns:
             A BERT model
         """
-
+        self.eat = 0
         direc = os.path.dirname(__file__)
         filename = os.path.join(direc, "../cfg/config.yaml")
         with open(filename, "r", encoding="utf8") as file:
@@ -87,6 +87,7 @@ class BERTModel(NLPModel):
         Returns:
             example dict with attention mask and input ids as tensors
         """
+        self.eat = 1
         example["attention_mask"] = torch.Tensor([example["attention_mask"]]).long()
         example["input_ids"] = torch.Tensor([example["input_ids"]]).long()
         return example
