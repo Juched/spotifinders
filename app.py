@@ -10,9 +10,10 @@
 import os
 import uuid
 import random
-import requests
 import string
 import json
+
+import requests
 import numpy as np
 
 
@@ -123,12 +124,13 @@ def log():
     )  # map(json.dumps, uPlaylists))
 
 
-def getModelData(text: string):
-    r = requests.post(
-        "http://bert:5000/api/v1/bert",
+def get_model_data(text: string):
+    """Gets feature dictionary from NLP model"""
+    req = requests.post(
+        "http://bert:5000ction to /api/v1/bert",
         json={"text": text},
     )
-    return r.json()["vector"]
+    return req.json()["vector"]
 
 
 # called once for each thread
@@ -139,7 +141,7 @@ def echo(socket):
     while True:
         data = json.loads(socket.receive())
 
-        feature_dict = getModelData(data["text"])
+        feature_dict = get_model_data(data["text"])
 
         next_song(feature_dict, data)
 

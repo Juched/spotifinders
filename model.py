@@ -1,9 +1,6 @@
 """App module."""
-import os
-import numpy as np
 
-
-from flask import Flask, render_template, session, request, redirect, jsonify
+from flask import Flask, request, jsonify
 
 from models.bert_model import BERTModel
 
@@ -14,6 +11,7 @@ model = BERTModel()
 
 @app.route("/api/v1/bert", methods=["POST"])
 def bert():
+    """Route for BERT model"""
     vector = model.get_vector(request.json["text"])
     return jsonify({"vector": vector})
 
