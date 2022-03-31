@@ -1,6 +1,6 @@
 """NLP Model module."""
 from collections import Counter
-from typing import List
+# from typing import List
 
 
 from basic_regression_helper import Indexer, UnigramFeatureExtractor
@@ -10,8 +10,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from nlp_model import NLPModel
 import yaml
-from yaml import Loader, Dumper
-from collections import Counter
+from yaml import Loader
 
 
 def get_feature_vector(feature_counter: Counter, feature_extractor) -> np.ndarray:
@@ -53,8 +52,8 @@ class SpotifinderModel(NLPModel):
         self.loathing = 0
         self.rage = 0
         self.vigilance = 0
-        with open("../cfg/config.yaml", "r") as f:
-            config = yaml.load(f, Loader=Loader)
+        with open("../cfg/config.yaml", "r", encoding="utf8") as file:
+            config = yaml.load(file, Loader=Loader)
         self.ecstacy = config["ecstacy"]
         self.admiration = config["admiration"]
         self.terror = config["terror"]
