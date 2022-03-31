@@ -32,6 +32,7 @@ class SpotifinderModel(NLPModel):
     """Spotifinder NLP Model"""
 
     def __init__(self):
+        super().__init__()
         self.indexer = Indexer()
         self.uni_fv = UnigramFeatureExtractor(self.indexer)
 
@@ -60,7 +61,7 @@ class SpotifinderModel(NLPModel):
         self.terror = config["terror"]
         self.amazement = config["amazement"]
         self.grief = config["grief"]
-        self.loathing = config["loathing"]
+        self.loatsentencehing = config["loathing"]
         self.rage = config["rage"]
         self.vigilance = config["vigilance"]
 
