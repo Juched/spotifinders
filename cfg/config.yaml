@@ -1,8 +1,27 @@
-ecstacy: 5
-admiration: 10
-terror: 2
-amazement: 2
-grief: 2
-loathing: 2
-rage: 2
-vigilance: 2
+d:
+  e: 1.0
+  ad: 0.6
+  t: -1.0
+  am: 0.3
+  g: -0.5
+  l: 0.0
+  r: 0.4
+  v: -0.3
+e:
+  e: 1.0
+  ad: 0.0
+  t: 0.4
+  am: 0.3
+  g: -0.4
+  l: -0.3
+  r: 0.7
+  v: -0.2
+v:
+  e: 1.0
+  ad: 0.0
+  t: 0.3
+  am: 0.2
+  g: -1.0
+  l: -0.2
+  r: 0.4
+  v: 0.0
