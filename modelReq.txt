@@ -1,0 +1,11 @@
+transformers
+torch
+flask
+Flask-Session
+redis
+spotipy
+flask-sock
+gunicorn
+pandas
+scikit-learn
+pyyaml
