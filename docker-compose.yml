@@ -2,10 +2,19 @@ version: '2'
 services:
     web:
         env_file:
-        - .env
+            - .env
         build: .
         ports:
             - "5000:5000"
         volumes:
             - .:/code
-        
+    bert:
+        env_file:
+            - .env
+        build:
+            context: .
+            dockerfile: ModelDockerfile
+        ports:
+            - "3000:5000"
+        volumes:
+            - .:/code
