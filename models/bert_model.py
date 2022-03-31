@@ -40,12 +40,11 @@ class BERTModel(NLPModel):
         Returns:
             A BERT model
         """
-        with open("../cfg/config.yaml", "r") as f:
-            self.config = yaml.load(f, Loader=Loader)
 
-        self.model = torch.load("bin/bert.mod")
         direc = os.path.dirname(__file__)
         filename = os.path.join(direc, "../cfg/config.yaml")
+        with open(filename, "r") as f:
+            self.config = yaml.load(f, Loader=Loader)
 
         direc = os.path.dirname(__file__)
         filename = os.path.join(direc, "bin/bert.mod")
@@ -86,18 +85,19 @@ class BERTModel(NLPModel):
         tok_input = self.convert_to_t_n(tok_input)
         classes = self.model(tok_input["input_ids"], tok_input["attention_mask"])
         feature_dict = {"danceability": 0.0, "energy": 0.0, "valence": 0.0}
-        classes = classes.tolist()
-
+        classes = classes.tolist()[0]
+        print(f"Raw Classes = {classes}")
         # clamp so we don't get weird nums
-        for c in classes:
+        for idx, c in enumerate(classes):
             if c < 0:
-                c = 0.0
+                classes[idx] = 0.0
             elif c > 1:
-                c = 1.0
+                classes[idx] = 1.0
 
-            c = c - 0.5
-            c = c * 2
+            classes[idx] = c - 0.5
+            classes[idx] = c * 2
 
+        print(f"Clamped Classes = {classes}")
         # apply configs
         feature_dict["danceability"] = (
             (self.config["d"]["e"] * classes[0])
@@ -132,11 +132,12 @@ class BERTModel(NLPModel):
             + (self.config["v"]["v"] * classes[7])
         )
 
+        print(feature_dict)
         # clamp
         for k, v in feature_dict.items():
             if v < 0:
-                v = 0
+                feature_dict[k] = 0
             elif v > 1:
-                v = 1
+                feature_dict[k] = 1
 
         return feature_dict
