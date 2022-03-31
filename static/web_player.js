@@ -178,6 +178,7 @@ function startPlayer() {
     document.getElementById("playerbox").style.display = "flex"
     delMask()
     establishPlaylistLinks()
+    makeListenerSocket()
 
   } else {
     //IF the player isn't ready yet.
@@ -238,6 +239,43 @@ function establishPlaylistLinks(){
     };
   }
 
+}
+
+function makeListenerSocket(){
+  const socket = new WebSocket(ws_scheme + location.host + '/echo');
+
+  socket.addEventListener('message', ev => {
+    console.log('<<< ' + ev.data);
+  });
+
+  //when the socket opens, also initialize textbox functionality
+  socket.addEventListener('open', (event) => {
+    textbox = document.getElementById("input_field");
+    textbox.onkeyup = function (event) {
+      if (event.keyCode === 13) {
+        sendSpeechSocketUpdate(textbox.value);
+        textbox.value = "";
+      }
+    };
+  });
+  function sendSpeechSocketUpdate(text){
+    socketData = {};
+    socketData["text"] = text;
+    socketData["playlistID"] = document.getElementById("CURRENTLY_PLAYING").getAttribute("playlist_id");
+
+    //Set the "isNew" flag. If the User has selected a new playlist, we send back "true". Otherwise, we send back "False"
+    let isNew = false;
+    if(socketData["playlistID"] != currentPlaylistID){
+      console.log("User has switched playlists! exclaim new value on backend.")
+      isNew = true;
+      currentPlaylistID = socketData["playlistID"]
+    }
+
+    socketData["isNew"] = isNew
+    socketData["deviceID"] = document.getElementById("CURRENTLY_PLAYING").getAttribute("device_id");
+
+    socket.send(JSON.stringify(socketData))
+  }
 }
 
 
