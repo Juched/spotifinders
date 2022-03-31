@@ -30,6 +30,8 @@ class CamembertRegressor(torch.nn.Module):
             torch.nn.Dropout(drop_rate), torch.nn.Linear(d_in, d_out)
         )
 
+        self.nothing = None
+
     def forward(self, input_ids=None, attention_mask=None, labels=None):
         """
         Run the BERT model
@@ -46,7 +48,6 @@ class CamembertRegressor(torch.nn.Module):
 
     def do_nothing(self):
         """Does nothing"""
-        self.nothing = 1
         return self.nothing
 
 
