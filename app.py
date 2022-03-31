@@ -250,9 +250,8 @@ def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager=None):
                 if song is not None:
                     songs.append(dict(song)["track"]["uri"])
 
-
         print(local_spotipy.current_playback().keys())
-        curr_song = local_spotipy.current_playback()['uri']
+        curr_song = local_spotipy.current_playback()["item"]["uri"]
         if curr_song in songs:
             print(curr_song)
             songs.remove(curr_song)
