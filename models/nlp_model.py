@@ -32,3 +32,6 @@ class NLPModel(ABC):
             {'danceability': float, 'energy': float, 'valence': float}.
 
         """
+
+    def do_nothing(self):
+        """Do nothing"""
