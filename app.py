@@ -127,7 +127,7 @@ def log():
 def get_model_data(text: string):
     """Gets feature dictionary from NLP model"""
     req = requests.post(
-        "http://bert:5000ction to /api/v1/bert",
+        "http://bert:5000/api/v1/bert",
         json={"text": text},
     )
     return req.json()["vector"]
