@@ -46,8 +46,7 @@ class CamembertRegressor(torch.nn.Module):
 
     def do_nothing(self):
         """Does nothing"""
-        self.nothing = 1
-        return self.nothing
+        return None
 
 
 class BERTModel(NLPModel):
