@@ -30,6 +30,8 @@ class CamembertRegressor(torch.nn.Module):
             torch.nn.Dropout(drop_rate), torch.nn.Linear(d_in, d_out)
         )
 
+        self.nothing = None
+
     def forward(self, input_ids=None, attention_mask=None, labels=None):
         """
         Run the BERT model
@@ -40,14 +42,12 @@ class CamembertRegressor(torch.nn.Module):
         outputs = self.camembert.forward(
             input_ids=input_ids, attention_mask=attention_mask
         )
-        labels = []
         class_label_output = outputs[1]
         outputs = self.regressor(class_label_output)
         return outputs
 
     def do_nothing(self):
         """Does nothing"""
-        self.nothing = 1
         return self.nothing
 
 
@@ -118,8 +118,8 @@ class BERTModel(NLPModel):
             elif enum_class > 1:
                 classes[idx] = 1.0
 
-            classes[idx] = enum_class - 0.5
-            classes[idx] = enum_class * 2
+            # classes[idx] = enum_class - 0.5
+            # classes[idx] = enum_class * 2
 
         print(f"Clamped Classes = {classes}")
         # apply configs
