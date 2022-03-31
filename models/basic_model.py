@@ -1,5 +1,6 @@
 """NLP Model module."""
 from collections import Counter
+
 # from typing import List
 
 
@@ -105,17 +106,17 @@ class SpotifinderModel(NLPModel):
 
         self.valence_reg = LinearRegression().fit(x_train, y_train)
 
-    def get_vector(self, sentence: str) -> np.array:
+    def get_vector(self, text: str) -> np.array:
         """Get spotify vector for sentence."""
 
-        sentence = sentence.replace("\n", " ")
-        sentence = sentence.replace(".", " ")
-        sentence = sentence.replace(",", " ")
-        sentence = sentence.replace("(", " ")
-        sentence = sentence.replace(")", " ")
-        sentence = sentence.lower()
+        text = text.replace("\n", " ")
+        text = text.replace(".", " ")
+        text = text.replace(",", " ")
+        text = text.replace("(", " ")
+        text = text.replace(")", " ")
+        text = text.lower()
 
-        words = sentence.split(" ")
+        words = text.split(" ")
         counter = self.uni_fv.extract_features(words, False)
 
         feature_vector = get_feature_vector(counter, self.uni_fv)
