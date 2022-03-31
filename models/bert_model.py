@@ -117,8 +117,8 @@ class BERTModel(NLPModel):
             elif enum_class > 1:
                 classes[idx] = 1.0
 
-            classes[idx] = enum_class - 0.5
-            classes[idx] = enum_class * 2
+            # classes[idx] = enum_class - 0.5
+            # classes[idx] = enum_class * 2
 
         print(f"Clamped Classes = {classes}")
         # apply configs
