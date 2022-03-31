@@ -1,11 +1,31 @@
 """Class implementing BERT model"""
 import string
-from nlp_model import NLPModel
-from transformers import BertTokenizer
+import os
+from models.nlp_model import NLPModel
+from transformers import BertTokenizer, BertModel
 
 import yaml
 from yaml import Loader, Dumper
 import torch
+
+
+class CamembertRegressor(torch.nn.Module):
+    def __init__(self, drop_rate=0.2, freeze_camembert=False):
+        super(CamembertRegressor, self).__init__()
+        D_in, D_out = 768, 8
+
+        self.camembert = BertModel.from_pretrained("bert-base-uncased")
+        self.regressor = torch.nn.Sequential(
+            torch.nn.Dropout(drop_rate), torch.nn.Linear(D_in, D_out)
+        )
+
+    def forward(self, input_ids=None, attention_mask=None, labels=None):
+        outputs = self.camembert.forward(
+            input_ids=input_ids, attention_mask=attention_mask
+        )
+        class_label_output = outputs[1]
+        outputs = self.regressor(class_label_output)
+        return outputs
 
 
 class BERTModel(NLPModel):
@@ -24,9 +44,20 @@ class BERTModel(NLPModel):
             self.config = yaml.load(f, Loader=Loader)
 
         self.model = torch.load("bin/bert.mod")
+        direc = os.path.dirname(__file__)
+        filename = os.path.join(direc, "../cfg/config.yaml")
+
+        direc = os.path.dirname(__file__)
+        filename = os.path.join(direc, "bin/bert.mod")
+        device = torch.device("cpu")
+
+        self.model = CamembertRegressor(drop_rate=0.2)
+        self.model.load_state_dict(torch.load(filename, map_location=device))
+        self.model.eval()
         self.tokenizer = BertTokenizer.from_pretrained(
             "bert-base-uncased", do_lower_case=True
         )
+        print("Loaded model")
 
     def convert_to_t_n(self, example):
         """
@@ -35,8 +66,8 @@ class BERTModel(NLPModel):
         Returns:
             example dict with attention mask and input ids as tensors
         """
-        example["attention_mask"] = torch.Tensor([example["attention_mask"]])
-        example["input_ids"] = torch.Tensor([example["input_ids"]])
+        example["attention_mask"] = torch.Tensor([example["attention_mask"]]).long()
+        example["input_ids"] = torch.Tensor([example["input_ids"]]).long()
         return example
 
     def get_vector(self, text: string):
@@ -56,8 +87,8 @@ class BERTModel(NLPModel):
         classes = self.model(tok_input["input_ids"], tok_input["attention_mask"])
         feature_dict = {"danceability": 0.0, "energy": 0.0, "valence": 0.0}
         classes = classes.tolist()
-        
-        #clamp so we don't get weird nums
+
+        # clamp so we don't get weird nums
         for c in classes:
             if c < 0:
                 c = 0.0
@@ -67,7 +98,7 @@ class BERTModel(NLPModel):
             c = c - 0.5
             c = c * 2
 
-        #apply configs
+        # apply configs
         feature_dict["danceability"] = (
             (self.config["d"]["e"] * classes[0])
             + (self.config["d"]["ad"] * classes[1])
