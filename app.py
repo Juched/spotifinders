@@ -10,21 +10,25 @@
 import os
 import uuid
 import random
+import string
 import json
+
+import requests
 import numpy as np
 
 
 from flask import Flask, render_template, session, request, redirect
+
 # from spotipy.oauth2 import SpotifyClientCredentials
 
 import spotipy
 from flask_session import Session
 from flask_sock import Sock
 
-from nlp_model import SpotifinderModel
 
 app = Flask(__name__)
 sock = Sock(app)
+# model = BERTModel()
 
 app.config["SECRET_KEY"] = os.urandom(64)
 app.config["SESSION_TYPE"] = "filesystem"
@@ -120,15 +124,24 @@ def log():
     )  # map(json.dumps, uPlaylists))
 
 
+def get_model_data(text: string):
+    """Gets feature dictionary from NLP model"""
+    req = requests.post(
+        "http://bert:5000/api/v1/bert",
+        json={"text": text},
+    )
+    return req.json()["vector"]
+
+
 # called once for each thread
 @sock.route("/echo")
 def echo(socket):
     """websocket route to get the speech to throw in the model and then update a song"""
-    model = SpotifinderModel()
+
     while True:
         data = json.loads(socket.receive())
 
-        feature_dict = model.get_vector(data["text"])
+        feature_dict = get_model_data(data["text"])
 
         next_song(feature_dict, data)
 
@@ -173,8 +186,8 @@ def discover_song(audio_features, spotipy_manager=None):
         limit=100,
     )
 
-    for track in tracks['tracks']:
-        songs.append(track['uri'])
+    for track in tracks["tracks"]:
+        songs.append(track["uri"])
 
     return songs
 
@@ -209,20 +222,21 @@ def find_closest_match(ideal_features, playlist_features):
 
     return ideal_id  # some track id
 
-def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager = None):
-    """ Obtains a list of songs depending what playlist is selected """
+
+def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager=None):
+    """Obtains a list of songs depending what playlist is selected"""
     local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
     try:
 
-        if playlist_id in ["discover_mode", 1]: # OR WAHATEVER WE WANTED
+        if playlist_id in ["discover_mode", 1]:  # OR WAHATEVER WE WANTED
             songs = discover_song(ideal_audio_features, local_spotipy)
 
         elif playlist_id in ["liked_songs", "1"]:
             tracks = dict(local_spotipy.current_user_saved_tracks(limit=50))
             songs = []
 
-            for song in tracks['items']:
+            for song in tracks["items"]:
                 if song is not None:
                     songs.append(dict(song)["track"]["uri"])
 
@@ -238,16 +252,15 @@ def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager = None):
 
     except Exception as ex:
         print(f"Error: {ex}")
-        songs = ['spotify:track:4uLU6hMCjMI75M1A2tKUQC']
+        songs = ["spotify:track:4uLU6hMCjMI75M1A2tKUQC"]
         # default list of songs if something goes wrong,
         # nothing should so this should not really be used
 
     return songs
 
 
-
-def filter_songs(track_ids, ideal_audio_features, spotipy_manager = None):
-    """ filters down the possible set of songs to the ideal one, return best match """
+def filter_songs(track_ids, ideal_audio_features, spotipy_manager=None):
+    """filters down the possible set of songs to the ideal one, return best match"""
     local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
     audio_features = None
@@ -258,8 +271,9 @@ def filter_songs(track_ids, ideal_audio_features, spotipy_manager = None):
     # find the closest match
     return find_closest_match(ideal_audio_features, audio_features)
 
+
 def queue_song(cool_song, spotipy_manager=None):
-    """ takes the song given and queues and plays the song """
+    """takes the song given and queues and plays the song"""
     local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
     # add to queue
@@ -270,6 +284,7 @@ def queue_song(cool_song, spotipy_manager=None):
             local_spotipy.next_track()
         else:
             local_spotipy.start_playback()
+
 
 # Method that obtains and plays the next song given the circumstances
 # Parameter idea_audio_features is the model's vector interpretation of the conversation
@@ -282,10 +297,10 @@ def next_song(ideal_audio_features, data):
     # TO DO to remove the song update timing when we get
     #  the proper conversation tracking in place
     if local_spotipy is not None and (
-            local_spotipy.current_playback() is None
-            or local_spotipy.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
-            #TODO: Maybe implement here to change if conversation is changed enough?
-        ):
+        local_spotipy.current_playback() is None
+        or local_spotipy.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
+        # TODO: Maybe implement here to change if conversation is changed enough?
+    ):
 
         songs = gather_song_set(playlist_id, ideal_audio_features, local_spotipy)
         cool_song = filter_songs(songs, ideal_audio_features, local_spotipy)
@@ -358,11 +373,10 @@ def device_listener(socket):
                 # Possible glitch whenever user manually selects illegal song.
                 # Try: frontend errors when illegal song
                 spotify.start_playback(
-                    device_id=data["device_id"], \
-                    uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']
+                    device_id=data["device_id"],
+                    uris=["spotify:track:6AjOUvtWc4h6MY9qEcPMR7"],
                 )
                 print(f"Error: {ex}")
-
 
             while True:
                 data = json.loads(socket.receive())
