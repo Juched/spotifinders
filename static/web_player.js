@@ -178,6 +178,8 @@ function startPlayer() {
     document.getElementById("playerbox").style.display = "flex"
     delMask()
     establishPlaylistLinks()
+    recognition.start();
+
 
   } else {
     //IF the player isn't ready yet.
@@ -239,5 +241,6 @@ function establishPlaylistLinks(){
   }
 
 }
+
 
 

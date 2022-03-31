@@ -1,82 +1,21 @@
 """NLP Model module."""
 from collections import Counter
-from typing import List
+
+# from typing import List
+
+
+from basic_regression_helper import Indexer, UnigramFeatureExtractor
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
+from nlp_model import NLPModel
+import yaml
+from yaml import Loader
 
-class Indexer():
-    """Indexer class"""
-    def __init__(self):
-        self.objs_to_ints = {}
-        self.ints_to_objs = {}
-
-    def __repr__(self):
-        return str([str(self.get_object(i)) for i in range(0, len(self))])
-
-    def __str__(self):
-        return self.__repr__()
-
-    def __len__(self):
-        return len(self.objs_to_ints)
-
-    def get_object(self, index):
-        """Get object from index"""
-        if index not in self.ints_to_objs:
-            return None
-
-        return self.ints_to_objs[index]
-
-    def contains(self, obj):
-        """ Check if indexer contains object"""
-        return self.index_of(obj) != -1
-
-    def index_of(self, obj):
-        """Get index from object"""
-        if obj not in self.objs_to_ints:
-            return -1
-
-        return self.objs_to_ints[obj]
-
-    def add_and_get_index(self, obj, add=True):
-        """Add object to indexer and return index, \
-        additional param add determines whether object actually gets added"""
-        if not add:
-            return self.index_of(obj)
-        if obj not in self.objs_to_ints:
-            new_idx = len(self.objs_to_ints)
-            self.objs_to_ints[obj] = new_idx
-            self.ints_to_objs[new_idx] = obj
-        return self.objs_to_ints[obj]
-
-class UnigramFeatureExtractor():
-    """Unigram Feature extractor class"""
-    def __init__(self, indexer: Indexer):
-        self._indexer = indexer
-
-    def get_indexer(self) -> Indexer:
-        """Get indexer"""
-        return self._indexer
-
-    def extract_features(self, sentence: List[str], add_to_indexer: bool = False) -> Counter:
-        """Extract features from sentence and return counter"""
-
-        # Contains non-unique list of all unigrams parsed from the sentence
-        unigram_list: List[str] = []
-
-        for unigram in sentence:
-
-            index = self._indexer.add_and_get_index(unigram.lower(), add_to_indexer)
-
-            # If unigram didn't get added to the indexer (this occurs during the testing phase)
-            if index != -1:
-                unigram_list.append(unigram.lower())
-
-        return Counter(unigram_list)
 
 def get_feature_vector(feature_counter: Counter, feature_extractor) -> np.ndarray:
-    """"Helper function to create feature vector from feature counter"""
+    """ "Helper function to create feature vector from feature counter"""
 
     feature_vector = np.zeros(len(feature_extractor.get_indexer()) + 1)
 
@@ -88,35 +27,56 @@ def get_feature_vector(feature_counter: Counter, feature_extractor) -> np.ndarra
 
     return feature_vector
 
-class SpotifinderModel():
+
+class SpotifinderModel(NLPModel):
     """Spotifinder NLP Model"""
 
     def __init__(self):
+        super().__init__()
         self.indexer = Indexer()
         self.uni_fv = UnigramFeatureExtractor(self.indexer)
 
         # load lyric data
-        data = pd.DataFrame(pd.read_csv('lyric_data.csv'))
+        data = pd.DataFrame(pd.read_csv("lyric_data.csv"))
 
         # preprocess data
-        data.dropna(subset = ['lyrics'], inplace=True)
-        data = data.astype({"lyrics": str}, errors='raise')
+        data.dropna(subset=["lyrics"], inplace=True)
+        data = data.astype({"lyrics": str}, errors="raise")
 
         # filter lyrics
         lyrics = []
 
-        for song in data['lyrics'].tolist():
-            song = song.replace('\n', ' ')
-            song = song.replace('.', ' ')
-            song = song.replace(',', ' ')
-            song = song.replace('(', ' ')
-            song = song.replace(')', ' ')
+        self.ecstacy = 0
+        self.admiration = 0
+        self.terror = 0
+        self.amazement = 0
+        self.grief = 0
+        self.loathing = 0
+        self.rage = 0
+        self.vigilance = 0
+        with open("../cfg/config.yaml", "r", encoding="utf8") as file:
+            config = yaml.load(file, Loader=Loader)
+        self.ecstacy = config["ecstacy"]
+        self.admiration = config["admiration"]
+        self.terror = config["terror"]
+        self.amazement = config["amazement"]
+        self.grief = config["grief"]
+        self.loatsentencehing = config["loathing"]
+        self.rage = config["rage"]
+        self.vigilance = config["vigilance"]
+
+        for song in data["lyrics"].tolist():
+            song = song.replace("\n", " ")
+            song = song.replace(".", " ")
+            song = song.replace(",", " ")
+            song = song.replace("(", " ")
+            song = song.replace(")", " ")
             lyrics.append(song.lower())
 
         # get feature vectors
         counter_list = []
         for song in lyrics:
-            words = song.split(' ')
+            words = song.split(" ")
             counter = self.uni_fv.extract_features(words, True)
             counter_list.append(counter)
 
@@ -129,32 +89,35 @@ class SpotifinderModel():
         feat_matrix = np.array(feature_vector_list)
 
         # danceability model
-        x_train, _, y_train, _ = \
-            train_test_split(feat_matrix, data[['danceability']], test_size=0.25, random_state=44)
+        x_train, _, y_train, _ = train_test_split(
+            feat_matrix, data[["danceability"]], test_size=0.25, random_state=44
+        )
         self.dance_reg = LinearRegression().fit(x_train, y_train)
 
         # energy model
-        x_train, _, y_train, _ = \
-            train_test_split(feat_matrix, data[['energy']], test_size=0.30, random_state=44)
+        x_train, _, y_train, _ = train_test_split(
+            feat_matrix, data[["energy"]], test_size=0.30, random_state=44
+        )
         self.energy_reg = LinearRegression().fit(x_train, y_train)
 
         # valence model
-        x_train, _, y_train, _ = \
-            train_test_split(feat_matrix, data[['valence']], test_size=0.30, random_state=44)
+        x_train, _, y_train, _ = train_test_split(
+            feat_matrix, data[["valence"]], test_size=0.30, random_state=44
+        )
 
         self.valence_reg = LinearRegression().fit(x_train, y_train)
 
-    def get_vector(self, sentence: str) -> np.array:
+    def get_vector(self, text: str) -> np.array:
         """Get spotify vector for sentence."""
 
-        sentence = sentence.replace('\n', ' ')
-        sentence = sentence.replace('.', ' ')
-        sentence = sentence.replace(',', ' ')
-        sentence = sentence.replace('(', ' ')
-        sentence = sentence.replace(')', ' ')
-        sentence = sentence.lower()
+        text = text.replace("\n", " ")
+        text = text.replace(".", " ")
+        text = text.replace(",", " ")
+        text = text.replace("(", " ")
+        text = text.replace(")", " ")
+        text = text.lower()
 
-        words = sentence.split(' ')
+        words = text.split(" ")
         counter = self.uni_fv.extract_features(words, False)
 
         feature_vector = get_feature_vector(counter, self.uni_fv)
@@ -174,10 +137,11 @@ class SpotifinderModel():
             elif feat < 0.0:
                 output[i] = 0.0
 
-        return {'danceability': output[0], 'energy': output[1], 'valence': output[2]}
+        return {"danceability": output[0], "energy": output[1], "valence": output[2]}
 
     def do_nothing(self):
         """Do nothing."""
+
 
 if __name__ == "__main__":
 
@@ -233,7 +197,6 @@ if __name__ == "__main__":
             \n\
             Lately our conversations end like it's the last goodbye"
 
-
     print(model.get_vector(SENT_1))
     print(model.get_vector(SENT_2))
 
@@ -260,4 +223,6 @@ if __name__ == "__main__":
 
     print(model.get_vector("I feel really sad so bad today I'm hurt lonely"))
 
-    print(model.get_vector("Let's get turnt turnt up yeah lit boy let's go to town drive"))
+    print(
+        model.get_vector("Let's get turnt turnt up yeah lit boy let's go to town drive")
+    )

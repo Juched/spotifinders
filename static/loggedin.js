@@ -9,7 +9,7 @@ var SpeechRecognition = window.webkitSpeechRecognition ||
                         window.oSpeechRecognition ||
                         window.SpeechRecognition;
 
-var recognition = new SpeechRecognition();
+const recognition = new SpeechRecognition();
 
 recognition.addEventListener('end', () => recognition.start())
 recognition.onstart = function() {
@@ -29,7 +29,6 @@ recognition.onspeechend = function() {
 //Whenever user changes playlist, we see a discrepancy between this variable and the HTML storage.
 //When there is a discrepancy, this indicates recent playlist chnage. We have to tell the backend to start a different playlist.
 var currentPlaylistID = document.getElementById("CURRENTLY_PLAYING").getAttribute("playlist_id"); //should be 1 at start.
-
 
 
 var that = this;
@@ -52,7 +51,6 @@ recognition.onresult = function(event) {
     console.log(confidence)
 
 };
-recognition.start();
 
 //}
 
@@ -64,29 +62,26 @@ if (window.location.protocol == "https:") {
   var ws_scheme = "ws://"
 };
 
-const socket = new WebSocket(ws_scheme + location.host + '/echo');
 
+
+const socket = new WebSocket(ws_scheme + location.host + '/echo');
 
 socket.addEventListener('message', ev => {
   console.log('<<< ' + ev.data);
 });
-
 
 //when the socket opens, also initialize textbox functionality
 socket.addEventListener('open', (event) => {
   textbox = document.getElementById("input_field");
   textbox.onkeyup = function (event) {
     if (event.keyCode === 13) {
-      sendSpeechSocketUpdate(textbox.value);
+      toSend = textbox.value.replaceAll(/[^a-zA-Z !?]+/g, "");
+      console.log('Text sent: ' + toSend)
+      sendSpeechSocketUpdate(toSend);
       textbox.value = "";
     }
   };
 });
-
-
-
-
-
 function sendSpeechSocketUpdate(text){
   socketData = {};
   socketData["text"] = text;
@@ -105,6 +100,11 @@ function sendSpeechSocketUpdate(text){
 
   socket.send(JSON.stringify(socketData))
 }
+
+
+
+
+
 
 // julius.onrecognition = function(sentence) {
 //   console.log(sentence);
