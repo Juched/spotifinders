@@ -127,7 +127,7 @@ def getModelData(text: string):
         "http://bert:5000/api/v1/bert",
         json={"text": text},
     )
-    return r.json()
+    return r.json()['vector']
 
 
 # called once for each thread
@@ -139,13 +139,13 @@ def echo(socket):
         data = json.loads(socket.receive())
         print(data)
         feature_dict = getModelData(data["text"])
-        # print(feature_dict)
-        output = np.random.rand(3)
-        feature_dict = {
-            "danceability": output[0],
-            "energy": output[1],
-            "valence": output[2],
-        }
+        print(feature_dict)
+        # output = np.random.rand(3)
+        # feature_dict = {
+        #     "danceability": output[0],
+        #     "energy": output[1],
+        #     "valence": output[2],
+        # }
 
         queue_from_playlist(feature_dict, data)
 
