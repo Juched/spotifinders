@@ -1,16 +1,26 @@
 """Class implementing BERT model"""
 import string
 import os
-from models.nlp_model import NLPModel
-from transformers import BertTokenizer, BertModel
-
 import yaml
 from yaml import Loader, Dumper
 import torch
 
+from models.nlp_model import NLPModel
+from transformers import BertTokenizer, BertModel
+
 
 class CamembertRegressor(torch.nn.Module):
+    """
+    BERT model NN module
+    """
+
     def __init__(self, drop_rate=0.2, freeze_camembert=False):
+        """
+        This class implements BERT and runs it for text input.
+
+        Returns:
+            A BERT model
+        """
         super(CamembertRegressor, self).__init__()
         D_in, D_out = 768, 8
 
@@ -20,6 +30,12 @@ class CamembertRegressor(torch.nn.Module):
         )
 
     def forward(self, input_ids=None, attention_mask=None, labels=None):
+        """
+        Run the BERT model
+
+        Returns:
+            Output TENSOR
+        """
         outputs = self.camembert.forward(
             input_ids=input_ids, attention_mask=attention_mask
         )
@@ -43,8 +59,8 @@ class BERTModel(NLPModel):
 
         direc = os.path.dirname(__file__)
         filename = os.path.join(direc, "../cfg/config.yaml")
-        with open(filename, "r") as f:
-            self.config = yaml.load(f, Loader=Loader)
+        with open(filename, "r") as fi:
+            self.config = yaml.load(fi, Loader=Loader)
 
         direc = os.path.dirname(__file__)
         filename = os.path.join(direc, "bin/bert.mod")
@@ -88,14 +104,14 @@ class BERTModel(NLPModel):
         classes = classes.tolist()[0]
         print(f"Raw Classes = {classes}")
         # clamp so we don't get weird nums
-        for idx, c in enumerate(classes):
-            if c < 0:
+        for idx, cl in enumerate(classes):
+            if cl < 0:
                 classes[idx] = 0.0
-            elif c > 1:
+            elif cl > 1:
                 classes[idx] = 1.0
 
-            classes[idx] = c - 0.5
-            classes[idx] = c * 2
+            classes[idx] = cl - 0.5
+            classes[idx] = cl * 2
 
         print(f"Clamped Classes = {classes}")
         # apply configs
@@ -133,11 +149,11 @@ class BERTModel(NLPModel):
         )
 
         # clamp
-        for k, v in feature_dict.items():
-            if v < 0:
-                feature_dict[k] = 0
-            elif v > 1:
-                feature_dict[k] = 1
+        for kl, vl in feature_dict.items():
+            if vl < 0:
+                feature_dict[kl] = 0
+            elif vl > 1:
+                feature_dict[kl] = 1
 
         print(feature_dict)
 

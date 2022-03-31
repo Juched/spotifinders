@@ -18,7 +18,6 @@ class NLPModel(ABC):
             A Model
 
         """
-        pass
 
     @abstractmethod
     def get_vector(self, text: string):
@@ -33,4 +32,3 @@ class NLPModel(ABC):
             {'danceability': float, 'energy': float, 'valence': float}.
 
         """
-        pass
