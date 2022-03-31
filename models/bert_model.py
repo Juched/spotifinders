@@ -104,14 +104,14 @@ class BERTModel(NLPModel):
         classes = classes.tolist()[0]
         print(f"Raw Classes = {classes}")
         # clamp so we don't get weird nums
-        for idx, cl in enumerate(classes):
-            if cl < 0:
+        for idx, enum_class in enumerate(classes):
+            if enum_class < 0:
                 classes[idx] = 0.0
-            elif cl > 1:
+            elif enum_class > 1:
                 classes[idx] = 1.0
 
-            classes[idx] = cl - 0.5
-            classes[idx] = cl * 2
+            classes[idx] = enum_class - 0.5
+            classes[idx] = enum_class * 2
 
         print(f"Clamped Classes = {classes}")
         # apply configs
@@ -149,11 +149,11 @@ class BERTModel(NLPModel):
         )
 
         # clamp
-        for kl, vl in feature_dict.items():
-            if vl < 0:
-                feature_dict[kl] = 0
-            elif vl > 1:
-                feature_dict[kl] = 1
+        for the_key, the_value in feature_dict.items():
+            if the_value < 0:
+                feature_dict[the_key] = 0
+            elif the_value > 1:
+                feature_dict[the_key] = 1
 
         print(feature_dict)
 
