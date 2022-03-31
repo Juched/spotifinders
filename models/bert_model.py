@@ -14,7 +14,7 @@ class CamembertRegressor(torch.nn.Module):
     BERT model NN module
     """
 
-    def __init__(self, drop_rate=0.2, freeze_camembert=False):
+    def __init__(self, drop_rate=0.2):
         """
         This class implements BERT and runs it for text input.
 
@@ -22,11 +22,11 @@ class CamembertRegressor(torch.nn.Module):
             A BERT model
         """
         super(CamembertRegressor, self).__init__()
-        D_in, D_out = 768, 8
+        d_in, d_out = 768, 8
 
         self.camembert = BertModel.from_pretrained("bert-base-uncased")
         self.regressor = torch.nn.Sequential(
-            torch.nn.Dropout(drop_rate), torch.nn.Linear(D_in, D_out)
+            torch.nn.Dropout(drop_rate), torch.nn.Linear(d_in, d_out)
         )
 
     def forward(self, input_ids=None, attention_mask=None, labels=None):
@@ -39,9 +39,15 @@ class CamembertRegressor(torch.nn.Module):
         outputs = self.camembert.forward(
             input_ids=input_ids, attention_mask=attention_mask
         )
+        labels = []
         class_label_output = outputs[1]
         outputs = self.regressor(class_label_output)
         return outputs
+
+    def do_nothing(self):
+        """Does nothing"""
+        nothing = 1
+        return nothing
 
 
 class BERTModel(NLPModel):
@@ -59,8 +65,8 @@ class BERTModel(NLPModel):
 
         direc = os.path.dirname(__file__)
         filename = os.path.join(direc, "../cfg/config.yaml")
-        with open(filename, "r") as fi:
-            self.config = yaml.load(fi, Loader=Loader)
+        with open(filename, "r", encoding="utf8") as file:
+            self.config = yaml.load(file, Loader=Loader)
 
         direc = os.path.dirname(__file__)
         filename = os.path.join(direc, "bin/bert.mod")
