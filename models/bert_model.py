@@ -132,12 +132,13 @@ class BERTModel(NLPModel):
             + (self.config["v"]["v"] * classes[7])
         )
 
-        print(feature_dict)
         # clamp
         for k, v in feature_dict.items():
             if v < 0:
                 feature_dict[k] = 0
             elif v > 1:
                 feature_dict[k] = 1
+
+        print(feature_dict)
 
         return feature_dict
