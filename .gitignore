@@ -1,3 +1,5 @@
 .env
 .flask_session/*
 .spotify_caches/*
+.vscode/*
+models/bin/*
