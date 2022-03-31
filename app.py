@@ -127,12 +127,11 @@ def echo(socket):
     model = SpotifinderModel()
     while True:
         data = json.loads(socket.receive())
-        print(data)
+
         feature_dict = model.get_vector(data["text"])
 
-        queue_from_playlist(feature_dict, data)
-        print(feature_dict)
-        # print(data)
+        next_song(feature_dict, data)
+
         socket.send(feature_dict)
 
 
@@ -158,47 +157,26 @@ def get_spotipy():
 
 
 # using spotipy to get a close match
-def discover_song(audio_features):
+def discover_song(audio_features, spotipy_manager=None):
     """discovers a song from spotify"""
     # get black box list of audio features :)
     # danceability, valence, energy dictionary
-    thing = ""
-    print("discovery mode!")
-    try:
+    songs = []
 
-        # standard
-        local_spotify = get_spotipy()
-        # return spotify.current_user_playlists()
+    local_spotify = get_spotipy() if spotipy_manager is None else spotipy_manager
 
-        # play a new song if the timer allows it
-        if local_spotify is not None and (
-            local_spotify.current_playback() is None
-            or local_spotify.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
-        ):
+    tracks = local_spotify.recommendations(
+        seed_genres=["rock", "pop", "alternative", "indie", "rap"],
+        target_danceability=audio_features["danceability"],
+        target_energy=audio_features["energy"],
+        target_valence=audio_features["valence"],
+        limit=100,
+    )
 
-            # localSP.recommendation_genre_seeds(),  #'alternative', #, pop, alternative, indie'
-            songs = local_spotify.recommendations(
-                seed_genres=["rock", "pop", "alternative", "indie", "rap"],
-                target_danceability=audio_features["danceability"],
-                target_energy=audio_features["energy"],
-                target_valence=audio_features["valence"],
-            )
+    for track in tracks['tracks']:
+        songs.append(track['uri'])
 
-            # adds new suggest song to queue
-            thing = songs["tracks"][0]["id"]
-            local_spotify.add_to_queue(thing)
-
-            # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
-            # currently_playing() is not None:
-            if local_spotify.current_playback() is not None:
-                local_spotify.next_track()
-            else:
-                local_spotify.start_playback()
-
-    except Exception as ex:
-        print(f"Error: {ex}")
-
-    return thing
+    return songs
 
 
 def find_closest_match(ideal_features, playlist_features):
@@ -225,64 +203,95 @@ def find_closest_match(ideal_features, playlist_features):
             if ideal_id is None or min_norm is None or current_min < min_norm:
                 min_norm = current_min
                 ideal_id = single_track["id"]
-                print(ideal_id)
 
     except Exception as ex:
         print(f"Error: {ex}")
 
     return ideal_id  # some track id
 
+def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager = None):
+    """ Obtains a list of songs depending what playlist is selected """
+    local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
-# Method that starts play
-def queue_from_playlist(ideal_audio_features, data):
-    """queues a song based on the ideal audio features"""
-    playlist_id = data["playlistID"]
+    try:
 
-    if playlist_id in ["discover_mode", 1, "liked_songs", "1"]:
-        # In the case this is a new playlist, we don't need to recommend anything
-        # (as of right now). Just transfer playback
-        discover_song(ideal_audio_features)
-        return
+        if playlist_id in ["discover_mode", 1]: # OR WAHATEVER WE WANTED
+            songs = discover_song(ideal_audio_features, local_spotipy)
 
-    local_spotipy = get_spotipy()
+        elif playlist_id in ["liked_songs", "1"]:
+            tracks = dict(local_spotipy.current_user_saved_tracks(limit=50))
+            songs = []
+
+            for song in tracks['items']:
+                if song is not None:
+                    songs.append(dict(song)["track"]["uri"])
+
+        else:
+            # get the songs from the playlist
+            tracks = local_spotipy.playlist(playlist_id)
+            intermediate_songs = tracks["tracks"]["items"]
+            songs = []
+
+            for song in intermediate_songs[:100]:
+                if song is not None:
+                    songs.append(dict(song)["track"]["uri"])
+
+    except Exception as ex:
+        print(f"Error: {ex}")
+        songs = ['spotify:track:4uLU6hMCjMI75M1A2tKUQC']
+        # default list of songs if something goes wrong,
+        # nothing should so this should not really be used
+
+    return songs
+
+
+
+def filter_songs(track_ids, ideal_audio_features, spotipy_manager = None):
+    """ filters down the possible set of songs to the ideal one, return best match """
+    local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
+
     audio_features = None
 
+    # get the audio features
+    audio_features = local_spotipy.audio_features(tracks=track_ids)
+
+    # find the closest match
+    return find_closest_match(ideal_audio_features, audio_features)
+
+def queue_song(cool_song, spotipy_manager=None):
+    """ takes the song given and queues and plays the song """
+    local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
+
+    # add to queue
+    if cool_song is not None:
+        local_spotipy.add_to_queue(cool_song)
+
+        if local_spotipy.current_playback() is not None:
+            local_spotipy.next_track()
+        else:
+            local_spotipy.start_playback()
+
+# Method that obtains and plays the next song given the circumstances
+# Parameter idea_audio_features is the model's vector interpretation of the conversation
+# Parameter data is the JSON packet sent back from the websocket. Includes playlistID
+def next_song(ideal_audio_features, data):
+    """queues a song based on the ideal audio features"""
+    playlist_id = data["playlistID"]
+    local_spotipy = get_spotipy()
+
+    # TO DO to remove the song update timing when we get
+    #  the proper conversation tracking in place
     if local_spotipy is not None and (
-        local_spotipy.current_playback() is None
-        or local_spotipy.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
-    ):
-        # get the songs from the playlist
-        # tracks = localSP.playlist(playlistID, fields="tracks,next")
-        tracks = local_spotipy.playlist(playlist_id)
-        # print('Custom playlist!')
+            local_spotipy.current_playback() is None
+            or local_spotipy.current_playback()["progress_ms"] >= UPDATE_SONG_TIME_MS
+            #TODO: Maybe implement here to change if conversation is changed enough?
+        ):
 
-        # print(tracks)
-        track_ids = []
+        songs = gather_song_set(playlist_id, ideal_audio_features, local_spotipy)
+        cool_song = filter_songs(songs, ideal_audio_features, local_spotipy)
+        queue_song(cool_song, local_spotipy)
 
-        for (song, i) in zip(tracks["tracks"]["items"], range(100)):
-            if i >= 0 and song is not None:
-                track_ids.append(song["track"]["uri"])
-
-        print(track_ids)
-        # get the audio features
-        audio_features = local_spotipy.audio_features(tracks=track_ids)
-
-        # print('got audio features! print here:')
-        # print(audioFeatures)
-        # find the closest match
-        cool_song = find_closest_match(ideal_audio_features, audio_features)
-        # add to queue
-        if cool_song is not None:
-            local_spotipy.add_to_queue(cool_song)
-
-            # currently_playing() is not None:
-            # DOESN'T RETURN BOOL, BUT NOONE WILL TELL ME WHAT IT DOES RETURN AND I CANT TEST YET
-            if local_spotipy.current_playback() is not None:
-                local_spotipy.next_track()
-            else:
-                local_spotipy.start_playback()
-
-    return audio_features
+    return ideal_audio_features
 
 
 # gets the playlists name and IDs and returns them (easily replaceable for URIs too)
@@ -341,7 +350,19 @@ def device_listener(socket):
             data = json.loads(socket.receive())
             print(f"Transferring playback to device {data['device_id']}")
 
-            spotify.transfer_playback(device_id=data["device_id"])
+            try:
+                spotify.transfer_playback(device_id=data["device_id"])
+            except Exception as ex:
+                # TODO: Make this exception choose from "Liked" or "Discovery" mode
+                # TODO: Broaden this error of transferring playback.
+                # Possible glitch whenever user manually selects illegal song.
+                # Try: frontend errors when illegal song
+                spotify.start_playback(
+                    device_id=data["device_id"], \
+                    uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7']
+                )
+                print(f"Error: {ex}")
+
 
             while True:
                 data = json.loads(socket.receive())
@@ -365,7 +386,7 @@ def device_listener(socket):
                         "items"
                     ]
 
-                    # TO DO: See if we should sample more than 20 liked songs.
+                    # TODO: See if we should sample more than 20 liked songs.
                     # Research what this does.
                     sampled_liked_songs = random.sample(liked_songs_arr, 20)
 
@@ -400,14 +421,11 @@ def device_listener(socket):
             # spotify.start_playback(device_id=device_id, \
             # uris=['spotify:track:6AjOUvtWc4h6MY9qEcPMR7'])
             # Ideally, we start playing a song depending on what they want
+        else:
+            print("Error: spotify not loaded for user")
 
     except Exception as ex:
         print(f"Error: {ex}")
-
-
-# def start_play(tracks_array, spotify):
-#     """ starts the playback of a random song """
-#     song = tracks_array[random.randint(0,len(tracks_array)-1)]
 
 
 @app.route("/testplayer")
@@ -421,7 +439,7 @@ def test():
     playlist_id = "37i9dQZF1EUMDoJuT8yJsl"
 
     # return str(player(audioFeatures))
-    return str(queue_from_playlist(audio_features, playlist_id))
+    return str(next_song(audio_features, playlist_id))
 
 
 @app.route("/sign_out")

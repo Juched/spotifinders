@@ -150,6 +150,7 @@ function makePlayer(socketMsg){
   player.connect().then(success => {
     if (success) {
       console.log('The Web Playback SDK successfully connected to Spotify!');
+      document.getElementById("debug_player_status").innerHTML = "Connected"
     }
   });
 }
@@ -174,6 +175,7 @@ function startPlayer() {
       makePlayer(socketMsg);
     }).catch(catchPlayerSocketError); // TODO: Change recursive calls to iterative ones to avoid stack overflows
 
+    document.getElementById("playerbox").style.display = "flex"
     delMask()
     establishPlaylistLinks()
 
