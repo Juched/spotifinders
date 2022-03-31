@@ -10,6 +10,8 @@
 import os
 import uuid
 import random
+import requests
+import string
 import json
 import numpy as np
 
@@ -21,10 +23,10 @@ import spotipy
 from flask_session import Session
 from flask_sock import Sock
 
-from models.basic_model import SpotifinderModel
 
 app = Flask(__name__)
 sock = Sock(app)
+# model = BERTModel()
 
 app.config["SECRET_KEY"] = os.urandom(64)
 app.config["SESSION_TYPE"] = "filesystem"
@@ -120,18 +122,33 @@ def log():
     )  # map(json.dumps, uPlaylists))
 
 
+def getModelData(text: string):
+    r = requests.post(
+        "http://bert:5000/api/v1/bert",
+        json={"text": text},
+    )
+    return r.json()
+
+
 # called once for each thread
 @sock.route("/echo")
 def echo(socket):
     """websocket route to get the speech to throw in the model and then update a song"""
-    model = SpotifinderModel()
+
     while True:
         data = json.loads(socket.receive())
         print(data)
-        feature_dict = model.get_vector(data["text"])
+        feature_dict = getModelData(data["text"])
+        # print(feature_dict)
+        output = np.random.rand(3)
+        feature_dict = {
+            "danceability": output[0],
+            "energy": output[1],
+            "valence": output[2],
+        }
 
         queue_from_playlist(feature_dict, data)
-        print(feature_dict)
+
         # print(data)
         socket.send(feature_dict)
 
