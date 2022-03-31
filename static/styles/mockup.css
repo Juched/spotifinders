@@ -8,15 +8,19 @@
     background: black;
   }
 
-  .profile-container {
-    position: absolute;
-    top: 8%;
-    left: 84%;
+
+  #top_button_bar{
+    position:absolute;
+    display: flex;
+    justify-content: space-between;
+    width: -webkit-fill-available;
+    margin: 7%;
   }
-  .playlist-container {
+
+  #index_button {
     position: absolute;
-    top: 8%;
-    left: 100% - 84%;
+    right: 7%;
+    top: 7%;
   }
 
   .container {
@@ -55,13 +59,14 @@
     padding: 14px 32px;
     border-color: transparent;
     font-size : 20px;
+    height: 80px;
   }
 
   .btn {
     background-color: #1ED760;
   }
 
-  .round-button {
+  /* .round-button {
     width:10%;
   }
   .round-button-circle {
@@ -93,7 +98,7 @@
     font-size:1.2em;
     font-weight:bold;
     text-decoration:none;
-  }
+  } */
   .dropdown_option{
     margin: 4px 10px;
     font-weight: bold;
@@ -101,8 +106,20 @@
     cursor: pointer;
   }
   .dropdown_option:hover{
-    background-color:rgba(103,103,103, 0.8)
+    background-color:rgba(103,103,103, 0.8);
   }
+
+  .toggle_off {
+    cursor: pointer;
+  }
+  .toggle_on {
+    background-color: lightgray;
+    cursor: pointer;
+  }
+
+
+
+
   .profile-dropdown-content {
     display: none;
     position: relative;
@@ -136,7 +153,7 @@
   #custom_playlist_selector:hover .custom-p-dropdown-content {
     display: block;
   }
-  #playlist_selection_box {
+  .popup_box {
     position: fixed;
     top: 20%;
     left: 20%;
@@ -226,36 +243,28 @@
   }
 
 
-
+.webplayer_bkg {
+  background-color: rgba(103,103,103, 0.5);
+  border-radius: 25px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 500px;
+  padding: 20px;
+  text-align: center;
+}
 #playerbox {
-  display: flex;
+  position: absolute;
+  display: none;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  text-align: center;
-  background-color: rgba(103,103,103, 0.5);
-  position: absolute;
-  border-radius: 25px;
-  top: 45%;
-  left: 25%;
-  bottom: 15%;
-  right: 25%;
-  min-width: 200px;
-  padding: 20px;
 }
 #mask_player {
   position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(103,103,103, 0.8);
-  border-radius: 25px;
-  top: 45%;
-  left: 25%;
-  bottom: 15%;
-  right: 25%;
-  min-width: 200px;
-  text-align: center;
 }
 .unclickable {
   background-color: gray;
@@ -289,5 +298,29 @@
   min-width: 80px;
   margin: 0 5% 0 5%;
   border-radius: 1em;
+  max-height: 150px;
 }
 
+
+.menu_bg {
+  display: flex;
+  justify-content: space-evenly;
+}
+#typebox {
+  display: none;
+
+  position: absolute;
+  top: 100%;
+  margin: 20px;
+  padding: 0px 50px 25px;
+  border-radius: 25px;
+  background-color: rgb(30,30,30);
+  color: white;
+  text-align: center;
+
+}
+#input_field {
+  width: 300px;
+  background-color: black;
+
+}
