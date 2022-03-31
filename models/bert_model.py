@@ -40,7 +40,6 @@ class CamembertRegressor(torch.nn.Module):
         outputs = self.camembert.forward(
             input_ids=input_ids, attention_mask=attention_mask
         )
-        labels = []
         class_label_output = outputs[1]
         outputs = self.regressor(class_label_output)
         return outputs
