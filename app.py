@@ -250,6 +250,12 @@ def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager=None):
                 if song is not None:
                     songs.append(dict(song)["track"]["uri"])
 
+        print(local_spotipy.current_playback().keys())
+        curr_song = local_spotipy.current_playback()["item"]["uri"]
+        if curr_song in songs:
+            print(curr_song)
+            songs.remove(curr_song)
+
     except Exception as ex:
         print(f"Error: {ex}")
         songs = ["spotify:track:4uLU6hMCjMI75M1A2tKUQC"]
