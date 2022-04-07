@@ -8,6 +8,7 @@
 
 
 import os
+from threading import local
 import uuid
 import random
 import string
@@ -59,6 +60,7 @@ def session_cache_path():
 
 # update the song playing every 15 seconds
 UPDATE_SONG_TIME_MS = 15 * 1000
+WORDS_PER_SONG = 200
 
 # @app.route('/')
 # def index():
@@ -137,15 +139,24 @@ def get_model_data(text: string):
 @sock.route("/echo")
 def echo(socket):
     """websocket route to get the speech to throw in the model and then update a song"""
-
+    # TODO change from websocket to route
+    # TODO split test into different partitions
     while True:
+        songs = []
+
         data = json.loads(socket.receive())
 
-        feature_dict = get_model_data(data["text"])
+        words = data["text"].split(" ")
 
-        next_song(feature_dict, data)
+        candidate_text = [" ".join(words[i:i + WORDS_PER_SONG]) for i in range(0, len(words), WORDS_PER_SONG)]
 
-        socket.send(feature_dict)
+        for sample in candidate_text:
+            feature_dict = get_model_data(sample)
+
+            songs.append(next_song(feature_dict, data))
+
+        songs = [ s for s in songs is not None ]
+        socket.send(songs)
 
 
 # gets the Spotipy obj
@@ -283,7 +294,7 @@ def queue_song(cool_song, spotipy_manager=None):
     local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
     # add to queue
-    if cool_song is not None:
+    if cool_song is not None and local_spotipy is not None:
         local_spotipy.add_to_queue(cool_song)
 
         if local_spotipy.current_playback() is not None:
@@ -299,6 +310,7 @@ def next_song(ideal_audio_features, data):
     """queues a song based on the ideal audio features"""
     playlist_id = data["playlistID"]
     local_spotipy = get_spotipy()
+    cool_song = None
 
     # TO DO to remove the song update timing when we get
     #  the proper conversation tracking in place
@@ -310,9 +322,9 @@ def next_song(ideal_audio_features, data):
 
         songs = gather_song_set(playlist_id, ideal_audio_features, local_spotipy)
         cool_song = filter_songs(songs, ideal_audio_features, local_spotipy)
-        queue_song(cool_song, local_spotipy)
+        # queue_song(cool_song, local_spotipy)
 
-    return ideal_audio_features
+    return cool_song
 
 
 # gets the playlists name and IDs and returns them (easily replaceable for URIs too)
