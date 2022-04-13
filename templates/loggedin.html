@@ -50,14 +50,7 @@
                     <div class="dropdown_option"><a href="/sign_out">Sign Out</a></div>
                 </div>
             </div>
-
-            
         </div>
-
-
-
-
-
 
         <div id="playerbox" class="webplayer_bkg">
             <img id="album_art" src=""></img>
@@ -72,10 +65,6 @@
                 <input type="text" id="input_field">
             </div>
         </div>
-
-
-
-
 
         <div id="mask_player" class="webplayer_bkg">
             <button id="init_button" class="unclickable spotbutt" onclick="startPlayer()">Initialize Player</button>
@@ -107,13 +96,12 @@
             </div>
         </div>
 
-
-
-
-
         <div id="CURRENTLY_PLAYING" playlist_id="1" device_id=""></div>
 
         <div id="snackbar">Bottom Text</div>
+
+        <textarea id="text_box"></textarea>
+        <button onclick="buttonClick()">Get playlist</button>
 
     </body>
     <script src="{{url_for('static', filename='web_player.js')}}"></script>
