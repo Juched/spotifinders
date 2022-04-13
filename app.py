@@ -9,6 +9,7 @@
 
 import os
 from threading import local
+from typing import List
 import uuid
 import random
 import string
@@ -18,7 +19,7 @@ import requests
 import numpy as np
 
 
-from flask import Flask, render_template, session, request, redirect
+from flask import Flask, render_template, session, request, redirect, jsonify
 
 # from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -136,27 +137,34 @@ def get_model_data(text: string):
 
 
 # called once for each thread
-@sock.route("/echo")
-def echo(socket):
+@app.route('/book', methods = ['POST'])
+def book():
     """websocket route to get the speech to throw in the model and then update a song"""
-    # TODO change from websocket to route
-    # TODO split test into different partitions
-    while True:
-        songs = []
 
-        data = json.loads(socket.receive())
+    book_text = request.json['text']
 
-        words = data["text"].split(" ")
+    songs: List[str] = _text_to_songs(book_text)
 
-        candidate_text = [" ".join(words[i:i + WORDS_PER_SONG]) for i in range(0, len(words), WORDS_PER_SONG)]
+    data = {i: songs[i] for i in range(0, len(songs))}
 
-        for sample in candidate_text:
-            feature_dict = get_model_data(sample)
+    return data, 200
 
-            songs.append(next_song(feature_dict, data))
+def _text_to_songs(text) -> List[str]:
 
-        songs = [ s for s in songs is not None ]
-        socket.send(songs)
+    songs = []
+
+    words = text.split(" ")
+
+    candidate_text = [" ".join(words[i:i + WORDS_PER_SONG]) for i in range(0, len(words), WORDS_PER_SONG)]
+
+    for sample in candidate_text:
+        feature_dict = get_model_data(sample)
+
+        songs.append(next_song(feature_dict, {"playlistID": "discover_mode"}))
+
+    songs = list(filter(None, songs))
+
+    return songs
 
 
 # gets the Spotipy obj
@@ -261,7 +269,6 @@ def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager=None):
                 if song is not None:
                     songs.append(dict(song)["track"]["uri"])
 
-        print(local_spotipy.current_playback().keys())
         curr_song = local_spotipy.current_playback()["item"]["uri"]
         if curr_song in songs:
             print(curr_song)
