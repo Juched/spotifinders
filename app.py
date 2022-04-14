@@ -160,7 +160,7 @@ def _text_to_songs(text) -> List[str]:
     for sample in candidate_text:
         feature_dict = get_model_data(sample)
 
-        songs.append(next_song(feature_dict, {"playlistID": "discover_mode"}, songs))
+        songs.append(next_song(feature_dict, {"playlistID": "discover_mode"}))
 
     songs = list(filter(None, songs))
 
@@ -242,7 +242,7 @@ def find_closest_match(ideal_features, playlist_features):
     return ideal_id  # some track id
 
 
-def gather_song_set(playlist_id, ideal_audio_features, songs_already_found, spotipy_manager=None):
+def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager=None):
     """Obtains a list of songs depending what playlist is selected"""
     local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
@@ -269,11 +269,9 @@ def gather_song_set(playlist_id, ideal_audio_features, songs_already_found, spot
                 if song is not None:
                     songs.append(dict(song)["track"]["uri"])
 
-        # curr_song = local_spotipy.current_playback()["item"]["uri"]
-        # removes any songs aleady chosen for the playlist
-        for curr_song in songs_already_found:
-            # if curr_song in songs:
-                # print(curr_song)
+        curr_song = local_spotipy.current_playback()["item"]["uri"]
+        if curr_song in songs:
+            print(curr_song)
             songs.remove(curr_song)
 
     except Exception as ex:
@@ -315,7 +313,7 @@ def queue_song(cool_song, spotipy_manager=None):
 # Method that obtains and plays the next song given the circumstances
 # Parameter idea_audio_features is the model's vector interpretation of the conversation
 # Parameter data is the JSON packet sent back from the websocket. Includes playlistID
-def next_song(ideal_audio_features, data, songs_already_found):
+def next_song(ideal_audio_features, data):
     """queues a song based on the ideal audio features"""
     playlist_id = data["playlistID"]
     local_spotipy = get_spotipy()
@@ -329,7 +327,7 @@ def next_song(ideal_audio_features, data, songs_already_found):
         # TODO: Maybe implement here to change if conversation is changed enough?
     ):
 
-        songs = gather_song_set(playlist_id, ideal_audio_features, songs_already_found, local_spotipy)
+        songs = gather_song_set(playlist_id, ideal_audio_features, local_spotipy)
         cool_song = filter_songs(songs, ideal_audio_features, local_spotipy)
         # queue_song(cool_song, local_spotipy)
 
