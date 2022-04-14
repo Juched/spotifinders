@@ -1,326 +1,75 @@
-  a {
-    cursor: pointer;
-  }
-  body {
-    font-family: 'Alatsi', sans-serif;
-    margin: 0;
-    overflow: hidden;
-    background: black;
-  }
+/* Container needed to position the button. Adjust the width as needed */
+.container {
+  position: relative;
+  width: 50%;
+}
 
+/* Make the image responsive */
+.container img {
+  width: 100%;
+  height: auto;
+}
 
-  #top_button_bar{
-    position:absolute;
-    display: flex;
-    justify-content: space-between;
-    width: -webkit-fill-available;
-    margin: 7%;
-  }
-
-  #index_button {
-    position: absolute;
-    right: 7%;
-    top: 7%;
-  }
-
-  .container {
-    display: none;
-    /* display from flex to none! this is the mic buton */
-    justify-content: center;
-    align-items: center;
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-  }
-
-  .titlecontainer{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-right: -50%;
-    transform: translate(-50%, -50%) }
-
-  .title {
-    font-size: 10vw;
-    color: white;
-  }
-
-  canvas {
-    width: 100%;
-    height: 100%;
-  }
-
-  .spotbutt {
-    background-color: #1ED760;
-    border-radius: 500px;
-    padding: 14px 32px;
-    border-color: transparent;
-    font-size : 20px;
-    height: 80px;
-  }
-
-  .btn {
-    background-color: #1ED760;
-  }
-
-  /* .round-button {
-    width:10%;
-  }
-  .round-button-circle {
-    width: 100%;
-    height:0;
-    padding-bottom: 100%;
-    border-radius: 50%;
-    border:5px solid #a7afb9;
-    overflow:hidden;
-
-    background: #d3d3d3;
-    box-shadow: 0 0 3px gray;
-  }
-  .round-button-circle:hover {
-    background:#343638;
-  }
-  .round-button a {
-    display:block;
-    float:left;
-    width:100%;
-    padding-top:50%;
-    padding-bottom:50%;
-    line-height:1em;
-    margin-top:-0.5em;
-
-    text-align:center;
-    color:#e2eaf3;
-    font-family:Verdana;
-    font-size:1.2em;
-    font-weight:bold;
-    text-decoration:none;
-  } */
-  .dropdown_option{
-    margin: 4px 10px;
-    font-weight: bold;
-    padding: 10px;
-    cursor: pointer;
-  }
-  .dropdown_option:hover{
-    background-color:rgba(103,103,103, 0.8);
-  }
-
-  .toggle_off {
-    cursor: pointer;
-  }
-  .toggle_on {
-    background-color: lightgray;
-    cursor: pointer;
-  }
-
-
-
-
-  .profile-dropdown-content {
-    display: none;
-    position: relative;
-    background-color: #f9f9f9;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    border-radius: 10px;
-  }
-  .profile-dropdown:hover .profile-dropdown-content {
-    display: block;
-  }
-
-  .playlist-dropdown-content {
-    display: none;
-    position: relative;
-    background-color: #f9f9f9;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    border-radius: 10px;
-  }
-  .playlist-dropdown:hover .playlist-dropdown-content {
-    display: block;
-  }
-
-  .custom-p-dropdown-content {
-    display: none;
-    position: relative;
-    left: 100%;
-  }
-
-  #custom_playlist_selector:hover .custom-p-dropdown-content {
-    display: block;
-  }
-  .popup_box {
-    position: fixed;
-    top: 20%;
-    left: 20%;
-    height: 50%;
-    width: 60%;
-    background-color: rgb(22,22,22);
-    overflow: hidden;
-    display: none;
-
-  }
-  .titlebox{
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    padding: 20px;
-
-  }
-  .scrollbar_container{
-    Overflow-y:scroll;
-    margin: auto 5%;
-    height: 20em;
-  }
-  .x_button{
-    position: absolute;
-    top: 5px;
-    right: 8px;
-    font-size: x-large;
-    cursor: pointer;
-  }
-  .playlist_choice{
-    color: white;
-    cursor: pointer;
-    padding: 8px 0px;
-    border: solid #6E6E6E;
-    border-width: 2px 4px;
-    border-radius: 4px;
-    font-size: large;
-  }
-
-  .playlist_choice:hover{
-    background-color: gray;
-  }
-   /* The snackbar - position it at the bottom and in the middle of the screen */
-  #snackbar {
-    visibility: hidden; /* Hidden by default. Visible on click */
-    min-width: 250px; /* Set a default minimum width */
-    margin-left: -125px; /* Divide value of min-width by 2 */
-    background-color: #333; /* Black background color */
-    color: #fff; /* White text color */
-    text-align: center; /* Centered text */
-    border-radius: 2px; /* Rounded borders */
-    padding: 16px; /* Padding */
-    position: fixed; /* Sit on top of the screen */
-    z-index: 1; /* Add a z-index if needed */
-    left: 50%; /* Center the snackbar */
-    bottom: 30px; /* 30px from the bottom */
-  }
-
-  /* Show the snackbar when clicking on a button (class added with JavaScript) */
-  #snackbar.show {
-    visibility: visible; /* Show the snackbar */
-    /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
-    However, delay the fade out process for 2.5 seconds */
-    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-    animation: fadein 0.5s, fadeout 0.5s 2.5s;
-  }
-
-  /* Animations to fade the snackbar in and out */
-  @-webkit-keyframes fadein {
-    from {bottom: 0; opacity: 0;}
-    to {bottom: 30px; opacity: 1;}
-  }
-
-  @keyframes fadein {
-    from {bottom: 0; opacity: 0;}
-    to {bottom: 30px; opacity: 1;}
-  }
-
-  @-webkit-keyframes fadeout {
-    from {bottom: 30px; opacity: 1;}
-    to {bottom: 0; opacity: 0;}
-  }
-
-  @keyframes fadeout {
-    from {bottom: 30px; opacity: 1;}
-    to {bottom: 0; opacity: 0;}
-  }
-
-
-.webplayer_bkg {
-  background-color: rgba(103,103,103, 0.5);
-  border-radius: 25px;
+/* Style the button and place it in the middle of the container/image */
+.container .btns {
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  min-width: 500px;
-  padding: 20px;
-  text-align: center;
-}
-#playerbox {
-  position: absolute;
-  display: none;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-}
-#mask_player {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.unclickable {
-  background-color: gray;
-  cursor: wait;
+  -ms-transform: translate(-50%, -50%);
 }
 
-#song_title{
-  text-align: center;
-  background-color: rgba(10,10,10,0.7);
-  margin: 10px;
-  border-radius: 4px;
-  color: white;
-  font-weight: bold;
+.myclass {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.myclass + label {
+    font-size: 2em;
+    font-weight: 700;
+    color: white;
+    background-color: #1DB954;
+    border-radius: 1000px;
+    display: inline-block;
+    padding: 20px 20px 20px 20px;
+    border-color: #1DB954;
+    border: 2px solid #1DB954;
+}
+
+.myclass:focus + label,
+.myclass + label:hover {
+    background-color: white;
+    color: #1DB954;
+	
+}
+
+.pastebtn {
+    font-size: 2em;
+    font-weight: 700;
+    color: white;
+    background-color: #1DB954;
+    border-radius: 1000px;
+    display: inline-block;
+    padding: 20px 20px 20px 20px;
+    border-color: #1DB954;
+    border: 2px solid #1DB954;
+}
+
+.pastebtn:focus,
+.pastebtn:hover {
+    background-color: white;
+    color: #1DB954;
+}
+
+.pastepressed {
+  display: "none"
+}
+
+.center {
+  margin: auto;
   padding: 10px;
-}
-#playback_buttons {
-  display: flex;
-  justify-content: space-between;
-  width: 70%;
-}
-.glyphicon {
-  color: black;
-  font-size: 3em;
-}
-.glyphicon:hover{
-  color: rgb(50, 50, 50);
-}
-
-#album_art{
-  min-height: 80px;
-  min-width: 80px;
-  margin: 0 5% 0 5%;
-  border-radius: 1em;
-  max-height: 150px;
-}
-
-
-.menu_bg {
-  display: flex;
-  justify-content: space-evenly;
-}
-#typebox {
-  display: none;
-
-  position: absolute;
-  top: 100%;
-  margin: 20px;
-  padding: 0px 50px 25px;
-  border-radius: 25px;
-  background-color: rgb(30,30,30);
-  color: white;
-  text-align: center;
-
-}
-#input_field {
-  width: 300px;
-  background-color: black;
-
 }

@@ -3,3 +3,5 @@
 .spotify_caches/*
 .vscode/*
 models/bin/*
+/.vs/spotifinders/v16
+/__pycache__
