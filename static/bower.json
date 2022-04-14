@@ -1,6 +1,6 @@
 {
   "name": "spotifinders",
-  "description": "An app which  listens to your conversations and suggests music",
+  "description": "An app which gets input text and suggests playlists",
   "main": "index.js",
   "authors": [
     "Juched <prth.2000@gmail.com>"
