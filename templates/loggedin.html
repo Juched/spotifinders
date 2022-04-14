@@ -11,16 +11,106 @@
         <!-- Our js and stylesheet-->
 
 
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/bookFinderStyle.css') }}">
-
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/mockup.css') }}">
+        <script src="loggedin.js"></script>
         <!-- <script>const playlists = {{ user_playlists }}; </script> -->
 
     </head>
     <body>
-        <textarea id="text_box"></textarea>
-        <button onclick="buttonClick()">Get playlist</button>
+        <div class="container">
+            <div class="round-button" onclick="toggleMic()">
+                <div class="round-button-circle">
+                    <a class="round-button">
+                        <!-- <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg> -->
+                        <i id="mic_icon" class="material-icons-outlined" style="text-align: center; font-size: 35px; color: black;">mic_off</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="top_button_bar">
+            <div class="playlist-dropdown">
+                <button class="spotbutt" id="playlist_drop">Playlists</button>
+                <div class="playlist-dropdown-content">
+                    <div id="liked_songs_selector" class="dropdown_option">Liked Songs</div>
+                    <div id="discovery_selector" class="dropdown_option">Discover</div>
+                    <div id="custom_playlist_selector" class="dropdown_option" onclick="togglePlaylistMenu(true)">Custom Playlist</div>
+                    <!-- <div><a>Genre or smth idk</a></div> -->
+                </div>
+            </div>
+            <div class="profile-dropdown">
+                <button class="spotbutt" id="pDropdown"><img width="42" height="42" src="{{ purl }}" alt="me"> &nbsp {{ pname }} </button>
+                <div class="profile-dropdown-content">
+                    <!-- <div class="dropdown_option"><a href="/currently_playing">Whats playing</a></div> -->
+                    <div class="dropdown_option" id="debug_menu_selector" onclick="toggleDebugMenu(true)">Debug Menu</div>
+                    <div class="dropdown_option"><a href="/sign_out">Sign Out</a></div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div id="playerbox" class="webplayer_bkg">
+            <img id="album_art" src=""></img>
+            <div id="song_title">No Current Song Playing</div>
+            <div id="playback_buttons" class="spotbutt">
+              <i id="skip_backward" class="glyphicon glyphicon-step-backward"></i>
+              <i id="pp_toggle" class="glyphicon glyphicon-play"></i>
+              <i id="skip_forward" class="glyphicon glyphicon-step-forward"></i>
+            </div>
+            <div id="typebox">
+                <div class="titlebox">Input custom speech here:</div>
+                <input type="text" id="input_field">
+            </div>
+        </div>
+
+
+
+
+
+        <div id="mask_player" class="webplayer_bkg">
+            <button id="init_button" class="unclickable spotbutt" onclick="startPlayer()">Initialize Player</button>
+        </div>
+
+        <div id="playlist_selection_box" class="popup_box">
+            <div class="x_button" onclick="togglePlaylistMenu(false)">&#10006</div>
+            <div class="titlebox">{{ pname }}'s playlists</div>
+            <div class="scrollbar_container">
+                {% for playlistID in user_playlists.keys() %}
+                <div id={{playlistID}} class="playlist_choice">{{user_playlists[playlistID]}}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="debug_selection_box" class="popup_box">
+            <div class="x_button" onclick="toggleDebugMenu(false)">&#10006</div>
+
+            <div class="titlebox">Player Status: <span id="debug_player_status">Not Connected</span></div>
+            <div class="menu_bg" id="debug_options_container">
+                <div class="menu_col">
+                    <div class="dropdown_option toggle_off" id="type_toggle" onclick="toggleTypeMode()">Type In Mode: Off</div>
+                    <div class="dropdown_option">Currently Playing</div>
+                </div>
+                <div class="menu_col">
+                    <div class="dropdown_option">Do something</div>
+                    <div class="dropdown_option">another thing</div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <div id="CURRENTLY_PLAYING" playlist_id="1" device_id=""></div>
+
+        <div id="snackbar">Bottom Text</div>
 
     </body>
+    <script src="{{url_for('static', filename='web_player.js')}}"></script>
     <script src="{{ url_for('static', filename='bower_components/jquery/dist/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='bower_components/juliusjs/dist/julius.js') }}"></script>
     <script src="{{url_for('static', filename='loggedin.js')}}"></script>
