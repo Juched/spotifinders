@@ -8,6 +8,8 @@
 
 
 import os
+from threading import local
+from typing import List
 import uuid
 import random
 import string
@@ -17,7 +19,7 @@ import requests
 import numpy as np
 
 
-from flask import Flask, render_template, session, request, redirect
+from flask import Flask, render_template, session, request, redirect, jsonify
 
 # from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -59,6 +61,7 @@ def session_cache_path():
 
 # update the song playing every 15 seconds
 UPDATE_SONG_TIME_MS = 15 * 1000
+WORDS_PER_SONG = 200
 
 # @app.route('/')
 # def index():
@@ -134,18 +137,34 @@ def get_model_data(text: string):
 
 
 # called once for each thread
-@sock.route("/echo")
-def echo(socket):
+@app.route('/book', methods = ['POST'])
+def book():
     """websocket route to get the speech to throw in the model and then update a song"""
 
-    while True:
-        data = json.loads(socket.receive())
+    book_text = request.json['text']
 
-        feature_dict = get_model_data(data["text"])
+    songs: List[str] = _text_to_songs(book_text)
 
-        next_song(feature_dict, data)
+    data = {i: songs[i] for i in range(0, len(songs))}
 
-        socket.send(feature_dict)
+    return data, 200
+
+def _text_to_songs(text) -> List[str]:
+
+    songs = []
+
+    words = text.split(" ")
+
+    candidate_text = [" ".join(words[i:i + WORDS_PER_SONG]) for i in range(0, len(words), WORDS_PER_SONG)]
+
+    for sample in candidate_text:
+        feature_dict = get_model_data(sample)
+
+        songs.append(next_song(feature_dict, {"playlistID": "discover_mode"}, songs))
+
+    songs = list(filter(None, songs))
+
+    return songs
 
 
 # gets the Spotipy obj
@@ -223,7 +242,7 @@ def find_closest_match(ideal_features, playlist_features):
     return ideal_id  # some track id
 
 
-def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager=None):
+def gather_song_set(playlist_id, ideal_audio_features, songs_already_found, spotipy_manager=None):
     """Obtains a list of songs depending what playlist is selected"""
     local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
@@ -250,11 +269,12 @@ def gather_song_set(playlist_id, ideal_audio_features, spotipy_manager=None):
                 if song is not None:
                     songs.append(dict(song)["track"]["uri"])
 
-        print(local_spotipy.current_playback().keys())
-        curr_song = local_spotipy.current_playback()["item"]["uri"]
-        if curr_song in songs:
-            print(curr_song)
-            songs.remove(curr_song)
+        # curr_song = local_spotipy.current_playback()["item"]["uri"]
+        # removes any songs aleady chosen for the playlist
+        for curr_song in songs_already_found:
+            if curr_song in songs:
+                print(curr_song)
+                songs.remove(curr_song)
 
     except Exception as ex:
         print(f"Error: {ex}")
@@ -283,7 +303,7 @@ def queue_song(cool_song, spotipy_manager=None):
     local_spotipy = get_spotipy() if spotipy_manager is None else spotipy_manager
 
     # add to queue
-    if cool_song is not None:
+    if cool_song is not None and local_spotipy is not None:
         local_spotipy.add_to_queue(cool_song)
 
         if local_spotipy.current_playback() is not None:
@@ -295,10 +315,11 @@ def queue_song(cool_song, spotipy_manager=None):
 # Method that obtains and plays the next song given the circumstances
 # Parameter idea_audio_features is the model's vector interpretation of the conversation
 # Parameter data is the JSON packet sent back from the websocket. Includes playlistID
-def next_song(ideal_audio_features, data):
+def next_song(ideal_audio_features, data, songs_already_found):
     """queues a song based on the ideal audio features"""
     playlist_id = data["playlistID"]
     local_spotipy = get_spotipy()
+    cool_song = None
 
     # TO DO to remove the song update timing when we get
     #  the proper conversation tracking in place
@@ -308,11 +329,11 @@ def next_song(ideal_audio_features, data):
         # TODO: Maybe implement here to change if conversation is changed enough?
     ):
 
-        songs = gather_song_set(playlist_id, ideal_audio_features, local_spotipy)
+        songs = gather_song_set(playlist_id, ideal_audio_features, songs_already_found, local_spotipy)
         cool_song = filter_songs(songs, ideal_audio_features, local_spotipy)
-        queue_song(cool_song, local_spotipy)
+        # queue_song(cool_song, local_spotipy)
 
-    return ideal_audio_features
+    return cool_song
 
 
 # gets the playlists name and IDs and returns them (easily replaceable for URIs too)
