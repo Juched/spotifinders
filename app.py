@@ -159,10 +159,10 @@ def _text_to_songs(text) -> List[str]:
 
     for sample in candidate_text:
         feature_dict = get_model_data(sample)
+        new_song = next_song(feature_dict, {"playlistID": "discover_mode"}, songs)
+        songs.append(new_song)
 
-        songs.append(next_song(feature_dict, {"playlistID": "discover_mode"}, songs))
-
-    songs = list(filter(None, songs))
+    # songs = list(filter(None, songs))
 
     return songs
 
