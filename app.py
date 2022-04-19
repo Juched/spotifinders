@@ -272,9 +272,10 @@ def gather_song_set(playlist_id, ideal_audio_features, songs_already_found, spot
         # curr_song = local_spotipy.current_playback()["item"]["uri"]
         # removes any songs aleady chosen for the playlist
         for curr_song in songs_already_found:
-            if curr_song in songs:
-                print(curr_song)
-                songs.remove(curr_song)
+            songs = [song for song in songs if song.split(":")[-1] != curr_song]
+                # if song == curr_song.split(":")[-1]:
+                #     print(curr_song)
+                #     songs.slice(i)
 
     except Exception as ex:
         print(f"Error: {ex}")
