@@ -159,10 +159,10 @@ def _text_to_songs(text) -> List[str]:
 
     for sample in candidate_text:
         feature_dict = get_model_data(sample)
+        new_song = next_song(feature_dict, {"playlistID": "discover_mode"}, songs)
+        songs.append(new_song)
 
-        songs.append(next_song(feature_dict, {"playlistID": "discover_mode"}, songs))
-
-    songs = list(filter(None, songs))
+    # songs = list(filter(None, songs))
 
     return songs
 
@@ -272,9 +272,10 @@ def gather_song_set(playlist_id, ideal_audio_features, songs_already_found, spot
         # curr_song = local_spotipy.current_playback()["item"]["uri"]
         # removes any songs aleady chosen for the playlist
         for curr_song in songs_already_found:
-            if curr_song in songs:
-                print(curr_song)
-                songs.remove(curr_song)
+            songs = [song for song in songs if song.split(":")[-1] != curr_song]
+                # if song == curr_song.split(":")[-1]:
+                #     print(curr_song)
+                #     songs.slice(i)
 
     except Exception as ex:
         print(f"Error: {ex}")
