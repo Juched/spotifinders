@@ -1,16 +1,20 @@
 
-function myFunction() {
-  var x = document.getElementById("myDIV");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
+function toggleTextBox() {
+  var x = document.getElementById("inputTextContainer");
+  x.classList.toggle("off")
+}
+function closeMenu() {
+  var x = document.getElementById("inputTextContainer");
+  x.classList.add("off")
 }
 
-function buttonClick()
+function submitTextInBox()
 {
-  text_box_data = document.getElementById('text_box').value
+  text_box = document.getElementById('text_box')
+
+  text_box_data = text_box.value
+
+  text_box.value = ""
 
   let data = {text: text_box_data};
 
