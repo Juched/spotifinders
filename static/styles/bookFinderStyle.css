@@ -91,11 +91,31 @@
   transform: translate(-50%, -50%);
   background-color: black;
   color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .bckgMenu {
   position: absolute;
   width: 100%;
   height: 100%;
+  top: 0;
+  left: 0;
   background-color: rgba(10, 10, 10, 0.24)
+}
+
+.menuBtn {
+  color: darkgray;
+
+}
+
+.bottomButtons{
+  display: flex;
+  justify-content: space-around;
+}
+
+#text_box{
+  color: black;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }

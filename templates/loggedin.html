@@ -27,20 +27,23 @@
 			        <label for="file">Choose a file</label>
 		        </div>
 		        <div class="btn center">
-			        <button class="myclass" onclick="toggleTextBox()" id="text" >Enter text</button>
-			        <div id="inputTextContainer" class="off bckgMenu">
-                        <div class="centerMenu">
-                            <label for="inputtext">Enter Text:</label>
-                            <input type="text" id="text_box" name="name" size="100">
-                            <button onclick="closeMenu()">Close</button>
-                        </div>
-			        </div>
+			        <button onclick="toggleTextBox()" id="text">Enter text</button>
 		        </div>
 	        </div>
         </div>
+        <div id="inputTextContainer" class="off bckgMenu">
+            <div class="centerMenu">
+                <label for="inputtext">Enter Text:</label>
+                <textarea type="text" id="text_box" name="name" size="100">
+                <div class="bottomButtons">
+                    <button onclick="closeMenu()">Close</button>
+                    <button onclick="submitTextInBox()">Submit text</button>
+                </div>
+
+            </div>
+        </div>
 
 
-        <button onclick="submitTextInBox()">Submit text</button>
     </body>
 
     <script src="{{url_for('static', filename='web_player.js')}}"></script>
