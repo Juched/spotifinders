@@ -1,3 +1,6 @@
+/* Body */
+body {background-color: #388A56;}
+
 /* Container needed to position the button. Adjust the width as needed */
 .container {
   position: relative;
@@ -8,6 +11,13 @@
 .container img {
   width: 100%;
   height: auto;
+}
+
+/* Style the title */
+.title {
+  position: center;
+  font-size: 40px;
+  color: #1DB954;
 }
 
 /* Style the button and place it in the middle of the container/image */
@@ -47,28 +57,6 @@
 	
 }
 
-.pastebtn {
-    font-size: 2em;
-    font-weight: 700;
-    color: white;
-    background-color: #1DB954;
-    border-radius: 1000px;
-    display: inline-block;
-    padding: 20px 20px 20px 20px;
-    border-color: #1DB954;
-    border: 2px solid #1DB954;
-}
-
-.pastebtn:focus,
-.pastebtn:hover {
-    background-color: white;
-    color: #1DB954;
-}
-
-.pastepressed {
-  display: "none"
-}
-
 .center {
   margin: auto;
   padding: 10px;
@@ -102,12 +90,11 @@
   height: 100%;
   top: 0;
   left: 0;
-  background-color: rgba(10, 10, 10, 0.24)
+  background-color: rgba(10, 10, 10, 0.24);
 }
 
 .menuBtn {
   color: darkgray;
-
 }
 
 .bottomButtons{

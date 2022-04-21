@@ -1,5 +1,5 @@
 let playlist = null
-
+/* New functions */
 function toggleTextBox() {
   var x = document.getElementById("inputTextContainer");
   x.classList.toggle("off")

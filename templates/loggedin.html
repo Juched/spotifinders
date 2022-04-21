@@ -20,19 +20,31 @@
     </head>
     <body>
         <div class="container center">
-  	        <img src="https://images.unsplash.com/photo-1485990005353-9abcf694f3e7?crop=entropy&cs=srgb&fm=jpg&ixid=MnwxNDU4OXwwfDF8cmFuZG9tfHx8fHx8fHx8MTY0OTg4NTk5OQ&ixlib=rb-1.2.1&q=85" 
-	        alt="Snow"
-	        width="80%">
-	        <div class="btns">
-		        <div class="btn center">
-			        <input type="file" nam="file" id="file" class="myclass"/>
-			        <label for="file">Choose a file</label>
-		        </div>
-		        <div class="btn center">
-			        <button onclick="toggleTextBox()" id="text">Enter text</button>
-		        </div>
-	        </div>
+  	        <img src="https://images.samsung.com/is/image/samsung/p6pim/levant/ef-bt730pjegww/gallery/levant-galaxy-tab-s7-fe-bt730-ef-bt730pjegww-475250520?$720_576_PNG$" 
+                alt="Snow"
+                width="200%">
+            <div class="btns">
+                <h1 class="title">SPOTIFINDERS</h1>
+                </br></br></br>
+                <div class="btn center">
+                    <input type="file" nam="file" id="file" class="myclass"/>
+                    <label for="file">Choose a file</label>
+                </div>
+
+                <!-- Old text button div -->
+                <div class="btn center">
+                    <button class="myclass" onclick="myFunction()" id="text" >Paste Text</button>
+                    <label for="text">Enter Text</label>
+                    <div id="myDIV" style="display: none">
+                    </br>
+                    <label for="inputtext" style="display: none">Enter Text:</label>
+                    <input type="text" id="name" name="name" size="20" style="height:50px;">
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- New text button div -->
         <div id="inputTextContainer" class="off bckgMenu">
             <div class="centerMenu">
                 <label for="inputtext">Enter Text:</label>
@@ -60,6 +72,8 @@
         </div>
 
 
+        <button onclick="buttonClick()">Get playlist</button>
+        <button onclick="createPlaylist()">Create Playlist</button>
     </body>
 
     <script src="{{url_for('static', filename='web_player.js')}}"></script>
