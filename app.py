@@ -174,6 +174,7 @@ def setup_html_info(songs):
 
     try:
 
+<<<<<<< HEAD
         # for song in songs:
         #     curr_song = {}
         #     curr_song["id"] = song
@@ -198,6 +199,16 @@ def setup_html_info(songs):
             curr_song["album_art"] = song_info["album"]["images"][0]["url"]
             curr_song["artist"] = song_info["artists"][0]["name"]
 
+=======
+        for song in songs:
+            curr_song = {}
+            curr_song["id"] = song
+
+            song_info = local_spotipy.track(song) # INEFFICIENT
+
+            curr_song["album_art"] = song_info["album"]["images"][0]["url"]
+            curr_song["name"] = song_info["name"]
+>>>>>>> 39677d84949d79bb49a8b652414c91d261390291
 
             return_songs.append(curr_song)
 
@@ -207,7 +218,10 @@ def setup_html_info(songs):
         curr_song["id"] = "4uLU6hMCjMI75M1A2tKUQC"
         curr_song["name"] = "Never Gonna Give You Up"
         curr_song["album_art"] = "https://i.scdn.co/image/ab67616d0000b273255e131abc1410833be95673"
+<<<<<<< HEAD
         curr_song["artist"] = "Rick Astley"
+=======
+>>>>>>> 39677d84949d79bb49a8b652414c91d261390291
 
         return_songs.append(curr_song)
 
