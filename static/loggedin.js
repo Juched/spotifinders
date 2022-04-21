@@ -18,6 +18,8 @@ function submitTextInBox()
 
   let data = {text: text_box_data};
 
+  closeMenu();
+
   fetch("http://localhost:5000/book", {
      method: "POST",
      headers: {'Content-Type': 'application/json'},
@@ -29,4 +31,6 @@ function submitTextInBox()
   }).catch(error => {
      console.log(error);
   });
+
+
 }
