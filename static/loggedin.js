@@ -1,4 +1,4 @@
-
+/* New functions */
 function toggleTextBox() {
   var x = document.getElementById("inputTextContainer");
   x.classList.toggle("off")
@@ -6,6 +6,16 @@ function toggleTextBox() {
 function closeMenu() {
   var x = document.getElementById("inputTextContainer");
   x.classList.add("off")
+}
+
+/* Old functions */
+function myFunction() {
+  var x = document.getElementById("myDIV");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
 }
 
 function submitTextInBox()
