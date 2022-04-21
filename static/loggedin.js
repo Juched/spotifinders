@@ -18,11 +18,8 @@ function submitTextInBox()
 
   let data = {text: text_box_data};
 
-<<<<<<< HEAD
   closeMenu();
 
-=======
->>>>>>> 39677d84949d79bb49a8b652414c91d261390291
   fetch("http://localhost:5000/book", {
      method: "POST",
      headers: {'Content-Type': 'application/json'},
@@ -34,9 +31,6 @@ function submitTextInBox()
   }).catch(error => {
      console.log(error);
   });
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 39677d84949d79bb49a8b652414c91d261390291
 }
