@@ -9,6 +9,11 @@ function closeMenu() {
   x.classList.add("off")
 }
 
+function togglePlaylistMenu(){
+  var x = document.getElementById("generated-playlist-container");
+  x.classList.toggle("off")
+}
+
 function submitTextInBox()
 {
   text_box = document.getElementById('text_box')
@@ -30,6 +35,39 @@ function submitTextInBox()
   }).then(jsonRes => {
      console.log(jsonRes);
      playlist = jsonRes;
+
+
+     let songContainer = document.getElementById('generated-playlists');
+
+     for (song in jsonRes){
+      let songDiv = document.createElement("div");
+      songDiv.classList.add("songBox");
+
+      let album_art = document.createElement("img");
+      album_art.setAttribute("src",song.album_art);
+      album_art.classList.add("album-art");
+
+
+      let nameDiv = document.createElement("div");
+      nameDiv.innerText = song.name;
+      nameDiv.classList.add("song-name");
+
+      let artistDiv = document.createElement("div");
+      artistDiv.innerText = song.artist;
+      artistDiv.classList.add("artist-name");
+
+      songDiv.appendChild(album_art);
+      songDiv.appendChild(nameDiv);
+      songDiv.appendChild(artistDiv);
+
+      songContainer.appendChild(songDiv);
+     }
+     togglePlaylistMenu();
+
+
+
+
+
 
     
 
