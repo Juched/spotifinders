@@ -44,7 +44,7 @@ SPOTIPY_REDIRECT_URI = os.environ["SPOTIPY_REDIRECT_URI"]
 SPOTIPY_OATH_SCOPE = (
     "user-library-read playlist-read-private user-top-read "
     "user-read-currently-playing user-read-playback-state streaming "
-    "user-modify-playback-state"
+    "user-modify-playback-state playlist-modify-public"
 )
 
 SEED_GENRES = ["rock", "pop", "alternative", "indie", "rap"]
@@ -148,6 +148,27 @@ def book():
     data = {i: songs[i] for i in range(0, len(songs))}
 
     return data, 200
+
+
+@app.route('/create_playlist', methods = ['POST'])
+def create_playlist():
+
+    song_dict = request.json
+
+    song_id_list = [song_dict[song_idx]["id"] for song_idx in song_dict]
+
+    local_spotify = get_spotipy()
+
+    user_id = local_spotify.current_user()["id"]
+
+    playlist_dict = local_spotify.user_playlist_create(user_id, "Book Playlist")
+
+    playlist_id = playlist_dict["id"]
+
+    local_spotify.user_playlist_add_tracks(user_id, playlist_id, song_id_list)
+
+    return({0: f"{playlist_dict['external_urls']['spotify']}"})
+
 
 def _text_to_songs(text) -> List[str]:
 
