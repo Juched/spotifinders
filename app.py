@@ -189,7 +189,7 @@ def setup_html_info(songs):
 
         the_songs = local_spotipy.tracks(tracks=songs) # INEFFICIENT
 
-        for song_info in the_songs:
+        for song_info in the_songs["tracks"]:
             curr_song = {}
             curr_song["id"] = song_info["id"]
 
