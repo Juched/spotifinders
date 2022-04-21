@@ -17,29 +17,27 @@ function togglePlaylistMenu(){
 function submitTextInBox()
 {
   text_box = document.getElementById('text_box')
-
   text_box_data = text_box.value
-
   text_box.value = ""
-
   let data = {text: text_box_data};
 
   closeMenu();
 
   fetch("http://localhost:5000/book", {
-     method: "POST",
-     headers: {'Content-Type': 'application/json'},
-     body: JSON.stringify(data)
+    method: "POST",
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
   }).then(res => {
-     return res.json();
+    return res.json();
   }).then(jsonRes => {
-     console.log(jsonRes);
-     playlist = jsonRes;
+    console.log(jsonRes);
+    playlist = jsonRes;
+      
 
-
-     let songContainer = document.getElementById('generated-playlists');
-
-     for (song in jsonRes){
+    let songContainer = document.getElementById('generated-playlists');
+      songContainer.innerHTML = "";
+    for (var song in jsonRes){
+      console.log("PRINGINT STUFF " + song);
       let songDiv = document.createElement("div");
       songDiv.classList.add("songBox");
 
@@ -61,8 +59,8 @@ function submitTextInBox()
       songDiv.appendChild(artistDiv);
 
       songContainer.appendChild(songDiv);
-     }
-     togglePlaylistMenu();
+    }
+    togglePlaylistMenu();
 
 
 
