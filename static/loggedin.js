@@ -33,25 +33,25 @@ function submitTextInBox()
     console.log(jsonRes);
     playlist = jsonRes;
       
-
+    console.log(jsonRes['0'])
     let songContainer = document.getElementById('generated-playlists');
       songContainer.innerHTML = "";
     for (var song in jsonRes){
-      console.log("PRINGINT STUFF " + song);
+      console.log("PRINGINT STUFF " + jsonRes[song]['name']);
       let songDiv = document.createElement("div");
       songDiv.classList.add("songBox");
 
       let album_art = document.createElement("img");
-      album_art.setAttribute("src",song.album_art);
+      album_art.setAttribute("src",jsonRes[song]['album_art']);
       album_art.classList.add("album-art");
 
 
       let nameDiv = document.createElement("div");
-      nameDiv.innerText = song.name;
+      nameDiv.innerText = jsonRes[song]['name'];
       nameDiv.classList.add("song-name");
 
       let artistDiv = document.createElement("div");
-      artistDiv.innerText = song.artist;
+      artistDiv.innerText = jsonRes[song]['artist'];
       artistDiv.classList.add("artist-name");
 
       songDiv.appendChild(album_art);

@@ -109,10 +109,11 @@ body {background-color: #388A56;}
 }
 
 .songBox{
-
+  display:flex;
+  justify-content: space-between;
 }
 .album-art{
-
+  width: 50px;
 }
 .artist-name{
 
