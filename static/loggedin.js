@@ -1,3 +1,5 @@
+let playlist = null
+
 function buttonClick()
 {
   text_box_data = document.getElementById('text_box').value
@@ -12,9 +14,30 @@ function buttonClick()
      return res.json();
   }).then(jsonRes => {
      console.log(jsonRes);
+     playlist = jsonRes;
   }).catch(error => {
      console.log(error);
   });
+}
+
+function createPlaylist()
+{
+  if (playlist != null)
+  {
+    fetch("http://localhost:5000/create_playlist", {
+      method: "POST",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(playlist)
+    }).then(res => {
+      return res.json();
+   }).then(jsonRes => {
+      console.log(jsonRes[0]);
+   }).catch(error => {
+      console.log(error);
+   });
+
+    playlist = null;
+  }
 }
 
 
