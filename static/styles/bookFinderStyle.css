@@ -113,6 +113,7 @@
 .bottomButtons{
   display: flex;
   justify-content: space-around;
+  color: black;
 }
 
 #text_box{

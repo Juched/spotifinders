@@ -40,12 +40,25 @@
                 <div class="bottomButtons">
                     <button onclick="closeMenu()">Close</button>
                     <button onclick="submitTextInBox()">Submit text</button>
+                    <button onclick="createPlaylist()">Create Playlist</button>
+
                 </div>
 
             </div>
         </div>
-        <button onclick="buttonClick()">Get playlist</button>
-        <button onclick="createPlaylist()">Create Playlist</button>
+        <div id="generated-playlist-container" class="off bckgMenu">
+            <div class="centerMenu">
+                <button onclick="closeMenu()">Close</button>
+                <div id="generated-playlists">
+                    <div id="exampleSong" class="songBox">
+                        <img src="" alt="album art" class="album-art"></img>
+                        <div class="song-name">Song</div>
+                        <div class="album-name"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
     </body>
 

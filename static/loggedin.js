@@ -30,6 +30,9 @@ function submitTextInBox()
   }).then(jsonRes => {
      console.log(jsonRes);
      playlist = jsonRes;
+
+    
+
   }).catch(error => {
      console.log(error);
   });
