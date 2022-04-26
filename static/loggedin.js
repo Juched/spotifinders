@@ -61,18 +61,29 @@ function submitTextInBox()
       songContainer.appendChild(songDiv);
     }
     togglePlaylistMenu();
-
-
-
-
-
-
-    
+    document.getElementById("creation").style.display = "";
 
   }).catch(error => {
      console.log(error);
   });
 }
+
+document.getElementById('file').addEventListener('change', function() {
+  console.log('hi')
+  var fr=new FileReader();
+  // fr.onload=function(){
+  //     document.getElementById('output')
+  //             .textContent=fr.result;
+  // }
+    
+  let x = fr.readAsText(this.files[0]);
+  console.log(x);
+})
+
+
+
+
+
 
 function createPlaylist()
 {
@@ -92,5 +103,6 @@ function createPlaylist()
 
     playlist = null;
   }
+  document.getElementById("creation").style.display = "none";
 }
 
